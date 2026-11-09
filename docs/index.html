@@ -247,13 +247,17 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
   <p>The other masks keep forest (the habitat map of swissEO VHI or the swissTLM3D forest), conifer, mixed or broadleaf
     forest (Forest Type NFI 2023, ETH tree species), single tree species (ETH) or all vegetation. They are described, with their sources, in
     <a href="#vis-veg">Vegetation masks</a>. Masks also apply to statistics, downloads and the timelapse.</p>
+  <div class="tip"><b>Tip:</b> for conifer, mixed or broadleaf forest, a slider with two handles sets where one class ends
+    and the next begins (30 % and 85 % of broadleaf trees by default). Move a handle and let go: the map follows. For
+    single tree species of the ETH map, tick the species you want, or use <i>All conifers</i> / <i>All broadleaves</i>.</div>
 
   <h2 id="t6"><span class="n">6</span>Read the value of a pixel</h2>
   <p>Click the <b>Pixel inspector</b> button (the (i) with a mouse pointer, at the top of the map) to switch it on: it turns
     blue. Then click on the map. A box shows the
     values at that spot: the position, the reflectance of every band, the index value of the layer, the cloud and
     terrain information, the forest / vegetation mask, the swissTLM3D forest class, the broadleaf probability of Forest
-    Type NFI and the Nutzungsflächen category. Click the button again to switch it off.</p>
+    Type NFI, the broadleaf share and dominant tree species of the ETH map and the Nutzungsflächen category. Click the
+    button again to switch it off.</p>
   <figure><img src="img/pixel-inspector.jpg" alt="Pixel inspector showing band and NDVI values" width="1400" height="900">
     <figcaption><b>Fig. 6</b> The pixel inspector on a field: band values (stored number and reflectance), the NDVI, the
     masks at this spot and the parcel of the Nutzungsflächen (arable land, peas, code 537).</figcaption></figure>
@@ -351,8 +355,8 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
     <li><b>Clouds</b> and <b>Cloud shadows</b>: the cloud mask delivered with each swissEO mosaic (thick and thin cloud,
       cloud shadow);</li>
     <li><b>Terrain shadow</b>: the slopes in the shadow of the terrain at the time of the acquisition;</li>
-    <li><b>Vegetation mask</b>: keeps forest, all vegetation, broadleaf or conifer forest, or chosen categories of the
-      agricultural land use (next section);</li>
+    <li><b>Vegetation mask</b>: keeps forest, all vegetation, conifer, mixed or broadleaf forest, chosen tree species, or
+      chosen categories of the agricultural land use (next section);</li>
     <li><b>Custom mask</b>: your own polygons (see <a href="#vis-mask">Custom masks</a>).</li>
   </ul>
 
@@ -385,7 +389,7 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
       <td>The same three classes and slider (30 / 85 %) on the <b>broadleaf share of the basal area</b>: a share, not a
       probability as in Forest Type NFI, so the limits are not directly comparable. The 3 × 3 mean covers 3 × 3 pixels of
       30 m (90 m). Only the forest pixels of the ETH map, without a further forest mask.</td>
-      <td rowspan="2"><a href=\"https://arxiv.org/abs/2611.08095\" target="_blank" rel="noopener">ETH tree species</a>, Zhou et al. 2026
+      <td rowspan="2"><a href="https://arxiv.org/abs/2611.08095" target="_blank" rel="noopener">ETH tree species</a>, Zhou et al. 2026
       (ETH Zürich, preprint arXiv:2611.08095), 30 m, trained on National Forest Inventory plots; licence CC BY-NC 4.0
       (non-commercial use only)</td></tr>
     <tr><td>ETH tree species (30 m): Dominant tree species</td>
@@ -402,7 +406,7 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
       of the Federal Office for Agriculture (BLW), from the data of the cantons, map service of the federal geoportal
       (metadata on geocat.ch)</td></tr>
   </table>
-  <figure><img src="img/mask-lfi.jpg" alt="NDVI of the Sihlwald restricted to broadleaf forest, with the threshold slider and the forest mask" width="1400" height="900">
+  <figure><img src="img/mask-lfi.jpg" alt="NDVI of the Sihlwald restricted to mixed forest, with the two-handle slider and the forest mask" width="1400" height="900">
     <figcaption><b>Fig. 11</b> NDVI of the Sihlwald and the Albis on 13 August 2026, restricted to mixed forest of Forest
     Type NFI 2023 (probability of broadleaf trees 30 to 85 %, mean of 3 × 3 pixels, within the habitat map forest). The
     slider with two handles sets both limits.</figcaption></figure>
@@ -423,7 +427,8 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
       <a href="#tools-spec">spectral explorer</a>, the downloads and the timelapse; the change report gives the masked
       area in hectares.</li>
     <li>The <a href="#tools-insp">pixel inspector</a> shows at every spot the habitat map, the swissTLM3D forest class,
-      the broadleaf probability and the Nutzungsflächen category, whichever mask is chosen.</li>
+      the broadleaf probability (Forest Type NFI), the broadleaf share and dominant tree species (ETH) and the
+      Nutzungsflächen category, whichever mask is chosen; with a leaf type mask also the class at the current limits.</li>
   </ul>
 
   <h3 id="vis-mask">Custom masks: your own geometries</h3>
@@ -581,8 +586,9 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
   <h3 id="tools-insp">Pixel inspector</h3>
   <p>Switch it on at the top of the map and click a spot. For the satellite layers it shows the band values (stored
     number and reflectance), the index value, the scene classification, cloud and terrain mask, the habitat map of the
-    date (forest, vegetation), the swissTLM3D forest class, the broadleaf probability of Forest Type NFI and the
-    Nutzungsflächen category; for the swissEO products the product value. See <a href="#t6">Fig. 6</a>.</p>
+    date (forest, vegetation), the swissTLM3D forest class, the broadleaf probability of Forest Type NFI, the broadleaf
+    share and dominant tree species of the ETH map and the Nutzungsflächen category; for the swissEO products the product
+    value. See <a href="#t6">Fig. 6</a>.</p>
 
   <h3 id="tools-exp">Image download</h3>
   <figure><img src="img/image-download.jpg" alt="Image download dialog, Analytical tab" width="460" height="828" style="max-width:460px">
@@ -615,7 +621,7 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
   <h2 id="share"><span class="n">3</span>Sharing and feedback</h2>
   <h3>Links</h3>
   <p>The address bar is updated with every change: place, date, cloud filter, configuration and layer, the open layer
-    menu, colour scale, masks (also the vegetation mask with its classes, categories or threshold), effects, the compare
+    menu, colour scale, masks (also the vegetation mask with its classes, categories, limits or tree species), effects, the compare
     list, the WMS / WMTS layer, the basemap and labels, the area of interest and the 3D view (tilt, direction, height
     model and vertical scaling). The <b>Copy link</b> button (chain icon) copies it. Links use Swiss coordinates (LV95)
     for the map centre, as map.geo.admin.ch does.</p>
@@ -656,7 +662,7 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
     <tr><td>Forest Type NFI 2023</td><td>Vegetation mask (conifer, mixed, broadleaf forest), pixel inspector</td>
       <td><a href="https://doi.org/10.16904/1000001.7" target="_blank" rel="noopener">WSL (Waser et al. 2025), doi:10.16904/1000001.7</a></td></tr>
     <tr><td>ETH tree species (30 m)</td><td>Vegetation mask (conifer, mixed, broadleaf forest; dominant tree species), pixel inspector</td>
-      <td><a href=\"https://arxiv.org/abs/2611.08095\" target="_blank" rel="noopener">ETH Zürich (Zhou et al. 2026), arXiv:2611.08095, CC BY-NC 4.0</a></td></tr>
+      <td><a href="https://arxiv.org/abs/2611.08095" target="_blank" rel="noopener">ETH Zürich (Zhou et al. 2026), arXiv:2611.08095, CC BY-NC 4.0</a></td></tr>
     <tr><td>Nutzungsflächen</td><td>Vegetation mask (13 main categories of the agricultural land use), pixel inspector</td>
       <td><a href="https://www.geocat.ch/datahub/dataset/ae183bc4-5c91-467e-89bc-85f390340efb" target="_blank" rel="noopener">BLW and the cantons, metadata on geocat.ch</a></td></tr>
     <tr><td>Basemaps, labels, place search</td><td>Background maps, names on the map, Go to Place</td>
@@ -681,6 +687,9 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
       Edge, switch on <i>Use graphics acceleration when available</i>. Layers of other map services can only be shown
       when the service allows access from other websites (CORS).</li>
     <li>The Nutzungsflächen mask is read at high resolution: for a very large view or area it asks you to zoom in.</li>
+    <li>The ETH tree species maps have 30 m pixels (each 10 m cell takes the pixel under its centre) and are licensed
+      CC BY-NC 4.0: non-commercial use only, with attribution. Their broadleaf share is a share of the basal area, the
+      Forest Type NFI value a probability: the same limits do not mean the same.</li>
     <li>Areas of interest can have up to 100,000 vertices and files up to 50 MB; areas from files are only part of a
       link when they are small.</li>
     <li>Layers marked <span class="beta" style="margin:0">BETA</span> are not yet verified; the VHI season layers count only

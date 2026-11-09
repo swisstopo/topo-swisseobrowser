@@ -716,6 +716,9 @@ Example:
   OSM background and no choice of coordinate system (always LV95). The 3D mode has no sky / atmosphere, no shadows
   cast by mountains, no lens flare, no anaglyph stereo, no split comparison and no 3D timelapse.
 - The map needs WebGL. Its custom projection API is experimental in MapLibre, so the page pins MapLibre 6.16.0.
+- The ETH tree species masks have 30 m pixels (5 m off the 10 m grid) and are licensed CC BY-NC 4.0 (non-commercial use
+  only); a 10 m version may follow. Their broadleaf basal-area share and the broadleaf probability of Forest Type NFI are
+  different quantities, so the same limits on the slider do not give the same classes.
 - The VHI forest and vegetation layers are rendered by the WMS with its published styling, so their colour scale cannot be changed.
 - The VHI season layers sum only the days with a VHI value, so long cloudy periods lead to an underestimated
   deficit; they read one COG per day, so the first view of a season takes a while, and they are not
