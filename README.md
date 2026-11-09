@@ -38,7 +38,7 @@ the swisstopo WMS/WMTS services directly in the browser.
 | [swissEO NDVIdiff v100](https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-ndvidiff) | `forest-10m` COGs of the STAC collection `ch.swisstopo.swisseo_ndvi_diff_v100` | NDVI change of the current year compared to the previous year, forest perimeter, 10 m; one product for the end of July, August and September each year (since 2018) |
 | [swissEO NDVIz v100](https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-ndviz) | `forest-10m` COGs of the STAC collection `ch.swisstopo.swisseo_ndvi_z_v100` | NDVI anomaly as z-score, forest perimeter, 10 m; end of July, August and September (since 2017) |
 | swissEO NDVIdiff v200 **BETA** | 30 example COGs on `cms.geo.admin.ch/Topo/umweltbeobachtung/beispiele/NDVIDIFFV2/` (not in STAC; the item list is in the page) | Year-on-year NDVI change of two-month first-quartile cloud-free mosaics of S2-SR v200 (June/July, July/August, August/September, 2017–2026), forest, 10 m |
-| Vegetation masks | Habitat map COGs v1-0 / v1-1 / v1-2 (forest, all vegetation) in `s3-topo-satromo-prod` (`data/MASKS/Vegetation/`, as used by the VHI processor), inside = value ≠ 0; the swissTLM3D forest (`wms.geo.admin.ch`, `ch.swisstopo.swisstlm3d-wald`); Forest Type NFI 2023 (WSL, probability of broadleaf trees per 10 m pixel for all vegetation above 3 m, Float32 COG in `s3-topo-satromo-prod` (`data/MASKS/Vegetation/waldmischungsgrad_2023_10m_2056_cog.tif`); Waser et al. 2025, [doi:10.16904/1000001.7](https://doi.org/10.16904/1000001.7)); the agricultural land use (Nutzungsflächen, BLW from the data of the cantons, `wms.geo.admin.ch` layer `ch.blw.landwirtschaftliche-nutzungsflaechen`; [metadata on geocat.ch](https://www.geocat.ch/datahub/dataset/ae183bc4-5c91-467e-89bc-85f390340efb)) | Forest, vegetation, broadleaf / conifer or land-use mask for every S2-SR layer, statistics and exports |
+| Vegetation masks | Habitat map COGs v1-0 / v1-1 / v1-2 (forest, all vegetation) in `s3-topo-satromo-prod` (`data/MASKS/Vegetation/`, as used by the VHI processor), inside = value ≠ 0; the swissTLM3D forest (`wms.geo.admin.ch`, `ch.swisstopo.swisstlm3d-wald`); Forest Type NFI 2023 (WSL, probability of broadleaf trees per 10 m pixel for all vegetation above 3 m, Float32 COG in `s3-topo-satromo-prod` (`data/MASKS/Vegetation/waldmischungsgrad_2023_10m_2056_cog.tif`); Waser et al. 2025, [doi:10.16904/1000001.7](https://doi.org/10.16904/1000001.7)); the ETH tree species maps (broadleaf basal-area share and dominant species, 30 m, `ETH_forest_leaf_type_share_01_broadleaved.tif` and `ETH_forest_species_argmax.tif` in the same folder; Zhou et al. 2026, [arXiv:2611.08095](https://arxiv.org/abs/2611.08095), CC BY-NC 4.0); the agricultural land use (Nutzungsflächen, BLW from the data of the cantons, `wms.geo.admin.ch` layer `ch.blw.landwirtschaftliche-nutzungsflaechen`; [metadata on geocat.ch](https://www.geocat.ch/datahub/dataset/ae183bc4-5c91-467e-89bc-85f390340efb)) | Forest, vegetation, broadleaf / conifer or land-use mask for every S2-SR layer, statistics and exports |
 | Basemaps | `wmts.geo.admin.ch` (pixelkarte-farbe, swissimage, pixelkarte-grau) | Background maps *Map*, *SWISSIMAGE* and *Map Grey* on the native LV95 grid |
 | 3D terrain | [swissALTIRegio](https://www.swisstopo.admin.ch/en/height-model-swissaltiregio): one COG on `data.geo.admin.ch` (STAC collection `ch.swisstopo.swissaltiregio`), 10 m, LV95, Switzerland and its border regions ([metadata on geocat.ch](https://www.geocat.ch/datahub/dataset/f7f058e9-288b-4c55-8f4e-6360880dbb59)); the surface model [swissSURFACE3D](https://www.swisstopo.admin.ch/en/height-model-swisssurface3d) resampled to 10 m, one COG in `s3-topo-satromo-prod` (`data/DSM/DSM_10m_EPSG2056_CH_clipped_10km_extended_9999_cog.tif`, Switzerland plus 10 km, no data −9999) | Heights of the optional 3D mode |
 | Labels | `vectortiles.geo.admin.ch`: swisstopo's base map vector tiles (`ch.swisstopo.base.vt`, Switzerland and Liechtenstein) with the label layers of its imagery base map style | *Labels*: place, road, peak and lake names above the data |
@@ -83,19 +83,43 @@ time series and spectral explorer, and the analytical and print exports. Its ent
   interpretation of the NFI 0.81). Larch counts as conifer. Yearly updates are planned from 2027. COG:
   `https://s3-topo-satromo-prod.s3.eu-central-1.amazonaws.com/data/MASKS/Vegetation/waldmischungsgrad_2023_10m_2056_cog.tif`
   (Float32, DEFLATE with the floating-point predictor, no data −3.4e38; read by geotiff.js exactly as by GDAL).
-  - *Broadleaf forest (Laubwald)* keeps cells above the threshold, *Conifer forest (Nadelwald, incl. larch)* those at or
-    below it. The threshold is a slider, **85 %** by default: the LFI calls broadleaf above 85 % pure.
-  - *Mean of 3 × 3 pixels before the threshold* (off by default): the LFI recommends it in mixed stands (values around
-    50 %). The mean of the valid values around each cell is used on grids of 15 m or finer; coarser grids read the
-    overviews of the COG, which are averages already.
+  - Three entries: *Conifer forest (Nadelwald, incl. larch)*, *Mixed forest (Mischwald)* and *Broadleaf forest
+    (Laubwald)*. A slider with two handles sets the limits on 0–100 %: conifer at or below the first (**30 %** by
+    default), mixed up to the second (**85 %**, the LFI's pure broadleaf), broadleaf above it. The limits are applied
+    when a handle is released and kept when switching between the three entries.
+  - *Mean of 3 × 3 pixels before the classes* (off by default): the LFI recommends it in mixed stands (values around
+    50 %). The mean of the valid values of the 3 × 3 pixels of the native raster around the pixel under each cell is
+    used on grids up to 1.5 native pixels (15 m); coarser grids read the overviews of the COG, which are averages already.
   - *Within*: the probability counts only inside a forest mask chosen independently, as the WSL suggests (forest mask AND
-    probability above the threshold): the **forest of the habitat map of the date** (default, the version as for the
-    habitat map entry), the **swissTLM3D forest** (all classes) or **none** (all vegetation above 3 m).
-  - The link writes `lfi-broad:85`, `:m3` for the 3 × 3 mean and `+tlm` / `+none` for the forest mask; links with an
-    older value (`lfi-broad:76`) open with their threshold and the habitat map forest.
-  - Check (2 × 2 km Sihlwald, statistics at 10 m against numpy on the COGs): broadleaf > 85 % without forest mask
-    22,197 cells, within the habitat map forest v1-2 18,984, conifer ≤ 85 % within swissTLM3D 10,553, broadleaf with
-    3 × 3 mean 20,738, conifer ≤ 60 % with 3 × 3 mean within the habitat map forest 5,058: equal in every case.
+    class of the probability): the **forest of the habitat map of the date** (default, the version as for the habitat
+    map entry), the **swissTLM3D forest** (all classes) or **none** (all vegetation above 3 m).
+  - The link writes `lfi-conif:30.85` / `lfi-mixed:30.85` / `lfi-broad:30.85` (lower.upper limit), `:m3` for the 3 × 3
+    mean and `+tlm` / `+none` for the forest mask. Older values with one number open too: `lfi-broad:76` with the upper
+    limit 76, `lfi-conif:40` with the lower limit 40.
+  - Check (2 × 2 km Sihlwald, statistics at 10 m against numpy on the COGs): conifer 3,226, mixed 7,732, broadleaf 22,197
+    cells without forest mask (together all 33,155 valid cells), broadleaf with 3 × 3 mean 20,738, mixed within the
+    habitat map forest v1-2 6,279: equal in every case.
+- **ETH tree species** (30 m): two maps of the tree species composition of Switzerland by the ETH Zürich, trained on the
+  basal areas of 3,992 plots of the National Forest Inventory (30 × 30 m) with aerial images, airborne laser scanning,
+  satellite embeddings and climate data (macro-R² 0.485 over 11 classes in spatial cross-validation; on an independent
+  forest-reserve dataset the dominant class right in 73.2 % of the pixels). COGs on the swissEO bucket next to the
+  habitat maps: `ETH_forest_leaf_type_share_01_broadleaved.tif` (Float32, broadleaf share of the basal area 0–1) and
+  `ETH_forest_species_argmax.tif` (Byte, the class with the largest predicted basal-area share). Non-forest pixels are
+  left out by an internal mask, which the page uses for validity (a masked pixel never counts as 0 % broadleaf). The
+  30 m grid starts at E 2'485'435 / N 1'295'915, 5 m off the 10 m grid: each 10 m cell takes the ETH pixel under its
+  centre, and a cell centred on a pixel edge (every third one) the right / lower pixel. There is no further forest mask.
+  - *Conifer / Mixed / Broadleaf forest*: the same two-handle slider (30 / 85 % by default) and 3 × 3 option as for Forest
+    Type NFI, on the **broadleaf share** (a share, not a probability, so the limits are not directly comparable); the
+    3 × 3 mean covers 3 × 3 ETH pixels (90 m). Link `eth-mixed:30.85`, `:m3`.
+  - *Dominant tree species*: check boxes for the 11 classes in the colours of the file: Spruce (Fichte), Fir (Tanne),
+    Pine (Föhre), Larch (Lärche), Arolla pine (Arve), Beech (Buche), Maple (Ahorn), Ash (Esche), Oak (Eiche), Chestnut
+    (Kastanie), Other (Andere); *All conifers*, *All broadleaves* and *All* set them at once. Link `eth-sp` or `eth-sp:1.2.6`.
+  - Check (the same 2 × 2 km square against numpy with rasterio on the COGs and their masks): conifer 3,330, mixed
+    8,137, broadleaf 22,829 (together all 34,296 ETH forest cells), mixed with 3 × 3 mean 13,978, beech 23,138, spruce
+    and fir 6,891: equal in every case.
+  - The pixel inspector shows the broadleaf share and the dominant species at every spot.
+  - Licence **CC BY-NC 4.0**: non-commercial use only, with attribution. Source: Zhou, Y.; Ferrari, L.; Griess, V. C.; Rehush, N.; Schindler, K.; Beloiu, M. (2026): *National-scale mapping of tree species composition in Switzerland from high-resolution aerial imagery and multimodal data*. [arXiv:2611.08095](https://arxiv.org/abs/2611.08095) (preprint). A 10 m version would
+    be possible (about two weeks of work, with compromises); the 30 m version is used for now.
   - Source: Waser, L.; Ginzler, C.; Psomas, A.; Rüetschi, M.; Rehush, N. (2025): *Forest Type NFI*. National Forest Inventory (NFI). [doi:10.16904/1000001.7](https://doi.org/10.16904/1000001.7); funded by the Federal Office for the Environment (BAFU).
 - **Nutzungsflächen** (agricultural land use, BLW from the data of the cantons; since
   [#16](https://github.com/swisstopo/topo-swisseobrowser/issues/16) the layer `ch.blw.landwirtschaftliche-nutzungsflaechen`
@@ -114,7 +138,8 @@ time series and spectral explorer, and the analytical and print exports. Its ent
   none on geodienste.ch). The pixel inspector asks the service for the parcel (GetFeatureInfo: main category, use and
   code). Source: BLW, the cantons ([metadata on geocat.ch](https://www.geocat.ch/datahub/dataset/ae183bc4-5c91-467e-89bc-85f390340efb)).
 
-The mask options in the layer menu link to the sources of Forest Type NFI (DOI) and the Nutzungsflächen (geocat.ch).
+The mask options in the layer menu link to the sources of Forest Type NFI (DOI), the ETH maps (arXiv) and the
+Nutzungsflächen (geocat.ch).
 
 The two-date layers use the mask of the selected date on both dates, so a new mask version never shows up as a
 change. The VHI season sums keep the forest mask of swissEO VHI v100 itself (see below).
@@ -173,7 +198,8 @@ The swissEO Browser therefore always uses the physical reflectance.
   - bottom right: the zoom buttons and, on one line, the mouse position (LV95 easting and northing, `E 2'661'150 N 1'187'175`)
     and the scale bar; bottom left: the attribution and the loading indicator. The attribution names the data on the
     map ([#12](https://github.com/swisstopo/topo-swisseobrowser/issues/12)): swisstopo, the office of a vegetation mask
-    from outside swisstopo (*Nutzungsflächen © BLW*, *Forest Type NFI © WSL / BAFU*) and the domain of a WMS /
+    from outside swisstopo (*Nutzungsflächen © BLW*, *Forest Type NFI © WSL / BAFU*, *ETH tree species © Zhou et al. 2026,
+    CC BY-NC 4.0*) and the domain of a WMS /
     WMTS layer; MapLibre is credited in the Info tab and below.
 - **Help and tutorial** ([`docs/index.html`](docs/index.html), opened by the (i) button in a new tab): an *About the
   swissEO Browser* overview with a beginner tutorial (Part A: window, place search, date, layers, vegetation mask, pixel
@@ -386,7 +412,7 @@ The swissEO Browser therefore always uses the physical reflectance.
     there are that dark and were left empty). The footprint comes from the TCI's internal mask at about 160 m;
     the edge zone is computed once per scene;
   - masks: clouds and cloud shadows (OmniCloudMask), terrain shadow (terrain mask 200), a vegetation
-    mask (pull-down: off, forest or all vegetation of the habitat map swissEO VHI uses on the date, the swissTLM3D forest classes, broadleaf or conifer forest of Forest Type NFI 2023, or
+    mask (pull-down: off, forest or all vegetation of the habitat map swissEO VHI uses on the date, the swissTLM3D forest classes, conifer, mixed or broadleaf forest of Forest Type NFI 2023 or of the ETH tree species maps, the ETH dominant tree species, or
     Nutzungsflächen categories; see [Vegetation masks](#vegetation-masks)) and a **custom mask**: your own polygons
     (e.g. a forest map) loaded from a file or URL with the same import and limits as the area of interest;
     *Inside* keeps the data inside the polygons, *Outside* (inverted) the data outside. It works for every
@@ -514,7 +540,8 @@ The swissEO Browser therefore always uses the physical reflectance.
   or terrain still loading) and of requests in flight; after 6 s of continuous loading it says that the connection is slow.
 - **Pixel inspector**: the LV95 position, band values (DN and physical value), index value, SCL, cloud
   mask, terrain mask, forest / vegetation of the habitat map of the date (and of the layer's own mask), the
-  swissTLM3D forest class, the broadleaf probability of Forest Type NFI and the Nutzungsflächen main category at
+  swissTLM3D forest class, the broadleaf probability of Forest Type NFI, the broadleaf share and dominant species of the
+  ETH maps and the Nutzungsflächen main category at
   a clicked location; for the two-date layers the index
   on both sides and the difference; for the Forest Disturbance Classification the class; for VHI,
   NDVIdiff, NDVIdiff v200 BETA and NDVIz the product value; for the VHI season layers the cumulative
@@ -669,7 +696,7 @@ Parameter names follow the Copernicus Browser where an equivalent exists.
 | `redRange`, `greenRange`, `blueRange` | `[0,0.8]` | Advanced RGB effects |
 | `opacity` | `70` | Layer opacity in % |
 | `cloudMask`, `shadowMask`, `terrainMask` | `true` | Masks (written when they differ from the layer's default; the two-date layers mask clouds and shadows by default) |
-| `vegetationMask` | `forest` | Vegetation mask of the S2-SR layers: `off`; `forest` or `vegetation` (the habitat map of the date, as swissEO VHI; older links with a version such as `forest@1-1` open with the map of the date too); `tlm` or `tlm:12.13` (swissTLM3D forest, all or some of the classes 12 Wald, 13 Wald offen, 6 Gebüschwald); `lfi-broad:85` or `lfi-conif:85` (Forest Type NFI 2023, broadleaf or conifer forest with the threshold of the broadleaf probability in %; optionally `:m3` for the mean of 3 × 3 pixels and `+tlm` or `+none` for the forest mask, default the habitat map forest of the date, e.g. `lfi-broad:85:m3+tlm`); `lnf` or `lnf:a.dw.dp` (Nutzungsflächen, all or some main categories: `a` Ackerfläche, `dw` Dauerwiesen, `dp` Dauerweiden, `r` Reben, `o` Obstanlagen, `dk` Übrige Dauerkulturen, `g` Geschützter Anbau, `s` Streueflächen, `h` Hecken-, Feld- und Ufergehölze, `u` Übrige Fläche innerhalb der LN, `so` Sömmerungsfläche, `v` Vegetation nicht LN, `w` Wald); the NDVI difference to a reference date layer and the Forest Disturbance Classification default to `forest` |
+| `vegetationMask` | `forest` | Vegetation mask of the S2-SR layers: `off`; `forest` or `vegetation` (the habitat map of the date, as swissEO VHI; older links with a version such as `forest@1-1` open with the map of the date too); `tlm` or `tlm:12.13` (swissTLM3D forest, all or some of the classes 12 Wald, 13 Wald offen, 6 Gebüschwald); `lfi-conif:30.85`, `lfi-mixed:30.85` or `lfi-broad:30.85` (Forest Type NFI 2023, conifer, mixed or broadleaf forest with the lower and upper limit of the broadleaf probability in %; optionally `:m3` for the mean of 3 × 3 pixels and `+tlm` or `+none` for the forest mask, default the habitat map forest of the date, e.g. `lfi-mixed:30.85:m3+tlm`; older values with one number such as `lfi-broad:85` open too); `eth-conif:30.85`, `eth-mixed:30.85` or `eth-broad:30.85` (ETH broadleaf basal-area share, optionally `:m3`); `eth-sp` or `eth-sp:1.2.6` (ETH dominant tree species, all or some of the codes 1 Spruce, 2 Fir, 3 Pine, 4 Larch, 5 Arolla pine, 6 Beech, 7 Maple, 8 Ash, 9 Oak, 10 Chestnut, 11 Other); `lnf` or `lnf:a.dw.dp` (Nutzungsflächen, all or some main categories: `a` Ackerfläche, `dw` Dauerwiesen, `dp` Dauerweiden, `r` Reben, `o` Obstanlagen, `dk` Übrige Dauerkulturen, `g` Geschützter Anbau, `s` Streueflächen, `h` Hecken-, Feld- und Ufergehölze, `u` Übrige Fläche innerhalb der LN, `so` Sömmerungsfläche, `v` Vegetation nicht LN, `w` Wald); the NDVI difference to a reference date layer and the Forest Disturbance Classification default to `forest` |
 | `basemap`, `labels` | `swissimage`, `true` | Basemap (`pixelkarte` = *Map*, `swissimage`, `grey` = *Map Grey*, `none`) and the *Labels* overlay (swisstopo vector labels) |
 | `compareLayers`, `comparedOpacity`, `comparedClipping`, `compareMode` | | Compare list (base64url JSON, each entry with its LV95 view; WMS / WMTS entries as `{"l":"ext","x":{"u":service URL,"k":"WMS"/"WMTS","n":layer name,"t":title}}`), per-layer opacity and split range; `compareMode` is `split` / `opacity` when comparing and `off` otherwise (links without it open in compare mode) |
 | `panel` | `wms` | The WMS / WMTS panel is open |
@@ -720,6 +747,7 @@ Example:
   [open government data](https://www.swisstopo.admin.ch/ogd-conditions). swissEO S2-SR and swissEO VHI
   contain modified Copernicus Sentinel data. 3D terrain: [swissALTIRegio](https://www.geocat.ch/datahub/dataset/f7f058e9-288b-4c55-8f4e-6360880dbb59) and swissSURFACE3D
   © swisstopo. Masks: [Forest Type NFI](https://doi.org/10.16904/1000001.7) © WSL (Waser et al. 2025, funded by the BAFU);
+  [ETH tree species](https://arxiv.org/abs/2611.08095) © Zhou et al. 2026 (ETH Zürich), CC BY-NC 4.0 (non-commercial use only);
   [Nutzungsflächen](https://www.geocat.ch/datahub/dataset/ae183bc4-5c91-467e-89bc-85f390340efb) © BLW and the cantons. Layers of other WMS / WMTS services
   © their providers.
 - User-interface workflow modelled on the [Copernicus Browser](https://browser.dataspace.copernicus.eu/)

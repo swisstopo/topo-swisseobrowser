@@ -244,8 +244,8 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
   <figure><img src="img/mask-lnf.jpg" alt="NDVI restricted to arable land, meadows and pastures, with the category check boxes" width="1400" height="900">
     <figcaption><b>Fig. 5</b> NDVI near Kerzers, 13 August 2026, restricted by the Nutzungsflächen mask to arable land,
     permanent meadows and permanent pastures. Each category has the colour of the federal map service.</figcaption></figure>
-  <p>The other masks keep forest (the habitat map of swissEO VHI or the swissTLM3D forest), broadleaf or conifer forest
-    (Forest Type NFI 2023) or all vegetation. They are described, with their sources, in
+  <p>The other masks keep forest (the habitat map of swissEO VHI or the swissTLM3D forest), conifer, mixed or broadleaf
+    forest (Forest Type NFI 2023, ETH tree species), single tree species (ETH) or all vegetation. They are described, with their sources, in
     <a href="#vis-veg">Vegetation masks</a>. Masks also apply to statistics, downloads and the timelapse.</p>
 
   <h2 id="t6"><span class="n">6</span>Read the value of a pixel</h2>
@@ -372,15 +372,26 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
       (open forest) and <i>Gebüschwald</i> (scrub forest), in any combination</td>
       <td><a href="https://www.swisstopo.admin.ch/en/landscape-model-swisstlm3d" target="_blank" rel="noopener">swissTLM3D</a>,
       swisstopo (map service layer <code>ch.swisstopo.swisstlm3d-wald</code>)</td></tr>
-    <tr><td>Forest Type NFI 2023: Broadleaf forest (Laubwald), Conifer forest (Nadelwald, incl. larch)</td>
-      <td>Trees whose <b>probability of being broadleaf</b> is above (broadleaf) or at most (conifer) a threshold. A slider
-      sets the threshold, <b>85 %</b> by default: the National Forest Inventory calls broadleaf above 85 % pure. Larch
-      counts as conifer. Options: the <i>mean of 3 × 3 pixels</i> before the threshold, which the LFI recommends in mixed
-      stands; and <i>Within</i>, the forest mask the trees must lie in: the habitat map forest of the date (default),
-      the swissTLM3D forest or none (all vegetation above 3 m).</td>
+    <tr><td>Forest Type NFI 2023: Conifer forest (Nadelwald, incl. larch), Mixed forest (Mischwald), Broadleaf forest (Laubwald)</td>
+      <td>Trees by their <b>probability of being broadleaf</b>. A slider with two handles sets the limits: conifer up to
+      the first (<b>30 %</b> by default), mixed up to the second (<b>85 %</b>, the National Forest Inventory's pure
+      broadleaf), broadleaf above it. Larch counts as conifer. Options: the <i>mean of 3 × 3 pixels</i> before the
+      classes, which the LFI recommends in mixed stands; and <i>Within</i>, the forest mask the trees must lie in: the
+      habitat map forest of the date (default), the swissTLM3D forest or none (all vegetation above 3 m).</td>
       <td><a href="https://doi.org/10.16904/1000001.7" target="_blank" rel="noopener">Forest Type NFI</a>, WSL (Waser et al. 2025,
       doi:10.16904/1000001.7), funded by the BAFU; 10 m, Sentinel-1 and -2 of 2021 to 2023, yearly updates planned
       from 2027</td></tr>
+    <tr><td>ETH tree species (30 m): Conifer forest, Mixed forest, Broadleaf forest</td>
+      <td>The same three classes and slider (30 / 85 %) on the <b>broadleaf share of the basal area</b>: a share, not a
+      probability as in Forest Type NFI, so the limits are not directly comparable. The 3 × 3 mean covers 3 × 3 pixels of
+      30 m (90 m). Only the forest pixels of the ETH map, without a further forest mask.</td>
+      <td rowspan="2"><a href=\"https://arxiv.org/abs/2611.08095\" target="_blank" rel="noopener">ETH tree species</a>, Zhou et al. 2026
+      (ETH Zürich, preprint arXiv:2611.08095), 30 m, trained on National Forest Inventory plots; licence CC BY-NC 4.0
+      (non-commercial use only)</td></tr>
+    <tr><td>ETH tree species (30 m): Dominant tree species</td>
+      <td>Check boxes for the class with the largest basal-area share per 30 m pixel: Spruce (Fichte), Fir (Tanne), Pine
+      (Föhre), Larch (Lärche), Arolla pine (Arve), Beech (Buche), Maple (Ahorn), Ash (Esche), Oak (Eiche), Chestnut
+      (Kastanie), Other (Andere); <i>All conifers</i>, <i>All broadleaves</i> and <i>All</i> set them at once.</td></tr>
     <tr><td>Nutzungsflächen (BLW): Land use</td>
       <td>The agricultural land use of the cantons, with check boxes for its 13 main categories: Ackerfläche (arable land),
       Dauerwiesen (permanent meadows), Dauerweiden (permanent pastures), Reben (vineyards), Obstanlagen (orchards), Übrige
@@ -392,9 +403,12 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
       (metadata on geocat.ch)</td></tr>
   </table>
   <figure><img src="img/mask-lfi.jpg" alt="NDVI of the Sihlwald restricted to broadleaf forest, with the threshold slider and the forest mask" width="1400" height="900">
-    <figcaption><b>Fig. 11</b> NDVI of the Sihlwald and the Albis on 13 August 2026, restricted to broadleaf forest of
-    Forest Type NFI 2023 (probability of broadleaf trees above 85 %, within the habitat map forest). Below the slider:
-    the 3 × 3 mean, the forest mask and the source.</figcaption></figure>
+    <figcaption><b>Fig. 11</b> NDVI of the Sihlwald and the Albis on 13 August 2026, restricted to mixed forest of Forest
+    Type NFI 2023 (probability of broadleaf trees 30 to 85 %, mean of 3 × 3 pixels, within the habitat map forest). The
+    slider with two handles sets both limits.</figcaption></figure>
+  <figure><img src="img/mask-eth.jpg" alt="NDVI restricted to the conifers and beech of the ETH dominant tree species, with the species check boxes" width="1400" height="900">
+    <figcaption><b>Fig. 12</b> The same view restricted to the ETH dominant tree species spruce, fir, pine, larch, arolla
+    pine and beech (30 m pixels). Below the check boxes: the source and its licence.</figcaption></figure>
   <p>Good to know:</p>
   <ul>
     <li>Below the pull-down, the menu shows the mask in use and its options: the check boxes, the slider and a link to the
@@ -419,7 +433,7 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
     applies to the map, compare, statistics, exports and the timelapse, and can be combined with a vegetation mask. A
     mask loaded from a URL is part of copied links; a mask from a file stays on your computer.</p>
   <figure><img src="img/custom-mask.jpg" alt="NDVI shown only inside two custom polygons" width="1400" height="900">
-    <figcaption><b>Fig. 12</b> A custom mask with two polygons: the NDVI is shown only inside them.</figcaption></figure>
+    <figcaption><b>Fig. 13</b> A custom mask with two polygons: the NDVI is shown only inside them.</figcaption></figure>
 
   <h3 id="vis-compare">Comparing visualizations</h3>
   <p>Click <b>Add to Compare</b> under the active layer to put it, with its date and settings, into the compare list.
@@ -427,13 +441,13 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
     icon next to the configuration). Two effects are available: <b>Split</b>, with a handle on the map that you drag to
     swipe between the layers, and <b>Opacity</b>. Entries can be reordered, removed or zoomed to.</p>
   <figure><img src="img/compare.jpg" alt="Compare view with two dates of the Great Aletsch Glacier" width="1400" height="900">
-    <figcaption><b>Fig. 13</b> Compare view: the Great Aletsch Glacier on 18 August 2019 (left of the handle) and 13 August 2026 (right).</figcaption></figure>
+    <figcaption><b>Fig. 14</b> Compare view: the Great Aletsch Glacier on 18 August 2019 (left of the handle) and 13 August 2026 (right).</figcaption></figure>
 
   <h3 id="vis-hl">Highlights</h3>
   <p>The configuration <i>Drought 2026</i> has <b>highlights</b>: short stories with a before and after comparison.
     Click a card to open the place with the two dates side by side; the chevron on the card shows the text and its source.</p>
   <figure><img src="img/highlights.jpg" alt="Highlight cards and the opened Aletsch highlight" width="1400" height="900">
-    <figcaption><b>Fig. 14</b> Highlights in the configuration Drought 2026.</figcaption></figure>
+    <figcaption><b>Fig. 15</b> Highlights in the configuration Drought 2026.</figcaption></figure>
 
   <h3 id="vis-wms">WMS / WMTS services</h3>
   <p>The third icon next to the configuration opens <b>WMS / WMTS</b>: layers of other map services on top of the
@@ -441,7 +455,7 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
     map.geo.admin.ch, and <span class="key">+</span> adds any other WMS or WMTS address. Search the layers, click one to
     show it, and use <i>Add to Compare</i> to compare it with a satellite layer.</p>
   <figure><img src="img/wms.jpg" alt="WMS / WMTS panel with a federal inventory layer on the map" width="1400" height="900">
-    <figcaption><b>Fig. 15</b> The swisstopo WMS: the Federal Inventory of Landscapes and Natural Monuments (ILNM, in German BLN) on the national map.</figcaption></figure>
+    <figcaption><b>Fig. 16</b> The swisstopo WMS: the Federal Inventory of Landscapes and Natural Monuments (ILNM, in German BLN) on the national map.</figcaption></figure>
 
   <h3 id="vis-base">Basemaps and labels</h3>
   <p>Hover the layers button at the top right of the map (left of the <span class="key">i</span>), as in the Copernicus
@@ -476,7 +490,7 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
     <li><b>Reset values</b> returns all settings except the height model to their defaults.</li>
   </ul>
   <figure><img src="img/3d-settings.jpg" alt="The 3D settings dialog next to the 3D view of the Aletsch Glacier" width="1400" height="900">
-    <figcaption><b>Fig. 16</b> The 3D settings: height model, sun shading with its parameters, vertical terrain scaling,
+    <figcaption><b>Fig. 17</b> The 3D settings: height model, sun shading with its parameters, vertical terrain scaling,
     and the sources of the height models.</figcaption></figure>
   <h3 style="font-size:15px">Sun shading (light bulb) and sun time (sun)</h3>
   <ul>
@@ -491,7 +505,7 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
       horizon).</li>
   </ul>
   <figure><img src="img/sun-time.jpg" alt="The sun time dialog with an evening sun over the Aletsch Glacier" width="1400" height="900">
-    <figcaption><b>Fig. 17</b> Sun time set with the sliders to 13 August 2026, 16:45 UTC: the sun stands in the west,
+    <figcaption><b>Fig. 18</b> Sun time set with the sliders to 13 August 2026, 16:45 UTC: the sun stands in the west,
     19° above the horizon, and lights the slopes facing it. <i>Scene time</i> returns to the time of the image
     (10:22 UTC that day).</figcaption></figure>
   <h3 style="font-size:15px">What works in 3D</h3>
@@ -524,7 +538,7 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
     <li>a pasted geometry, an MGRS or GEOREF grid cell, or a bounding box in WGS84, LV95 or LV03 coordinates.</li>
   </ul>
   <figure><img src="img/import.jpg" alt="Import dialog for an area of interest" width="460" height="444" style="max-width:460px">
-    <figcaption><b>Fig. 18</b> Importing an area of interest.</figcaption></figure>
+    <figcaption><b>Fig. 19</b> Importing an area of interest.</figcaption></figure>
   <p>The toolbar of the area copies the geometry, shows the area, centres the map, opens the <a href="#tools-stats">statistics</a>
     and the <a href="#tools-spec">spectral explorer</a>, and downloads the area as GeoJSON. Small areas are part of
     copied links; large areas from a file are not (the toolbar then shows <i>⚠ not in link</i>), while areas loaded from
@@ -572,7 +586,7 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
 
   <h3 id="tools-exp">Image download</h3>
   <figure><img src="img/image-download.jpg" alt="Image download dialog, Analytical tab" width="460" height="828" style="max-width:460px">
-    <figcaption><b>Fig. 19</b> The Analytical tab of the image download.</figcaption></figure>
+    <figcaption><b>Fig. 20</b> The Analytical tab of the image download.</figcaption></figure>
   <ul>
     <li><b>Basic</b>: the current view as PNG or JPG, with captions (data source, date, the vegetation mask, scale bar), an
       optional description, the map labels, the legend and the area of interest; also in compare mode and in 3D.</li>
@@ -596,7 +610,7 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
   </ol>
   <p>There are no hard limits: a weekly glacier animation over ten years works, it just takes a few minutes.</p>
   <figure><img src="img/timelapse.jpg" alt="Timelapse dialog with monthly images of the Seeland" width="1400" height="900">
-    <figcaption><b>Fig. 20</b> A monthly timelapse of the Seeland, April to September 2026.</figcaption></figure>
+    <figcaption><b>Fig. 21</b> A monthly timelapse of the Seeland, April to September 2026.</figcaption></figure>
 
   <h2 id="share"><span class="n">3</span>Sharing and feedback</h2>
   <h3>Links</h3>
@@ -616,7 +630,7 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
   <p>Both already contain the link to exactly the view you are looking at and a summary of what is on the map, so one or
     two sentences are enough. A value from the pixel inspector helps a lot when something looks wrong.</p>
   <figure><img src="img/feedback.jpg" alt="Info tab with the Feedback and issue buttons" width="420" height="700" style="max-width:420px">
-    <figcaption><b>Fig. 21</b> Feedback and the four issue forms in the Info tab.</figcaption></figure>
+    <figcaption><b>Fig. 22</b> Feedback and the four issue forms in the Info tab.</figcaption></figure>
 
   <h2 id="data"><span class="n">4</span>Data, sources and limits</h2>
   <h3>Data and sources</h3>
@@ -639,8 +653,10 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
       <td>swisstopo, swissEO VHI processor (<a href="https://github.com/swisstopo/topo-satromo-v2" target="_blank" rel="noopener">topo-satromo-v2</a>)</td></tr>
     <tr><td>swissTLM3D forest</td><td>Vegetation mask (Wald, Wald offen, Gebüschwald), pixel inspector</td>
       <td><a href="https://www.swisstopo.admin.ch/en/landscape-model-swisstlm3d" target="_blank" rel="noopener">swisstopo</a>, wms.geo.admin.ch</td></tr>
-    <tr><td>Forest Type NFI 2023</td><td>Vegetation mask (broadleaf, conifer forest), pixel inspector</td>
+    <tr><td>Forest Type NFI 2023</td><td>Vegetation mask (conifer, mixed, broadleaf forest), pixel inspector</td>
       <td><a href="https://doi.org/10.16904/1000001.7" target="_blank" rel="noopener">WSL (Waser et al. 2025), doi:10.16904/1000001.7</a></td></tr>
+    <tr><td>ETH tree species (30 m)</td><td>Vegetation mask (conifer, mixed, broadleaf forest; dominant tree species), pixel inspector</td>
+      <td><a href=\"https://arxiv.org/abs/2611.08095\" target="_blank" rel="noopener">ETH Zürich (Zhou et al. 2026), arXiv:2611.08095, CC BY-NC 4.0</a></td></tr>
     <tr><td>Nutzungsflächen</td><td>Vegetation mask (13 main categories of the agricultural land use), pixel inspector</td>
       <td><a href="https://www.geocat.ch/datahub/dataset/ae183bc4-5c91-467e-89bc-85f390340efb" target="_blank" rel="noopener">BLW and the cantons, metadata on geocat.ch</a></td></tr>
     <tr><td>Basemaps, labels, place search</td><td>Background maps, names on the map, Go to Place</td>
@@ -674,7 +690,8 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
   <footer>
     <p>swissEO Browser, a prototype of <a href="https://www.swisstopo.admin.ch" target="_blank" rel="noopener">swisstopo</a>.
       Data © swisstopo (open government data); swissEO S2-SR and swissEO VHI contain modified Copernicus Sentinel data.
-      Forest Type NFI © WSL (Waser et al. 2025, funded by the BAFU); Nutzungsflächen © BLW and the cantons.
+      Forest Type NFI © WSL (Waser et al. 2025, funded by the BAFU); ETH tree species © Zhou et al. 2026 (ETH Zürich),
+      CC BY-NC 4.0, non-commercial use only; Nutzungsflächen © BLW and the cantons.
       User interface modelled on the Copernicus Browser of the Copernicus Data Space Ecosystem; this project is not
       affiliated with or endorsed by it. Source code and technical details:
       <a href="https://github.com/swisstopo/topo-swisseobrowser" target="_blank" rel="noopener">github.com/swisstopo/topo-swisseobrowser</a>.</p>
