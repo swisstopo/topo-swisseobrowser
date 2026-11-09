@@ -245,15 +245,15 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
     <figcaption><b>Fig. 5</b> NDVI near Kerzers, 13 August 2026, restricted by the Nutzungsflächen mask to arable land,
     permanent meadows and permanent pastures. Each category has the colour of the federal map service.</figcaption></figure>
   <p>The other masks keep forest (the habitat map of swissEO VHI or the swissTLM3D forest), broadleaf or conifer forest
-    (Waldmischungsgrad LFI) or all vegetation. They are described, with their sources, in
+    (Forest Type NFI 2023) or all vegetation. They are described, with their sources, in
     <a href="#vis-veg">Vegetation masks</a>. Masks also apply to statistics, downloads and the timelapse.</p>
 
   <h2 id="t6"><span class="n">6</span>Read the value of a pixel</h2>
   <p>Click the <b>Pixel inspector</b> button (the (i) with a mouse pointer, at the top of the map) to switch it on: it turns
     blue. Then click on the map. A box shows the
     values at that spot: the position, the reflectance of every band, the index value of the layer, the cloud and
-    terrain information, the forest / vegetation mask, the swissTLM3D forest class, the broadleaf share of the
-    Waldmischungsgrad LFI and the Nutzungsflächen category. Click the button again to switch it off.</p>
+    terrain information, the forest / vegetation mask, the swissTLM3D forest class, the broadleaf probability of Forest
+    Type NFI and the Nutzungsflächen category. Click the button again to switch it off.</p>
   <figure><img src="img/pixel-inspector.jpg" alt="Pixel inspector showing band and NDVI values" width="1400" height="900">
     <figcaption><b>Fig. 6</b> The pixel inspector on a field: band values (stored number and reflectance), the NDVI, the
     masks at this spot and the parcel of the Nutzungsflächen (arable land, peas, code 537).</figcaption></figure>
@@ -372,11 +372,15 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
       (open forest) and <i>Gebüschwald</i> (scrub forest), in any combination</td>
       <td><a href="https://www.swisstopo.admin.ch/en/landscape-model-swisstlm3d" target="_blank" rel="noopener">swissTLM3D</a>,
       swisstopo (map service layer <code>ch.swisstopo.swisstlm3d-wald</code>)</td></tr>
-    <tr><td>Waldmischungsgrad LFI: Broadleaf forest (Laubwald), Conifer forest (Nadelwald)</td>
-      <td>Forest whose share of broadleaf trees is above (broadleaf) or at most (conifer) a threshold. A slider sets the
-      threshold, <b>76 %</b> by default.</td>
-      <td><a href="https://www.geocat.ch/geonetwork/srv/ger/catalog.search#/metadata/b07a4589-159b-4c3a-b1e7-dbdad11f7e62" target="_blank" rel="noopener">Waldmischungsgrad
-      of the Swiss National Forest Inventory LFI</a>, BAFU / WSL, 10 m (metadata on geocat.ch)</td></tr>
+    <tr><td>Forest Type NFI 2023: Broadleaf forest (Laubwald), Conifer forest (Nadelwald, incl. larch)</td>
+      <td>Trees whose <b>probability of being broadleaf</b> is above (broadleaf) or at most (conifer) a threshold. A slider
+      sets the threshold, <b>85 %</b> by default: the National Forest Inventory calls broadleaf above 85 % pure. Larch
+      counts as conifer. Options: the <i>mean of 3 × 3 pixels</i> before the threshold, which the LFI recommends in mixed
+      stands; and <i>Within</i>, the forest mask the trees must lie in: the habitat map forest of the date (default),
+      the swissTLM3D forest or none (all vegetation above 3 m).</td>
+      <td><a href="https://doi.org/10.16904/1000001.7" target="_blank" rel="noopener">Forest Type NFI</a>, WSL (Waser et al. 2025,
+      doi:10.16904/1000001.7), funded by the BAFU; 10 m, Sentinel-1 and -2 of 2021 to 2023, yearly updates planned
+      from 2027</td></tr>
     <tr><td>Nutzungsflächen (BLW): Land use</td>
       <td>The agricultural land use of the cantons, with check boxes for its 13 main categories: Ackerfläche (arable land),
       Dauerwiesen (permanent meadows), Dauerweiden (permanent pastures), Reben (vineyards), Obstanlagen (orchards), Übrige
@@ -387,9 +391,10 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
       of the Federal Office for Agriculture (BLW), from the data of the cantons, map service of the federal geoportal
       (metadata on geocat.ch)</td></tr>
   </table>
-  <figure><img src="img/mask-lfi.jpg" alt="NDVI of the Sihlwald restricted to broadleaf forest, with the threshold slider" width="1400" height="900">
+  <figure><img src="img/mask-lfi.jpg" alt="NDVI of the Sihlwald restricted to broadleaf forest, with the threshold slider and the forest mask" width="1400" height="900">
     <figcaption><b>Fig. 11</b> NDVI of the Sihlwald and the Albis on 13 August 2026, restricted to broadleaf forest of
-    the Waldmischungsgrad LFI (share of broadleaf trees above 76 %). Below the slider: the source and its metadata.</figcaption></figure>
+    Forest Type NFI 2023 (probability of broadleaf trees above 85 %, within the habitat map forest). Below the slider:
+    the 3 × 3 mean, the forest mask and the source.</figcaption></figure>
   <p>Good to know:</p>
   <ul>
     <li>Below the pull-down, the menu shows the mask in use and its options: the check boxes, the slider and a link to the
@@ -404,7 +409,7 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
       <a href="#tools-spec">spectral explorer</a>, the downloads and the timelapse; the change report gives the masked
       area in hectares.</li>
     <li>The <a href="#tools-insp">pixel inspector</a> shows at every spot the habitat map, the swissTLM3D forest class,
-      the broadleaf share and the Nutzungsflächen category, whichever mask is chosen.</li>
+      the broadleaf probability and the Nutzungsflächen category, whichever mask is chosen.</li>
   </ul>
 
   <h3 id="vis-mask">Custom masks: your own geometries</h3>
@@ -562,7 +567,7 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
   <h3 id="tools-insp">Pixel inspector</h3>
   <p>Switch it on at the top of the map and click a spot. For the satellite layers it shows the band values (stored
     number and reflectance), the index value, the scene classification, cloud and terrain mask, the habitat map of the
-    date (forest, vegetation), the swissTLM3D forest class, the broadleaf share of the Waldmischungsgrad LFI and the
+    date (forest, vegetation), the swissTLM3D forest class, the broadleaf probability of Forest Type NFI and the
     Nutzungsflächen category; for the swissEO products the product value. See <a href="#t6">Fig. 6</a>.</p>
 
   <h3 id="tools-exp">Image download</h3>
@@ -634,8 +639,8 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
       <td>swisstopo, swissEO VHI processor (<a href="https://github.com/swisstopo/topo-satromo-v2" target="_blank" rel="noopener">topo-satromo-v2</a>)</td></tr>
     <tr><td>swissTLM3D forest</td><td>Vegetation mask (Wald, Wald offen, Gebüschwald), pixel inspector</td>
       <td><a href="https://www.swisstopo.admin.ch/en/landscape-model-swisstlm3d" target="_blank" rel="noopener">swisstopo</a>, wms.geo.admin.ch</td></tr>
-    <tr><td>Waldmischungsgrad LFI</td><td>Vegetation mask (broadleaf, conifer forest), pixel inspector</td>
-      <td><a href="https://www.geocat.ch/geonetwork/srv/ger/catalog.search#/metadata/b07a4589-159b-4c3a-b1e7-dbdad11f7e62" target="_blank" rel="noopener">BAFU / WSL, metadata on geocat.ch</a></td></tr>
+    <tr><td>Forest Type NFI 2023</td><td>Vegetation mask (broadleaf, conifer forest), pixel inspector</td>
+      <td><a href="https://doi.org/10.16904/1000001.7" target="_blank" rel="noopener">WSL (Waser et al. 2025), doi:10.16904/1000001.7</a></td></tr>
     <tr><td>Nutzungsflächen</td><td>Vegetation mask (13 main categories of the agricultural land use), pixel inspector</td>
       <td><a href="https://www.geocat.ch/datahub/dataset/ae183bc4-5c91-467e-89bc-85f390340efb" target="_blank" rel="noopener">BLW and the cantons, metadata on geocat.ch</a></td></tr>
     <tr><td>Basemaps, labels, place search</td><td>Background maps, names on the map, Go to Place</td>
@@ -669,7 +674,7 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
   <footer>
     <p>swissEO Browser, a prototype of <a href="https://www.swisstopo.admin.ch" target="_blank" rel="noopener">swisstopo</a>.
       Data © swisstopo (open government data); swissEO S2-SR and swissEO VHI contain modified Copernicus Sentinel data.
-      Waldmischungsgrad LFI © BAFU / WSL; Nutzungsflächen © BLW and the cantons.
+      Forest Type NFI © WSL (Waser et al. 2025, funded by the BAFU); Nutzungsflächen © BLW and the cantons.
       User interface modelled on the Copernicus Browser of the Copernicus Data Space Ecosystem; this project is not
       affiliated with or endorsed by it. Source code and technical details:
       <a href="https://github.com/swisstopo/topo-swisseobrowser" target="_blank" rel="noopener">github.com/swisstopo/topo-swisseobrowser</a>.</p>

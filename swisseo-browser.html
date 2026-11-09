@@ -751,9 +751,10 @@ table.kv td:first-child{color:var(--muted)}
               uses (COGs in <code>s3-topo-satromo-prod</code>, inside = value ≠ 0): the <i>Habitat Map</i> of the date, as in
               swissEO VHI (v1-0 before 2024-07-12, v1-1 before 2025-12-11, v1-2 since; in a time series per date). Or the swissTLM3D forest
               (WMS <code>ch.swisstopo.swisstlm3d-wald</code>, any of Wald, Wald offen, Gebüschwald); broadleaf or conifer forest
-              of the Waldmischungsgrad LFI (BAFU / WSL, share of broadleaf trees above or at most a threshold, 76 % by
-              default; <a href="https://www.geocat.ch/geonetwork/srv/ger/catalog.search#/metadata/b07a4589-159b-4c3a-b1e7-dbdad11f7e62"
-              target="_blank" rel="noopener">metadata</a>); or Nutzungsflächen main categories (BLW, data of the cantons, WMS
+              of <i>Forest Type NFI 2023</i> (WSL: probability of broadleaf trees per 10 m pixel, vegetation above 3 m; broadleaf
+              above a threshold, 85 % by default as the LFI's pure broadleaf, conifer at or below it, larch counts as conifer;
+              optionally averaged over 3 × 3 pixels; within a forest mask of your choice;
+              <a href="https://doi.org/10.16904/1000001.7" target="_blank" rel="noopener">Waser et al. 2025</a>); or Nutzungsflächen main categories (BLW, data of the cantons, WMS
               <code>ch.blw.landwirtschaftliche-nutzungsflaechen</code> on wms.geo.admin.ch, read at 2.5 m by the legend colours;
               <a href="https://www.geocat.ch/datahub/dataset/ae183bc4-5c91-467e-89bc-85f390340efb" target="_blank"
               rel="noopener">metadata</a>). The two-date layers use the mask of the
@@ -842,8 +843,8 @@ table.kv td:first-child{color:var(--muted)}
             The swissEO products contain modified Copernicus Sentinel data. 3D terrain:
             <a href="https://www.geocat.ch/datahub/dataset/f7f058e9-288b-4c55-8f4e-6360880dbb59" target="_blank" rel="noopener">swissALTIRegio</a>,
             swissSURFACE3D © swisstopo. Labels © swisstopo.
-            <a href="https://www.geocat.ch/geonetwork/srv/ger/catalog.search#/metadata/b07a4589-159b-4c3a-b1e7-dbdad11f7e62" target="_blank" rel="noopener">Waldmischungsgrad LFI</a>
-            © BAFU / WSL. <a href="https://www.geocat.ch/datahub/dataset/ae183bc4-5c91-467e-89bc-85f390340efb" target="_blank" rel="noopener">Nutzungsflächen</a>
+            <a href="https://doi.org/10.16904/1000001.7" target="_blank" rel="noopener">Forest Type NFI</a>
+            © WSL (Waser et al. 2025, funded by the BAFU). <a href="https://www.geocat.ch/datahub/dataset/ae183bc4-5c91-467e-89bc-85f390340efb" target="_blank" rel="noopener">Nutzungsflächen</a>
             © BLW and the cantons.
             Layers of other WMS / WMTS services: © their providers. Not for operational use.</div>
           <div class="legal">
@@ -2672,8 +2673,9 @@ const SCL_CLOUD = { 3: 1, 8: 1, 9: 1, 10: 1 };   // SCL cloud shadow, cloud medi
      map of each date; the two-date layers the map of the selected date on both dates. Older links with a fixed version
      ("forest@1-1") open with the map of the date too (issue #9: one habitat map entry);
    - "tlm" or "tlm:12.13": the forest of swissTLM3D (WMS ch.swisstopo.swisstlm3d-wald), all or some of its classes;
-   - "lfi-broad:76" / "lfi-conif:76": broadleaf (share of broadleaf trees > 76 %) or conifer forest (≤ 76 %) of the
-     Waldmischungsgrad LFI (BAFU / WSL), with an adjustable threshold;
+   - "lfi-broad:85" / "lfi-conif:85", optionally ":m3" and "+tlm" / "+none": broadleaf (probability of broadleaf trees
+     > 85 %) or conifer forest (≤ 85 %) of Forest Type NFI 2023 (WSL), with an adjustable threshold, optionally the mean of
+     3 × 3 pixels first, within the forest of the habitat map of the date (default), of swissTLM3D or without a forest mask;
    - "lnf" or "lnf:a.dw": the agricultural land use (Nutzungsflächen, BLW), all or some main categories. */
 const MASK_BASE = "https://s3-topo-satromo-prod.s3.eu-central-1.amazonaws.com/data/MASKS/Vegetation/";
 const HABITAT = [   // version, used from (date of the data), file name part, name
@@ -2684,12 +2686,16 @@ const TLM_FOREST = "ch.swisstopo.swisstlm3d-wald";
 const TLM_CLASSES = { 12: "Wald (forest)", 13: "Wald offen (open forest)", 6: "Gebüschwald (scrub forest)" };
 const TLM_KEYS = ["12", "13", "6"];
 const TLM_RGB = { 12: [26, 110, 17], 13: [146, 181, 134], 6: [149, 201, 89] };   // fill colours of the WMS
-const LFI = "https://data.geo.admin.ch/ch.bafu.landesforstinventar-waldmischungsgrad/landesforstinventar-waldmischungsgrad/landesforstinventar-waldmischungsgrad_2056.tif";
-const LFI_T = 76;
+/* Forest Type NFI 2023 (WSL; Waser et al. 2025, doi:10.16904/1000001.7): probability of broadleaf trees in % per 10 m
+   pixel for all vegetation above 3 m (Float32, no data −3.4e38), from Sentinel-1 and -2 of 2021 to 2023. The LFI calls
+   broadleaf above 85 % pure; larch counts as conifer. Combined with a forest mask of the browser (issue: LFI feedback). */
+const LFI = "https://s3-topo-satromo-prod.s3.eu-central-1.amazonaws.com/data/MASKS/Vegetation/waldmischungsgrad_2023_10m_2056_cog.tif";
+const LFI_T = 85;
+const LFI_BASE = { forest: "Habitat Map forest", tlm: "swissTLM3D forest", none: "None (all > 3 m)" };
 /* metadata of the sources (geocat.ch), linked from the mask options */
-const META_LFI = "https://www.geocat.ch/geonetwork/srv/ger/catalog.search#/metadata/b07a4589-159b-4c3a-b1e7-dbdad11f7e62";
+const META_LFI = "https://doi.org/10.16904/1000001.7";
 const META_LNF = "https://www.geocat.ch/datahub/dataset/ae183bc4-5c91-467e-89bc-85f390340efb";
-const LFI_TYPE = { broad: "Broadleaf forest (Laubwald)", conif: "Conifer forest (Nadelwald)" };
+const LFI_TYPE = { broad: "Broadleaf forest (Laubwald)", conif: "Conifer forest (Nadelwald, incl. larch)" };
 /* Nutzungsflächen: the layer of the federal geoportal (BLW, from the cantonal data; issue #16), whose fill colour gives
    the main category. It draws every parcel with a light-blue outline of a fixed pixel width (LNF_OUTLINE), which blends
    with the fills around it: read at 10 m, two thirds of the pixels are outline or blend. So it is read at 2.5 m (at most
@@ -2719,7 +2725,8 @@ function vegParse(v) {
     const c = m[1] ? TLM_KEYS.filter(k => m[1].split(".").includes(k)) : TLM_KEYS;
     return c.length ? { kind: "tlm", classes: c } : null;
   }
-  if ((m = /^lfi-(broad|conif)(?::(\d{1,3}))?$/.exec(v))) return { kind: "lfi", type: m[1], t: m[2] ? clamp(+m[2], 0, 100) : LFI_T };
+  if ((m = /^lfi-(broad|conif)(?::(\d{1,3}))?(:m3)?(?:[+ ](forest|tlm|none))?$/.exec(v)))   // "+" may come as a space
+    return { kind: "lfi", type: m[1], t: m[2] ? clamp(+m[2], 0, 100) : LFI_T, m3: !!m[3], base: m[4] || "forest" };
   if ((m = /^lnf(?::([a-z.]+))?$/.exec(v))) {
     const g = m[1] ? LNF.map(x => x.k).filter(k => m[1].split(".").includes(k)) : LNF.map(x => x.k);
     return g.length ? { kind: "lnf", groups: g } : null;
@@ -2729,7 +2736,7 @@ function vegParse(v) {
 /* the value of a parsed mask (all classes or groups: the short form) */
 function vegStr(p) {
   if (p.kind === "tlm") return p.classes.length === TLM_KEYS.length ? "tlm" : "tlm:" + p.classes.join(".");
-  if (p.kind === "lfi") return "lfi-" + p.type + ":" + p.t;
+  if (p.kind === "lfi") return "lfi-" + p.type + ":" + p.t + (p.m3 ? ":m3" : "") + (p.base !== "forest" ? "+" + p.base : "");
   if (p.kind === "lnf") return p.groups.length === LNF.length ? "lnf" : "lnf:" + p.groups.join(".");
   return p.kind + (p.ver ? "@" + p.ver : "");
 }
@@ -2744,8 +2751,11 @@ function vegName(v, date, short) {
     return short ? "swissTLM3D forest mask" + c : "Forest, swissTLM3D" + c;
   }
   if (p.kind === "lfi") {
-    const t = p.type === "broad" ? "broadleaf share > " + p.t + " %" : "broadleaf share ≤ " + p.t + " %";
-    return short ? LFI_TYPE[p.type].replace(/ \(.*/, "").toLowerCase() + " mask (LFI, " + t + ")" : LFI_TYPE[p.type] + ", Waldmischungsgrad LFI (" + t + ")";
+    const t = "broadleaf probability " + (p.type === "broad" ? "> " : "≤ ") + p.t + " %" + (p.m3 ? ", mean of 3 × 3 pixels" : "");
+    const b = p.base === "forest" ? "within the forest of " + habitatOf(null, date || state.date).ref.replace(/ \(.*/, "")
+      : p.base === "tlm" ? "within the swissTLM3D forest" : "all vegetation above 3 m";
+    return short ? LFI_TYPE[p.type].replace(/ \(.*/, "").toLowerCase() + " mask (Forest Type NFI, " + t + ", " + b + ")"
+                 : LFI_TYPE[p.type].replace(/ \(.*/, "") + ", Forest Type NFI 2023 (" + t + "; " + b + ")";
   }
   if (p.kind === "lnf") {
     const g = p.groups.length === LNF.length ? "all main categories"
@@ -2848,12 +2858,29 @@ async function tlmClassAt(x, y) {
   const f = (await r.json()).features || [];
   return f.length ? +f[0].properties.objektart : null;
 }
-/* Waldmischungsgrad LFI for a box: broadleaf share in % per 10 m cell, −128 outside the stocked area. */
-async function readLfiMask(p, bbox, W, H, signal) {
-  const a = await readGrid(LFI, bbox, W, H, signal, -128), m = new Uint8Array(W * H);
-  if (a) for (let k = 0; k < a.length; k++) {
-    const v = a[k];
-    m[k] = v < 0 || v > 100 ? 0 : p.type === "broad" ? (v > p.t ? 1 : 0) : (v <= p.t ? 1 : 0);
+/* Forest Type NFI for a box: broadleaf above the threshold, conifer at or below it, on the probability of broadleaf trees
+   (0–100 %, no data outside vegetation above 3 m). With p.m3 the mean of the valid values of the 3 × 3 pixels around a
+   cell is used (the LFI recommendation for mixed stands; on grids of 15 m or finer, coarser ones read averaged overviews).
+   Then only cells inside the chosen forest mask count: the habitat map forest of the date, the swissTLM3D forest or none. */
+async function readLfiMask(p, date, bbox, W, H, signal) {
+  const g = p.m3 && (bbox[2] - bbox[0]) / W <= 15 ? 1 : 0, rx = (bbox[2] - bbox[0]) / W, ry = (bbox[3] - bbox[1]) / H;
+  const W2 = W + 2 * g, H2 = H + 2 * g;
+  const [a, base] = await Promise.all([
+    readGrid(LFI, [bbox[0] - g * rx, bbox[1] - g * ry, bbox[2] + g * rx, bbox[3] + g * ry], W2, H2, signal, -1),
+    p.base === "none" ? null : readVegMask(p.base === "tlm" ? "tlm" : "forest", date, bbox, W, H, signal)]);
+  if (p.base !== "none" && !base) throw new Error("the forest mask of the Forest Type NFI mask could not be read");
+  const m = new Uint8Array(W * H), ok = v => v >= 0 && v <= 100;
+  if (a) for (let j = 0; j < H; j++) for (let i = 0; i < W; i++) {
+    const k = j * W + i;
+    if (base && !base[k]) continue;
+    let v = a[(j + g) * W2 + i + g];
+    if (!ok(v)) continue;
+    if (g) {
+      let s = 0, n = 0;
+      for (let dy = 0; dy <= 2; dy++) for (let dx = 0; dx <= 2; dx++) { const q = a[(j + dy) * W2 + i + dx]; if (ok(q)) { s += q; n++; } }
+      v = s / n;
+    }
+    m[k] = p.type === "broad" ? (v > p.t ? 1 : 0) : (v <= p.t ? 1 : 0);
   }
   return m;
 }
@@ -2889,7 +2916,8 @@ const vegCache = new Map();          // the last 24 mask grids: a time series re
 async function readVegMask(v, date, bbox, W, H, signal) {
   const p = vegParse(v);
   if (!p) return null;
-  const key = (p.kind === "forest" || p.kind === "vegetation" ? vegUrl(p, date) : vegStr(p)) + "|" + bbox.join(",") + "|" + W + "x" + H;
+  const key = (p.kind === "forest" || p.kind === "vegetation" ? vegUrl(p, date) : vegStr(p)) +
+    (p.kind === "lfi" && p.base === "forest" ? "|" + vegUrl({ kind: "forest", ver: null }, date) : "") + "|" + bbox.join(",") + "|" + W + "x" + H;
   if (vegCache.has(key)) { const m = vegCache.get(key); vegCache.delete(key); vegCache.set(key, m); return m; }
   const m = await readVegMaskGrid(p, v, date, bbox, W, H, signal);
   if (m) {
@@ -2901,7 +2929,7 @@ async function readVegMask(v, date, bbox, W, H, signal) {
 async function readVegMaskGrid(p, v, date, bbox, W, H, signal) {
   try {
     if (p.kind === "tlm") return await readTlmMask(p, bbox, W, H, signal);
-    if (p.kind === "lfi") return await readLfiMask(p, bbox, W, H, signal);
+    if (p.kind === "lfi") return await readLfiMask(p, date, bbox, W, H, signal);
     if (p.kind === "lnf") {
       const m = await readLnfMask(p, bbox, W, H, signal);
       if (m) return m;
@@ -3723,7 +3751,7 @@ function layerAttr(cfg) {
   if (cfg.rec.type === "ext") return escA(hostOf(cfg.rec.ext.u));
   const p = cfg.rec.source === "s2" ? vegParse(cfg.s.veg) : null;
   return ATTR + (!p ? "" : p.kind === "lnf" ? ', Nutzungsflächen &copy; <a href="https://www.blw.admin.ch" target="_blank" rel="noopener">BLW</a>'
-    : p.kind === "lfi" ? ', Waldmischungsgrad LFI &copy; <a href="https://www.lfi.ch" target="_blank" rel="noopener">BAFU / WSL</a>' : "");
+    : p.kind === "lfi" ? ', Forest Type NFI &copy; <a href="https://doi.org/10.16904/1000001.7" target="_blank" rel="noopener">WSL / BAFU</a>' : "");
 }
 function makeLayer(cfg) {
   const rec = cfg.rec, o = { opacity: cfg.s.opacity / 100, before: "z-data", attribution: layerAttr(cfg) };
@@ -4205,8 +4233,9 @@ function classList(box, list) {
   });
 }
 
-/* Vegetation mask pull-down: off, the habitat map of the date (forest or all vegetation, as swissEO VHI), the swissTLM3D forest, the Waldmischungsgrad LFI and the Nutzungsflächen. Below it the
-   options of the chosen mask: the swissTLM3D classes, the LFI threshold or the Nutzungsflächen categories. */
+/* Vegetation mask pull-down: off, the habitat map of the date (forest or all vegetation, as swissEO VHI), the swissTLM3D
+   forest, broadleaf or conifer forest of Forest Type NFI 2023 and the Nutzungsflächen. Below it the options of the chosen
+   mask: the swissTLM3D classes, the Forest Type threshold, 3 × 3 mean and forest mask, or the Nutzungsflächen categories. */
 function vegSelect(value, on) {
   const wrap = el("span", "vctl"), g = el("select", "vsel"), ex = el("div", "vopts");
   g.title = "Vegetation mask";
@@ -4217,7 +4246,7 @@ function vegSelect(value, on) {
   opt(x, "forest", "Forest"); opt(x, "vegetation", "All vegetation");
   x = grp("swissTLM3D");
   opt(x, "tlm", "Forest (classes below)");
-  x = grp("Waldmischungsgrad LFI");
+  x = grp("Forest Type NFI 2023 (WSL)");
   opt(x, "lfi-broad", LFI_TYPE.broad); opt(x, "lfi-conif", LFI_TYPE.conif);
   x = grp("Nutzungsflächen (BLW)");
   opt(x, "lnf", "Land use (categories below)");
@@ -4239,10 +4268,10 @@ function vegSelect(value, on) {
     chosen = now;
     set(make(now));
   }, rgbs && rgbs[n]));
-  const source = (url, name) => {
+  const source = (url, name, where) => {
     const s = el("small", null, "Source: "), a = el("a", null, name);
     a.href = url; a.target = "_blank"; a.rel = "noopener";
-    s.append(a, " (metadata on geocat.ch)");
+    s.append(a, " (" + (where || "metadata on geocat.ch") + ")");
     return s;
   };
   function extras() {
@@ -4255,15 +4284,25 @@ function vegSelect(value, on) {
       ex.append(el("small", null, "Read from the federal geoportal with 4 × 4 samples per cell (2.5 m for a 10 m cell)."),
                 source(META_LNF, "Nutzungsflächen, BLW (data of the cantons)"));
     } else if (p.kind === "lfi") {
+      const lfi = o => set(Object.assign({}, p, o));
       const l = el("label", "vrange"), r = el("input"), out = el("b");
       r.type = "range"; r.min = 0; r.max = 100; r.step = 1; r.value = p.t;
       const txt = () => { out.textContent = (p.type === "broad" ? "> " : "≤ ") + r.value + " %"; };
       txt();
       r.oninput = txt;
-      r.onchange = () => set({ kind: "lfi", type: p.type, t: +r.value });
-      l.append(el("span", null, "Broadleaf share "), out, r);
-      ex.append(l, el("small", null, "Broadleaf forest: share of broadleaf trees above the threshold; conifer forest: at or below it."),
-                source(META_LFI, "Waldmischungsgrad LFI, BAFU / WSL"));
+      r.onchange = () => lfi({ t: +r.value });
+      l.append(el("span", null, "Broadleaf probability "), out, r);
+      const fl = el("label", "vrange"), fs = el("select", "vsel");
+      Object.entries(LFI_BASE).forEach(([k, t]) => { const o = el("option", null, t); o.value = k; fs.append(o); });
+      fs.value = p.base;
+      fs.onchange = () => lfi({ base: fs.value });
+      fl.append(el("span", null, "Within "), fs);
+      ex.append(l, box("Mean of 3 × 3 pixels before the threshold (LFI recommendation for mixed stands)", p.m3, i => lfi({ m3: i.checked })), fl,
+                el("small", null, "Within: the forest of the habitat map of the date, of swissTLM3D (all classes), or all " +
+                  "vegetation above 3 m. Probability of broadleaf trees per 10 m pixel (0–100 %); broadleaf forest " +
+                  "above the threshold, conifer forest at or below it; larch counts as conifer. The LFI calls broadleaf above 85 % " +
+                  "pure. Remote sensing 2021–2023, yearly updates planned from 2027."),
+                source(META_LFI, "Forest Type NFI, WSL (Waser et al. 2025)", "doi:10.16904/1000001.7"));
     }
     ex.hidden = !ex.childElementCount;
   }
@@ -4272,7 +4311,8 @@ function vegSelect(value, on) {
     const k = g.value, q = p;
     p = k === "tlm" ? { kind: "tlm", classes: q && q.kind === "tlm" ? q.classes : TLM_KEYS }
       : k === "lnf" ? { kind: "lnf", groups: q && q.kind === "lnf" ? q.groups : LNF.map(y => y.k) }
-      : k.startsWith("lfi-") ? { kind: "lfi", type: k.slice(4), t: q && q.kind === "lfi" ? q.t : LFI_T }
+      : k.startsWith("lfi-") ? { kind: "lfi", type: k.slice(4), t: q && q.kind === "lfi" ? q.t : LFI_T,
+                                 m3: !!(q && q.kind === "lfi" && q.m3), base: q && q.kind === "lfi" ? q.base : "forest" }
       : vegParse(k);
     extras();
     set(p);
@@ -7508,8 +7548,8 @@ map.on("click", async e => {
     tr("SCL", scl == null ? "n/a" : scl + " · " + (P_SCL[scl] ? P_SCL[scl][0] : "?"));
     tr("Cloud mask", cld == null ? "n/a" : cld + " · " + (P_CLOUD[cld] ? P_CLOUD[cld][0] : "?"));
     tr("Terrain mask", TERRAIN_TXT(ter));
-    // habitat map of the date (as swissEO VHI), the swissTLM3D forest class, the broadleaf share of the
-    // Waldmischungsgrad LFI and the Nutzungsflächen category
+    // habitat map of the date (as swissEO VHI), the swissTLM3D forest class, the broadleaf probability of Forest Type NFI
+    // and the Nutzungsflächen category
     const hp = habitatOf(null, state.date), sp = vegParse(S(rec).veg);
     const inMask = kind => readPoint(vegUrl({ kind, ver: null }, state.date), p.x, p.y).catch(() => null);
     const [vf, vv, tlm, lfi, lnf] = await Promise.all([inMask("forest"), inMask("vegetation"), tlmClassAt(p.x, p.y).catch(() => undefined),
@@ -7517,8 +7557,8 @@ map.on("click", async e => {
     tr("Forest / vegetation (" + hp.ref.replace(/ \(.*/, "") + ")", (vf == null ? "n/a" : vf ? "forest" : "no forest") + " / " +
                                    (vv == null ? "n/a" : vv ? "vegetation" : "no vegetation"));
     tr("swissTLM3D forest", tlm === undefined ? "n/a" : tlm == null ? "no forest" : TLM_CLASSES[tlm] || "class " + tlm);
-    tr("Broadleaf share (LFI)", lfi === undefined ? "n/a" : lfi == null || lfi < 0 || lfi > 100 ? "no forest" : lfi + " %" +
-       (sp && sp.kind === "lfi" ? " · " + (lfi > sp.t ? "broadleaf" : "conifer") + " at " + sp.t + " %" : ""));
+    tr("Broadleaf probability (Forest Type NFI)", lfi === undefined ? "n/a" : lfi == null || lfi < 0 || lfi > 100 ? "no vegetation above 3 m" :
+       lfi.toFixed(lfi % 1 ? 1 : 0) + " %" + (sp && sp.kind === "lfi" ? " · " + (lfi > sp.t ? "broadleaf" : "conifer") + " at " + sp.t + " %" : ""));
     tr("Nutzungsfläche", lnf === undefined ? "n/a" : !lnf ? "none" : lnf.hauptkategorie_de + " · " + lnf.nutzung_de + " (" + lnf.lnf_code + ")");
     $("#inspBody").innerHTML = "<table>" + rows + "</table>";
   } catch (err) {
