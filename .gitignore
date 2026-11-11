@@ -39,3 +39,5 @@ yarn-error.log*
 /test-results/
 /e2e/.auth/
 /.playwright-cli/
+
+/temp/*
