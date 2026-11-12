@@ -1,0 +1,21 @@
+# Dependabot watches the two places where our dependencies are pinned (issue #21).
+# The root package.json is the frozen upstream Copernicus Browser and deliberately has no entry here:
+# it is never deployed, and update pull requests against it would only churn the reference copy.
+version: 2
+updates:
+  # The commit-SHA pins of the GitHub Actions workflows.
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+
+  # The self-hosted runtime libraries of the page: tools/vendor/package.json pins the exact versions
+  # that tools/vendor/vendor.mjs copies into lib/. After merging a bump: run
+  #   cd tools/vendor && npm ci && node vendor.mjs
+  # then update the lib/ file names in the LIB_CDN map of swisseo-browser.html and the SBOM table of
+  # the README (tools/check-dist.sh fails the deploy when they drift).
+  - package-ecosystem: npm
+    directory: "/tools/vendor"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
