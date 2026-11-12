@@ -685,7 +685,9 @@ The page loads no code from third-party CDNs: the runtime libraries are self-hos
 [`tools/vendor/package.json`](tools/vendor/package.json) (`cd tools/vendor && npm ci && node vendor.mjs`).
 The pinned CDN URLs remain in the page only as the fallback when it is opened as a lone local file without
 the `lib/` folder. MapLibre GL JS is an ES module, so the page script is a module too; proj4, pbf,
-vector-tile and vt-pbf also run inside MapLibre's workers.
+vector-tile and vt-pbf also run inside MapLibre's workers. The decision trees of the Forest Disturbance
+Classification are converted into a module as well, so the served page compiles no code at runtime and
+works under a Content-Security-Policy without `'unsafe-eval'` (it needs `worker-src 'self' blob:`).
 
 | Library | Version | Licence | Source | Used for |
 | --- | --- | --- | --- | --- |
@@ -700,7 +702,7 @@ vector-tile and vt-pbf also run inside MapLibre's workers.
 | [shpjs](https://github.com/calvinmetcalf/shapefile-js) | 4.0.4 | MIT | npm `shpjs` | Shapefile import |
 | [mgrs](https://github.com/proj4js/mgrs) | 2.1.0 | MIT | npm `mgrs` | MGRS grid references |
 | [gifenc](https://github.com/mattdesl/gifenc) | 1.0.3 | MIT | npm `gifenc` | timelapse GIF export |
-| [Forest Disturbance Classification](https://github.com/sentinel-hub/custom-scripts) | commit `0a071cf` | CC BY-SA 4.0 | sentinel-hub/custom-scripts (Joanneum Research, EvoLand) | `fdc` layer model |
+| [Forest Disturbance Classification](https://github.com/sentinel-hub/custom-scripts) | commit `0a071cf` | CC BY-SA 4.0 | sentinel-hub/custom-scripts (Joanneum Research, EvoLand) | `fdc` layer model, 150 decision trees converted to a module |
 | [WMS / WMTS provider list](https://github.com/geoadmin/web-mapviewer) | commit `3e5a2900` | BSD-3-Clause | geoadmin/web-mapviewer | WMS / WMTS panel suggestions |
 
 ### Security

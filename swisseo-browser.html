@@ -1219,7 +1219,8 @@ const LIB_CDN = {
   "jszip-3.10.1.min.js":           "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js",
   "shp-4.0.4.min.js":              "https://cdn.jsdelivr.net/npm/shpjs@4.0.4/dist/shp.min.js",
   "mgrs-2.1.0.js":                 "https://cdn.jsdelivr.net/npm/mgrs@2.1.0/dist/mgrs.js",
-  "forest-disturbance-0a071cf.js": "https://cdn.jsdelivr.net/gh/sentinel-hub/custom-scripts@0a071cfc15adc91ae79cdda1cec6332133bb7565/sentinel-2/forest_disturbance_classification/script.js",
+  // file:// reads the original script here and compiles it; lib/ holds it converted to a module (tools/vendor)
+  "forest-disturbance-trees-0a071cf.mjs": "https://cdn.jsdelivr.net/gh/sentinel-hub/custom-scripts@0a071cfc15adc91ae79cdda1cec6332133bb7565/sentinel-2/forest_disturbance_classification/script.js",
   "external-providers-3e5a2900.json": "https://raw.githubusercontent.com/geoadmin/web-mapviewer/3e5a2900/packages/mapviewer/src/modules/menu/components/advancedTools/ImportCatalogue/external-providers.json"
 };
 const libUrl = f => location.protocol === "file:" ? LIB_CDN[f] : new URL("lib/" + f, location.href).href;
@@ -2279,18 +2280,21 @@ const ICONS = {
 
 const nd = v => (v[0] - v[1]) / (v[0] + v[1]);
 /* Forest Disturbance Classification (Sentinel Hub custom script by Joanneum Research, EvoLand project).
-   The 150 trees (411 kB) are loaded on first use from lib/ (a copy pinned to a commit of
-   sentinel-hub/custom-scripts), and only accepted when the code consists of tree functions alone. The model
-   expects Sentinel Hub L2A DN with harmonizeValues = true, i.e. DN = 10000 × reflectance: for swissEO
-   (ρ = DN × 0.0001 − 0.1) that is DN − 1000, clamped at 0. */
-const FDC_URL = libUrl("forest-disturbance-0a071cf.js");
+   The 150 trees (411 kB) are loaded on first use from lib/, where tools/vendor has converted the script
+   pinned to a commit of sentinel-hub/custom-scripts into a module that exports them: the site compiles no
+   code at runtime and needs no 'unsafe-eval'. The model expects Sentinel Hub L2A DN with
+   harmonizeValues = true, i.e. DN = 10000 × reflectance: for swissEO (ρ = DN × 0.0001 − 0.1) that is
+   DN − 1000, clamped at 0. */
 const FDC_PALETTE = { 0: ["Bark beetle", [171, 104, 32]], 1: ["Clear cut", [184, 182, 180]], 2: ["Healthy forest (not drawn)", null],
   3: ["Salvage logged (low confidence)", [184, 182, 180]], 4: ["Wildfire", [122, 46, 1]], 5: ["Windthrow", [76, 119, 237]] };
 let fdcReq = null;
 function fdcModel() {
   if (!fdcReq) {
     fdcReq = (async () => {
-      const r = await fetch(FDC_URL);
+      if (location.protocol !== "file:") return (await import(libUrl("forest-disturbance-trees-0a071cf.mjs"))).trees;
+      /* Opened as a file, there is no lib/ to import: the original script is read from the pinned CDN copy
+         and compiled, after checking that it consists of tree functions and arithmetic alone. */
+      const r = await fetch(LIB_CDN["forest-disturbance-trees-0a071cf.mjs"]);
       if (!r.ok) throw new Error("HTTP " + r.status + " for the classification model");
       const src = await r.text(), a = src.indexOf("function pt0("), b = src.indexOf("function predict(");
       if (a < 0 || b < a) throw new Error("Unexpected format of the classification model.");

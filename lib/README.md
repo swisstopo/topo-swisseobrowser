@@ -20,5 +20,5 @@ table of the repository README.
 - `pbf-5.1.2.esm.js`: pbf 5.1.2
 - `vector-tile-3.0.0.esm.js`: @mapbox/vector-tile 3.0.0
 - `vt-pbf-4.3.3.esm.js`: @maplibre/vt-pbf 4.3.3
-- `forest-disturbance-0a071cf.js`: Forest Disturbance Classification model (Joanneum Research, EvoLand), sentinel-hub/custom-scripts, CC BY 4.0
 - `external-providers-3e5a2900.json`: WMS / WMTS provider list of geoadmin/web-mapviewer (BSD-3-Clause)
+- `forest-disturbance-trees-0a071cf.mjs`: Forest Disturbance Classification trees (Joanneum Research, EvoLand), sentinel-hub/custom-scripts, CC BY-SA 4.0

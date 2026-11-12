@@ -14,7 +14,11 @@ set -euo pipefail
 site=${1:?usage: check-dist.sh <site dir>}
 page=$site/index.html
 
-grep -oE '"lib/[^"]+"' "$page" | tr -d '"' | sort -u | while read -r f; do
+# The page names a library either as a path in a tag (href="lib/x.css") or as a key of its LIB_CDN map,
+# which libUrl() resolves to lib/ over http(s). Both must exist in the assembled site.
+{ grep -oE '"lib/[^"]+"' "$page" | tr -d '"'
+  grep -oE 'libUrl\("[^"]+"\)' "$page" | sed -E 's/libUrl\("(.*)"\)/lib\/\1/'
+} | sort -u | while read -r f; do
   [ -f "$site/$f" ] || { echo "::error::$f is referenced by the page but missing from the site"; exit 1; }
 done
 

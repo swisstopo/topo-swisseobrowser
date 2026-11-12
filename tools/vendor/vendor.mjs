@@ -40,16 +40,34 @@ const bundles = [
 ];
 
 /* Pinned raw files (immutable commit URLs). */
+const FDC_SRC = "https://raw.githubusercontent.com/sentinel-hub/custom-scripts/" +
+  "0a071cfc15adc91ae79cdda1cec6332133bb7565/sentinel-2/forest_disturbance_classification/script.js";
 const downloads = [
-  ["forest-disturbance-0a071cf.js",
-   "https://raw.githubusercontent.com/sentinel-hub/custom-scripts/0a071cfc15adc91ae79cdda1cec6332133bb7565/" +
-   "sentinel-2/forest_disturbance_classification/script.js",
-   "Forest Disturbance Classification model (Joanneum Research, EvoLand), sentinel-hub/custom-scripts, CC BY-SA 4.0"],
   ["external-providers-3e5a2900.json",
    "https://raw.githubusercontent.com/geoadmin/web-mapviewer/3e5a2900/packages/mapviewer/src/" +
    "modules/menu/components/advancedTools/ImportCatalogue/external-providers.json",
    "WMS / WMTS provider list of geoadmin/web-mapviewer (BSD-3-Clause)"]
 ];
+
+/* The Forest Disturbance Classification model is converted once into a static ES module: the page then
+   imports the decision trees instead of compiling them with new Function(), so the production site needs
+   no 'unsafe-eval' in its Content-Security-Policy. The checks are the ones the page used to run at
+   runtime: the extracted code must consist of tree functions and arithmetic alone. */
+function vendorFdc(src) {
+  const a = src.indexOf("function pt0("), b = src.indexOf("function predict(");
+  if (a < 0 || b < a) throw new Error("forest disturbance: unexpected format of the script");
+  const code = src.slice(a, b);
+  const rest = code.replace(/function pt\d+\(B02, B05, B06, B8A, B11, B12\)|return|\b(B02|B05|B06|B8A|B11|B12)\b/g, "");
+  if (/[^\s\d.eE+\-<=?:(){};,]/.test(rest)) throw new Error("forest disturbance: the script contains unexpected code");
+  const n = (code.match(/function pt\d+\(/g) || []).length;
+  if (n < 100) throw new Error("forest disturbance: only " + n + " trees found");
+  return ["/* Forest Disturbance Classification (Joanneum Research, EvoLand), CC BY-SA 4.0.",
+    " * " + n + " decision trees, extracted by tools/vendor from",
+    " * " + FDC_SRC,
+    " * The page imports this module; it compiles no code at runtime. */",
+    code.trimEnd(), "",
+    "export const trees = [" + Array.from({ length: n }, (_, i) => "pt" + i).join(",") + "];", ""].join("\n");
+}
 
 fs.rmSync(lib, { recursive: true, force: true });
 fs.mkdirSync(lib);
@@ -82,6 +100,16 @@ for (const [f, url, note] of downloads) {
   console.log("fetched " + f);
 }
 
+{
+  const r = await fetch(FDC_SRC);
+  if (!r.ok) throw new Error("HTTP " + r.status + " for " + FDC_SRC);
+  const f = "forest-disturbance-trees-0a071cf.mjs";
+  fs.writeFileSync(path.join(lib, f), vendorFdc(await r.text()));
+  made.push([f, "Forest Disturbance Classification trees (Joanneum Research, EvoLand), " +
+                "sentinel-hub/custom-scripts, CC BY-SA 4.0", "", ""]);
+  console.log("converted " + f);
+}
+
 /* Self-test: the ESM files must load and export what swisseo-browser.html imports. */
 for (const [pkg, , name, check] of bundles) {
   const m = await import(pathToFileURL(path.join(lib, name(V(pkg)))).href);
@@ -91,6 +119,14 @@ for (const [pkg, , name, check] of bundles) {
   const m = await import(pathToFileURL(path.join(lib, `gifenc-${V("gifenc")}.esm.js`)).href);
   for (const k of ["GIFEncoder", "quantize", "applyPalette"])
     if (typeof m[k] !== "function") throw new Error("gifenc: export " + k + " missing");
+}
+{
+  const { trees } = await import(pathToFileURL(path.join(lib, "forest-disturbance-trees-0a071cf.mjs")).href);
+  if (!Array.isArray(trees) || trees.length < 100 || typeof trees[0] !== "function")
+    throw new Error("forest disturbance: the converted module does not export the trees");
+  if (!Number.isFinite(trees[0](1200, 1500, 1800, 3000, 2200, 1500)))
+    throw new Error("forest disturbance: a tree did not return a number");
+  console.log("forest disturbance: " + trees.length + " trees");
 }
 console.log("self-test OK");
 
@@ -104,11 +140,13 @@ fs.writeFileSync(path.join(lib, "README.md"), [
   ...made.map(([f, src, v]) => `- \`${f}\`: ${src}${v ? " " + v : ""}`), ""
 ].join("\n"));
 
-/* Warn when the page references lib/ files that this run did not produce (or the other way round). */
+/* Warn when the page and lib/ drift apart. The page names a library either as a path in a tag
+   (href="lib/x.css") or as a key of its LIB_CDN map (libUrl("x.js")), so both are matched by name. */
 const page = fs.readFileSync(path.join(root, "swisseo-browser.html"), "utf8");
-const refs = new Set([...page.matchAll(/"lib\/([^"]+)"/g)].map(m => m[1]));
-const names = new Set(made.map(([f]) => f));
-for (const r of refs) if (!names.has(r)) console.warn("WARNING: the page references lib/" + r + ", which was not generated");
-for (const n of names) if (refs.size && !refs.has(n) && n !== "README.md")
-  console.warn("note: lib/" + n + " is not referenced by the page");
+const refs = new Set([...page.matchAll(/"lib\/([^"]+)"|libUrl\("([^"]+)"\)|^\s*"([^"]+)":\s*"https:/gm)]
+  .map(m => m[1] || m[2] || m[3]));
+for (const r of refs) if (!made.some(([f]) => f === r))
+  console.warn("WARNING: the page asks for lib/" + r + ", which was not generated");
+for (const [n] of made) if (!refs.has(n))
+  console.warn("WARNING: lib/" + n + " is not used by the page");
 console.log("lib/ complete: " + made.length + " files");
