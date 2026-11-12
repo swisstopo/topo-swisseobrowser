@@ -121,19 +121,30 @@ jobs:
 
       - name: Invalidate the CloudFront cache
         run: |
+          # "/*" counts as a single invalidation path, so a full invalidation per deploy stays free
           id=$(aws cloudfront create-invalidation \
                  --distribution-id "${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}" \
                  --paths "/*" --query Invalidation.Id --output text)
-          echo "invalidation $id"
+          echo "invalidation $id created"
+          # waiting needs cloudfront:GetInvalidation as well; the invalidation is on its way either way,
+          # so a role without that permission only loses the wait, not the deploy
           aws cloudfront wait invalidation-completed \
-                 --distribution-id "${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}" --id "$id"
+                 --distribution-id "${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}" --id "$id" ||
+            echo "::warning::could not wait for invalidation $id (needs cloudfront:GetInvalidation); it still runs"
 
       - name: Smoke test
         run: |
-          curl -fsS "$PROD_URL/?smoke=$GITHUB_RUN_ID" -o page.html
+          # the edges may serve the previous page for a moment after the invalidation, so retry
+          for i in 1 2 3 4 5 6; do
+            curl -fsS "$PROD_URL/?smoke=$GITHUB_RUN_ID.$i" -o page.html &&
+              grep -q 'const VERIFIED_IDS = \[' page.html && break
+            echo "attempt $i: not the new page yet"
+            sleep 20
+          done
           grep -q 'const VERIFIED_IDS = \[' page.html ||
-            { echo "::error::VERIFIED_IDS was not injected into the deployed page"; exit 1; }
+            { echo "::error::the deployed page does not carry the injected VERIFIED_IDS"; exit 1; }
           mjs=$(grep -oE '"lib/maplibre-gl-[0-9.]+\.mjs"' page.html | tr -d '"' | head -1)
-          curl -fsSI "$PROD_URL/$mjs" | tr -d '\r' | grep -i '^content-type:' | grep -qi 'text/javascript' ||
-            { echo "::error::$mjs is not served as text/javascript"; exit 1; }
+          curl -fsS "$PROD_URL/$mjs" -o lib.mjs -D headers.txt
+          tr -d '\r' < headers.txt | grep -i '^content-type:' | grep -qi 'text/javascript' ||
+            { echo "::error::$mjs is not served as text/javascript:"; grep -i '^content-type:' headers.txt; exit 1; }
           echo "smoke test OK: $PROD_URL"
