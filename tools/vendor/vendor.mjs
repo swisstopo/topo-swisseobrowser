@@ -1,0 +1,114 @@
+/* Generates ../../lib/, the self-hosted runtime libraries of swisseo-browser.html.
+   Usage:  cd tools/vendor && npm ci && node vendor.mjs
+   File names carry the version (lib/maplibre-gl-6.16.0.mjs), so the deployed files can be cached as
+   immutable and an upgrade is always a visible rename: after a version bump, update the LIB_CDN map in
+   swisseo-browser.html and the SBOM table in README.md (this script warns when they drift).
+   The four *.esm.js bundles are built with esbuild because the jsDelivr /+esm bundles the page used
+   before are not self-contained (they import further jsDelivr URLs). */
+import { build } from "esbuild";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
+
+const here = path.dirname(fileURLToPath(import.meta.url));
+const root = path.resolve(here, "..", "..");
+const lib = path.join(root, "lib");
+const mod = p => path.join(here, "node_modules", p);
+const meta = pkg => JSON.parse(fs.readFileSync(mod(path.join(pkg, "package.json")), "utf8"));
+const V = pkg => meta(pkg).version;
+
+/* The ten dist files copied as they are (UMD / classic / self-contained ESM / CSS). */
+const copies = [
+  ["maplibre-gl", "dist/maplibre-gl.css",        v => `maplibre-gl-${v}.css`],
+  ["maplibre-gl", "dist/maplibre-gl.mjs",        v => `maplibre-gl-${v}.mjs`],
+  ["maplibre-gl", "dist/maplibre-gl-worker.mjs", v => `maplibre-gl-worker-${v}.mjs`],
+  ["proj4",       "dist/proj4.js",               v => `proj4-${v}.js`],
+  ["geotiff",     "dist-browser/geotiff.js",     v => `geotiff-${v}.js`],
+  ["gifenc",      "dist/gifenc.esm.js",          v => `gifenc-${v}.esm.js`],
+  ["@tmcw/togeojson", "dist/togeojson.umd.js",   v => `togeojson-${v}.umd.js`],
+  ["jszip",       "dist/jszip.min.js",           v => `jszip-${v}.min.js`],
+  ["shpjs",       "dist/shp.min.js",             v => `shp-${v}.min.js`],
+  ["mgrs",        "dist/mgrs.js",                v => `mgrs-${v}.js`]
+];
+
+/* The ESM bundles for MapLibre's workers and their self-test: the named exports the page imports. */
+const bundles = [
+  ["proj4",               "stubs/proj4.js",       v => `proj4-${v}.esm.js`,       m => typeof m.default === "function"],
+  ["pbf",                 "stubs/pbf.js",         v => `pbf-${v}.esm.js`,         m => typeof m.PbfReader === "function"],
+  ["@mapbox/vector-tile", "stubs/vector-tile.js", v => `vector-tile-${v}.esm.js`, m => typeof m.VectorTile === "function"],
+  ["@maplibre/vt-pbf",    "stubs/vt-pbf.js",      v => `vt-pbf-${v}.esm.js`,      m => typeof m.fromVectorTileJs === "function"]
+];
+
+/* Pinned raw files (immutable commit URLs). */
+const downloads = [
+  ["forest-disturbance-0a071cf.js",
+   "https://raw.githubusercontent.com/sentinel-hub/custom-scripts/0a071cfc15adc91ae79cdda1cec6332133bb7565/" +
+   "sentinel-2/forest_disturbance_classification/script.js",
+   "Forest Disturbance Classification model (Joanneum Research, EvoLand), sentinel-hub/custom-scripts, CC BY-SA 4.0"],
+  ["external-providers-3e5a2900.json",
+   "https://raw.githubusercontent.com/geoadmin/web-mapviewer/3e5a2900/packages/mapviewer/src/" +
+   "modules/menu/components/advancedTools/ImportCatalogue/external-providers.json",
+   "WMS / WMTS provider list of geoadmin/web-mapviewer (BSD-3-Clause)"]
+];
+
+fs.rmSync(lib, { recursive: true, force: true });
+fs.mkdirSync(lib);
+
+const made = [];
+for (const [pkg, from, name] of copies) {
+  const f = name(V(pkg));
+  fs.copyFileSync(mod(path.join(pkg, from)), path.join(lib, f));
+  made.push([f, pkg, V(pkg), meta(pkg).license]);
+  console.log("copied  " + f);
+}
+
+for (const [pkg, stub, name] of bundles) {
+  const f = name(V(pkg));
+  await build({
+    entryPoints: [path.join(here, stub)], bundle: true, format: "esm", platform: "browser",
+    target: "es2020", minify: true, legalComments: "inline",
+    banner: { js: `/* ${pkg}@${V(pkg)} (${meta(pkg).license}), bundled from npm by tools/vendor */` },
+    outfile: path.join(lib, f), logLevel: "silent"
+  });
+  made.push([f, pkg, V(pkg), meta(pkg).license]);
+  console.log("bundled " + f);
+}
+
+for (const [f, url, note] of downloads) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error("HTTP " + r.status + " for " + url);
+  fs.writeFileSync(path.join(lib, f), Buffer.from(await r.arrayBuffer()));
+  made.push([f, note, "", ""]);
+  console.log("fetched " + f);
+}
+
+/* Self-test: the ESM files must load and export what swisseo-browser.html imports. */
+for (const [pkg, , name, check] of bundles) {
+  const m = await import(pathToFileURL(path.join(lib, name(V(pkg)))).href);
+  if (!check(m)) throw new Error(name(V(pkg)) + ": expected export missing");
+}
+{
+  const m = await import(pathToFileURL(path.join(lib, `gifenc-${V("gifenc")}.esm.js`)).href);
+  for (const k of ["GIFEncoder", "quantize", "applyPalette"])
+    if (typeof m[k] !== "function") throw new Error("gifenc: export " + k + " missing");
+}
+console.log("self-test OK");
+
+fs.writeFileSync(path.join(lib, "README.md"), [
+  "# lib/ (generated)", "",
+  "Generated by `tools/vendor` (`npm ci && node vendor.mjs`); do not edit by hand.",
+  "These are the runtime libraries of `swisseo-browser.html`, self-hosted so that no third-party CDN",
+  "runs code on the site (the pinned CDN URLs remain only as the fallback when the page is opened as a",
+  "local file). Versions are pinned in `tools/vendor/package.json`; licences are listed in the SBOM",
+  "table of the repository README.", "",
+  ...made.map(([f, src, v]) => `- \`${f}\`: ${src}${v ? " " + v : ""}`), ""
+].join("\n"));
+
+/* Warn when the page references lib/ files that this run did not produce (or the other way round). */
+const page = fs.readFileSync(path.join(root, "swisseo-browser.html"), "utf8");
+const refs = new Set([...page.matchAll(/"lib\/([^"]+)"/g)].map(m => m[1]));
+const names = new Set(made.map(([f]) => f));
+for (const r of refs) if (!names.has(r)) console.warn("WARNING: the page references lib/" + r + ", which was not generated");
+for (const n of names) if (refs.size && !refs.has(n) && n !== "README.md")
+  console.warn("note: lib/" + n + " is not referenced by the page");
+console.log("lib/ complete: " + made.length + " files");
