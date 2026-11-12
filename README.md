@@ -669,11 +669,15 @@ Two environments, two branches:
   `int` is merged into `main` through a reviewed pull request; repository admins can also start it manually.
   The workflow signs in to AWS with **OIDC** (no stored access keys; the IAM trust policy is limited to this
   repository and `main`), syncs the site to the bucket and invalidates the CloudFront cache. It needs two
-  repository secrets: `AWS_ROLE_ARN` (the role to assume) and `CLOUDFRONT_DISTRIBUTION_ID`.
+  repository secrets, `AWS_ROLE_ARN` (the role to assume) and `CLOUDFRONT_DISTRIBUTION_ID`, and the
+  repository variable `PROD_URL`, the public address the deploy checks afterwards (the CloudFront domain
+  until the swisstopo domain is in place; without it the deploy runs and only that check is skipped).
 
-Both deploys assemble the same site: `swisseo-browser.html` as `index.html` (and under its own name), this
-README, the help pages in `docs/`, the self-hosted libraries in `lib/` and the layer thumbnails the page
-references from `public/previews/`; the upstream Copernicus Browser sources are never published. On every
+Both deploys assemble the same site: `swisseo-browser.html` as `index.html`, this README, the help pages in
+`docs/`, the self-hosted libraries in `lib/` and the layer thumbnails the page references from
+`public/previews/`; the upstream Copernicus Browser sources are never published. Integration additionally
+keeps the page under its own name, so older links to `swisseo-browser.html` still work there; production
+serves it only as `index.html`. On every
 deploy the [layer verification](#layer-verification) checklist of this README is applied to the page
 (`tools/apply-verification.py`) and `tools/check-dist.sh` verifies that no library is loaded from a CDN.
 All GitHub Actions are pinned to commit SHAs.
