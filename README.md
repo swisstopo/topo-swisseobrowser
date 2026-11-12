@@ -672,6 +672,11 @@ Two environments, two branches:
   repository secrets, `AWS_ROLE_ARN` (the role to assume) and `CLOUDFRONT_DISTRIBUTION_ID`, and the
   repository variable `PROD_URL`, the public address the deploy checks afterwards (the CloudFront domain
   until the swisstopo domain is in place; without it the deploy runs and only that check is skipped).
+  The subject this repository sends to AWS uses GitHub's *immutable* format, with the numeric owner and
+  repository ids next to the names (`repo:<owner>@<id>/<repo>@<id>:ref:refs/heads/main`), so the trust
+  policy of the role must contain exactly that string. The workflow prints the claims of its own token as
+  an annotation and in the run summary before it calls AWS, which is the authoritative source if the
+  trust ever has to be rebuilt.
 
 Both deploys assemble the same site: `swisseo-browser.html` as `index.html`, this README, the help pages in
 `docs/`, the self-hosted libraries in `lib/` and the layer thumbnails the page references from
