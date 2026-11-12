@@ -1,0 +1,116 @@
+# Deploys the swissEO Browser to production:
+#   s3://s3-topo-satromo-swisseobrowser behind CloudFront, https://swisseobrowser.swisstopo.admin.ch
+# Branch model: int is integration (GitHub Pages, pages.yml); merging int into main deploys here.
+# Who may deploy: pushes to main are controlled by the branch protection of main (pull request +
+# review); a manual run additionally requires the admin role on the repository.
+# AWS access: OIDC only (no stored keys). The IAM trust policy is limited to
+# repo:swisstopo/topo-swisseobrowser:ref:refs/heads/main, so this workflow must run from main.
+# (Alternative: a "production" environment with required reviewers; that changes the OIDC sub claim
+# to "...:environment:production" and needs the IAM trust policy updated first.)
+# Secrets: AWS_ROLE_ARN (the role to assume), CLOUDFRONT_DISTRIBUTION_ID.
+# Actions are pinned to commit SHAs (issue #21): tags can be moved, commits cannot.
+name: Deploy swissEO Browser to production
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - swisseo-browser.html
+      - README.md
+      - public/previews/**
+      - docs/**
+      - lib/**
+      - tools/**
+      - .github/workflows/deploy-prod.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: deploy-prod
+  cancel-in-progress: false
+
+env:
+  BUCKET: s3-topo-satromo-swisseobrowser
+  AWS_REGION: eu-central-1
+  PROD_URL: https://swisseobrowser.swisstopo.admin.ch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require main and, for manual runs, a repository admin
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          [ "$GITHUB_REF" = "refs/heads/main" ] ||
+            { echo "::error::production deploys run from main only (the AWS OIDC trust is limited to refs/heads/main)"; exit 1; }
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            perm=$(gh api "repos/$GITHUB_REPOSITORY/collaborators/$GITHUB_ACTOR/permission" --jq .permission)
+            echo "$GITHUB_ACTOR has '$perm' permission"
+            [ "$perm" = "admin" ] ||
+              { echo "::error::only repository admins may start a production deploy by hand"; exit 1; }
+          fi
+
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Assemble the site
+        run: |
+          mkdir -p _site/public/previews
+          cp swisseo-browser.html _site/index.html
+          cp swisseo-browser.html _site/swisseo-browser.html
+          cp README.md _site/README.md
+          grep -oE '"[A-Z-]+-[0-9a-f]{6}-[^"]+\.png"' swisseo-browser.html | tr -d '"' | sort -u |
+            while read -r f; do cp "public/previews/$f" _site/public/previews/; done
+          cp -r docs _site/docs
+          cp -r lib _site/lib
+
+      - name: Apply the layer verification checklist of README.md
+        run: python3 tools/apply-verification.py _site/index.html _site/swisseo-browser.html
+
+      - name: Check the site serves its libraries itself
+        run: bash tools/check-dist.sh _site
+
+      - uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Upload to S3
+        run: |
+          # One cache-control per pass (aws s3 sync applies a single value; filters: last match wins).
+          # lib/ files carry their version in the name, so they can be cached as immutable; .mjs gets an
+          # explicit JavaScript MIME type because module workers and import() enforce it strictly.
+          S="aws s3 sync _site s3://$BUCKET --no-progress"
+          $S --exclude "*" --include "lib/*" --exclude "lib/*.mjs" \
+             --cache-control "public,max-age=31536000,immutable"
+          $S --exclude "*" --include "lib/*.mjs" \
+             --cache-control "public,max-age=31536000,immutable" --content-type "text/javascript"
+          $S --exclude "*" --include "public/previews/*" --cache-control "public,max-age=86400"
+          $S --exclude "*" --include "docs/*" --cache-control "public,max-age=3600"
+          # the page, its copy and the README: short cache, refreshed by the invalidation below
+          $S --exclude "lib/*" --exclude "public/previews/*" --exclude "docs/*" \
+             --cache-control "public,max-age=300,must-revalidate"
+          # remove objects that are no longer part of the site (uploads above are newer, so this only deletes)
+          aws s3 sync _site "s3://$BUCKET" --delete --no-progress
+
+      - name: Invalidate the CloudFront cache
+        run: |
+          id=$(aws cloudfront create-invalidation \
+                 --distribution-id "${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}" \
+                 --paths "/*" --query Invalidation.Id --output text)
+          echo "invalidation $id"
+          aws cloudfront wait invalidation-completed \
+                 --distribution-id "${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}" --id "$id"
+
+      - name: Smoke test
+        run: |
+          curl -fsS "$PROD_URL/?smoke=$GITHUB_RUN_ID" -o page.html
+          grep -q 'const VERIFIED_IDS = \[' page.html ||
+            { echo "::error::VERIFIED_IDS was not injected into the deployed page"; exit 1; }
+          mjs=$(grep -oE '"lib/maplibre-gl-[0-9.]+\.mjs"' page.html | tr -d '"' | head -1)
+          curl -fsSI "$PROD_URL/$mjs" | tr -d '\r' | grep -i '^content-type:' | grep -qi 'text/javascript' ||
+            { echo "::error::$mjs is not served as text/javascript"; exit 1; }
+          echo "smoke test OK: $PROD_URL"

@@ -1,0 +1,47 @@
+# CodeQL analysis of our own code (issue #21): the JavaScript embedded in swisseo-browser.html and the
+# help pages in docs/. The rest of the repository is the upstream Copernicus Browser, kept only as a
+# reference and never deployed, and lib/ is vendored third-party code; both are excluded to keep the
+# alerts relevant. Actions are pinned to commit SHAs: tags can be moved, commits cannot.
+name: CodeQL
+
+on:
+  push:
+    branches: [main, int]
+    paths:
+      - swisseo-browser.html
+      - docs/**
+      - .github/workflows/codeql.yml
+  pull_request:
+    branches: [main, int]
+    paths:
+      - swisseo-browser.html
+      - docs/**
+      - .github/workflows/codeql.yml
+  schedule:
+    - cron: "30 5 * * 1"
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - uses: github/codeql-action/init@33d7b85da1a04171e211befe2c739303b9a4c066 # v4
+        with:
+          languages: javascript-typescript
+          build-mode: none
+          config: |
+            paths:
+              - swisseo-browser.html
+              - docs
+            paths-ignore:
+              - lib
+
+      - uses: github/codeql-action/analyze@33d7b85da1a04171e211befe2c739303b9a4c066 # v4
+        with:
+          category: "/language:javascript-typescript"
