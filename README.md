@@ -722,6 +722,16 @@ works under a Content-Security-Policy without `'unsafe-eval'` (it needs `worker-
 - **Dependency alerts**: Dependabot watches the pinned GitHub Actions and the library versions in
   `tools/vendor/package.json` ([`.github/dependabot.yml`](.github/dependabot.yml)); CodeQL analyses the
   page's JavaScript weekly and on every push ([`.github/workflows/codeql.yml`](.github/workflows/codeql.yml)).
+- **Two dependency manifests, only one of them shipped**: this repository still carries the upstream
+  Copernicus Browser (`package.json` and `package-lock.json` at the root, around 2000 packages of a React
+  build), kept as a reference and never built, never installed and never deployed. GitHub's dependency graph
+  scans those files all the same, so most alerts on this repository point at them. Only alerts whose manifest
+  is `tools/vendor/package.json` or `tools/vendor/package-lock.json` concern code that reaches users, and
+  only the runtime dependencies there do: `esbuild` is a build tool that produces `lib/` on a developer
+  machine. The upstream tree contains older copies of libraries that are also in `lib/` (for example
+  `maplibre-gl` 1.15.3 against 6.17.0 in `lib/`), so an alert can name a library the site uses and still not
+  apply to it. Check the version and the manifest path of the alert, then dismiss an upstream one as "not
+  used" with that reason.
 - **Vendored libraries are reproducible**: [`.github/workflows/vendor-check.yml`](.github/workflows/vendor-check.yml)
   rebuilds `lib/` from the pinned versions on every pull request that touches `lib/` or `tools/vendor/` and
   fails if the result differs, so nothing can be edited into `lib/` by hand. A Dependabot pull request that
