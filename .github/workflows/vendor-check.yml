@@ -1,0 +1,53 @@
+# Checks that lib/ is exactly what tools/vendor produces from the pinned versions in
+# tools/vendor/package.json. This keeps two promises of the SBOM in the README: the deployed libraries
+# really come from those versions (nobody hand-edited lib/), and a version bump is only complete once
+# lib/ has been regenerated. A Dependabot pull request that bumps tools/vendor/package.json therefore
+# fails here until "cd tools/vendor && npm ci && node vendor.mjs" has been run and the result committed.
+# Actions are pinned to commit SHAs: tags can be moved, commits cannot.
+name: Vendored libraries
+
+on:
+  push:
+    branches: [main, int]
+    paths:
+      - lib/**
+      - tools/vendor/**
+      - .github/workflows/vendor-check.yml
+  pull_request:
+    paths:
+      - lib/**
+      - tools/vendor/**
+      - .github/workflows/vendor-check.yml
+
+permissions:
+  contents: read
+
+jobs:
+  reproducible:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+
+      - name: Rebuild lib/ from the pinned versions
+        run: |
+          cd tools/vendor
+          npm ci
+          node vendor.mjs
+
+      - name: lib/ must match the rebuild
+        run: |
+          if ! git diff --exit-code --stat -- lib/; then
+            echo "::error::lib/ does not match the output of tools/vendor. Run 'cd tools/vendor && npm ci && node vendor.mjs', then commit lib/ and update the file names in the LIB_CDN map of swisseo-browser.html and the SBOM table of README.md."
+            exit 1
+          fi
+          echo "lib/ is reproducible from tools/vendor/package.json"
+
+      - name: The page must use the rebuilt files
+        run: |
+          # a minimal site: the repository root cannot be used, its index.html is the upstream one
+          mkdir -p _check && cp swisseo-browser.html _check/index.html && cp -r lib _check/lib
+          bash tools/check-dist.sh _check

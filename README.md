@@ -713,6 +713,11 @@ works under a Content-Security-Policy without `'unsafe-eval'` (it needs `worker-
 - **Dependency alerts**: Dependabot watches the pinned GitHub Actions and the library versions in
   `tools/vendor/package.json` ([`.github/dependabot.yml`](.github/dependabot.yml)); CodeQL analyses the
   page's JavaScript weekly and on every push ([`.github/workflows/codeql.yml`](.github/workflows/codeql.yml)).
+- **Vendored libraries are reproducible**: [`.github/workflows/vendor-check.yml`](.github/workflows/vendor-check.yml)
+  rebuilds `lib/` from the pinned versions on every pull request that touches `lib/` or `tools/vendor/` and
+  fails if the result differs, so nothing can be edited into `lib/` by hand. A Dependabot pull request that
+  bumps a library is therefore only half the change: run `cd tools/vendor && npm ci && node vendor.mjs`, commit
+  the new `lib/`, and update the file names in the `LIB_CDN` map of the page and in the SBOM table above.
 - **Update process**: the application owner reviews new Dependabot and CodeQL alerts weekly and on
   notification. A critical vulnerability in a shipped library is fixed within 48 hours: bump the version in
   `tools/vendor/package.json`, regenerate `lib/`, update the `LIB_CDN` map in the page and the SBOM table
