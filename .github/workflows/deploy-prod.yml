@@ -84,11 +84,17 @@ jobs:
                 python3 -c 'import json,sys; print(json.load(sys.stdin)["value"])')
           echo "::add-mask::$tok"
           python3 -c '
-          import base64, json, sys
+          import base64, json, os, sys
           p = sys.argv[1].split(".")[1]
           c = json.loads(base64.urlsafe_b64decode(p + "=" * (-len(p) % 4)))
           for k in ("iss", "aud", "sub", "repository", "ref", "event_name"):
               if k in c: print(f"{k:11} {c[k]}")
+          iss, aud, sub = c.get("iss"), c.get("aud"), c.get("sub")
+          # also an annotation and a job summary, so the claims can be read without opening the log
+          print(f"::notice title=OIDC claims for the AWS trust policy::iss={iss} aud={aud} sub={sub}")
+          rows = "".join(f"| `{k}` | `{c[k]}` |\n" for k in ("iss", "aud", "sub") if k in c)
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf8") as f:
+              f.write("### OIDC claims sent to AWS\n\n| claim | value |\n| --- | --- |\n" + rows)
           ' "$tok"
           case "${{ secrets.AWS_ROLE_ARN }}" in
             arn:aws:iam::[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]:role/*)

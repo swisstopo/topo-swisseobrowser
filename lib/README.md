@@ -12,7 +12,7 @@ table of the repository README.
 - `proj4-2.22.0.js`: proj4 2.22.0
 - `geotiff-2.1.3.js`: geotiff 2.1.3
 - `gifenc-1.0.3.esm.js`: gifenc 1.0.3
-- `togeojson-5.8.1.umd.js`: @tmcw/togeojson 5.8.1
+- `togeojson-7.1.3.umd.js`: @tmcw/togeojson 7.1.3
 - `jszip-3.10.2.min.js`: jszip 3.10.2
 - `shp-6.2.0.min.js`: shpjs 6.2.0
 - `mgrs-2.2.0.js`: mgrs 2.2.0

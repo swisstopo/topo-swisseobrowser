@@ -697,7 +697,7 @@ works under a Content-Security-Policy without `'unsafe-eval'` (it needs `worker-
 | [pbf](https://github.com/mapbox/pbf) | 5.1.2 | BSD-3-Clause | npm `pbf` | label tiles (workers) |
 | [vector-tile](https://github.com/mapbox/vector-tile-js) | 3.0.0 | BSD-3-Clause | npm `@mapbox/vector-tile` | label tiles (workers) |
 | [vt-pbf](https://github.com/maplibre/vt-pbf) | 4.3.3 | MIT | npm `@maplibre/vt-pbf` | label tiles (workers) |
-| [togeojson](https://github.com/placemark/togeojson) | 5.8.1 | BSD-2-Clause | npm `@tmcw/togeojson` | KML / GPX import |
+| [togeojson](https://github.com/placemark/togeojson) | 7.1.3 | BSD-2-Clause | npm `@tmcw/togeojson` | KML / GPX import |
 | [JSZip](https://github.com/Stuk/jszip) | 3.10.2 | MIT (dual MIT / GPL-3.0-or-later; used under MIT) | npm `jszip` | KMZ / Shapefile import |
 | [shpjs](https://github.com/calvinmetcalf/shapefile-js) | 6.2.0 | MIT | npm `shpjs` | Shapefile import |
 | [mgrs](https://github.com/proj4js/mgrs) | 2.2.0 | MIT | npm `mgrs` | MGRS grid references |
