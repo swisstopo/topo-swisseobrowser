@@ -669,11 +669,15 @@ Two environments, two branches:
   `int` is merged into `main` through a reviewed pull request; repository admins can also start it manually.
   The workflow signs in to AWS with **OIDC** (no stored access keys; the IAM trust policy is limited to this
   repository and `main`), syncs the site to the bucket and invalidates the CloudFront cache. It needs two
-  repository secrets: `AWS_ROLE_ARN` (the role to assume) and `CLOUDFRONT_DISTRIBUTION_ID`.
+  repository secrets, `AWS_ROLE_ARN` (the role to assume) and `CLOUDFRONT_DISTRIBUTION_ID`, and the
+  repository variable `PROD_URL`, the public address the deploy checks afterwards (the CloudFront domain
+  until the swisstopo domain is in place; without it the deploy runs and only that check is skipped).
 
-Both deploys assemble the same site: `swisseo-browser.html` as `index.html` (and under its own name), this
-README, the help pages in `docs/`, the self-hosted libraries in `lib/` and the layer thumbnails the page
-references from `public/previews/`; the upstream Copernicus Browser sources are never published. On every
+Both deploys assemble the same site: `swisseo-browser.html` as `index.html`, this README, the help pages in
+`docs/`, the self-hosted libraries in `lib/` and the layer thumbnails the page references from
+`public/previews/`; the upstream Copernicus Browser sources are never published. Integration additionally
+keeps the page under its own name, so older links to `swisseo-browser.html` still work there; production
+serves it only as `index.html`. On every
 deploy the [layer verification](#layer-verification) checklist of this README is applied to the page
 (`tools/apply-verification.py`) and `tools/check-dist.sh` verifies that no library is loaded from a CDN.
 All GitHub Actions are pinned to commit SHAs.
@@ -697,7 +701,7 @@ works under a Content-Security-Policy without `'unsafe-eval'` (it needs `worker-
 | [pbf](https://github.com/mapbox/pbf) | 5.1.2 | BSD-3-Clause | npm `pbf` | label tiles (workers) |
 | [vector-tile](https://github.com/mapbox/vector-tile-js) | 3.0.0 | BSD-3-Clause | npm `@mapbox/vector-tile` | label tiles (workers) |
 | [vt-pbf](https://github.com/maplibre/vt-pbf) | 4.3.3 | MIT | npm `@maplibre/vt-pbf` | label tiles (workers) |
-| [togeojson](https://github.com/placemark/togeojson) | 5.8.1 | BSD-2-Clause | npm `@tmcw/togeojson` | KML / GPX import |
+| [togeojson](https://github.com/placemark/togeojson) | 7.1.3 | BSD-2-Clause | npm `@tmcw/togeojson` | KML / GPX import |
 | [JSZip](https://github.com/Stuk/jszip) | 3.10.2 | MIT (dual MIT / GPL-3.0-or-later; used under MIT) | npm `jszip` | KMZ / Shapefile import |
 | [shpjs](https://github.com/calvinmetcalf/shapefile-js) | 6.2.0 | MIT | npm `shpjs` | Shapefile import |
 | [mgrs](https://github.com/proj4js/mgrs) | 2.2.0 | MIT | npm `mgrs` | MGRS grid references |

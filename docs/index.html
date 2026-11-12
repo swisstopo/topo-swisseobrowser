@@ -89,7 +89,9 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
 </head>
 <body>
 <header><div class="hbar">
-  <a class="conf-logo" href="../swisseo-browser.html" title="swissEO Browser">
+  <!-- the links back to the browser point at the site root, which serves it on every deployment;
+       in a local copy they are rewritten to the file itself (see the script at the end of the page) -->
+  <a class="conf-logo" data-home href="../" title="swissEO Browser">
     <!-- Swiss flag of web-mapviewer (assets/svg/swiss-flag.svg), as in ConfederationFullLogo.vue -->
     <svg class="swiss-flag" viewBox="0 0 604 669" aria-hidden="true"><path fill="#D52B1E" d="M302,2 C 402,2 502,19 602,52 C 602,286 604,534 302,667 C 0,534 2,286 2,52 C 102,19 202,2 302,2 z"/><path fill="#fff" d="M102,242 h140 v-140 h120 v140 h140 v120 h-140 v140 h-120 v-140 h-140 z"/></svg>
     <div class="conf-txt"><span>Schweizerische Eidgenossenschaft</span><span>Confédération suisse</span>
@@ -97,7 +99,7 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
   </a>
   <span class="sep" aria-hidden="true"></span>
   <div class="t">swissEO Browser<span class="beta">BETA</span><small>Help and tutorial</small></div>
-  <a class="open" href="../swisseo-browser.html">Open the <span class="long">swissEO </span>Browser</a>
+  <a class="open" data-home href="../">Open the <span class="long">swissEO </span>Browser</a>
 </div></header>
 
 <div class="wrap">
@@ -170,7 +172,7 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
 <!-- ======================= PART A ======================= -->
 <div class="card">
   <h1>Part A: Tutorial for your first visit</h1>
-  <p>No prior knowledge needed. Open the <a href="../swisseo-browser.html" target="_blank" rel="noopener">swissEO Browser</a>
+  <p>No prior knowledge needed. Open the <a data-home href="../" target="_blank" rel="noopener">swissEO Browser</a>
     in a second window and follow along.</p>
 
   <h2 id="t1"><span class="n">1</span>What you see</h2>
@@ -716,5 +718,13 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
 </div>
 </main>
 </div>
+<script>
+/* The deployed site serves the browser as index.html at its root, so the links back to it point at "../".
+   A local copy, and the repository itself, have it under its own name next to this folder: the links go
+   there when that file exists (a file:// page cannot ask, and is always such a copy). */
+const home = () => document.querySelectorAll("a[data-home]").forEach(a => { a.href = "../swisseo-browser.html"; });
+if (location.protocol === "file:") home();
+else fetch("../swisseo-browser.html", { method: "HEAD" }).then(r => { if (r.ok) home(); }).catch(() => {});
+</script>
 </body>
 </html>

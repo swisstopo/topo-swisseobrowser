@@ -35,7 +35,11 @@ concurrency:
 env:
   BUCKET: s3-topo-satromo-swisseobrowser
   AWS_REGION: eu-central-1
-  PROD_URL: https://swisseobrowser.swisstopo.admin.ch
+  # The public address of the production site, only used to check the result after the deploy.
+  # Repository variable (Settings, Secrets and variables, Actions, tab "Variables"), so it can follow the
+  # CloudFront domain today and the swisstopo domain at go-live without changing this workflow. When it is
+  # not set, the deploy still runs and only the check is skipped.
+  PROD_URL: ${{ vars.PROD_URL }}
 
 jobs:
   deploy:
@@ -59,8 +63,8 @@ jobs:
       - name: Assemble the site
         run: |
           mkdir -p _site/public/previews
+          # production serves the page only as index.html, under no second name
           cp swisseo-browser.html _site/index.html
-          cp swisseo-browser.html _site/swisseo-browser.html
           cp README.md _site/README.md
           grep -oE '"[A-Z-]+-[0-9a-f]{6}-[^"]+\.png"' swisseo-browser.html | tr -d '"' | sort -u |
             while read -r f; do cp "public/previews/$f" _site/public/previews/; done
@@ -68,7 +72,7 @@ jobs:
           cp -r lib _site/lib
 
       - name: Apply the layer verification checklist of README.md
-        run: python3 tools/apply-verification.py _site/index.html _site/swisseo-browser.html
+        run: python3 tools/apply-verification.py _site/index.html
 
       - name: Check the site serves its libraries itself
         run: bash tools/check-dist.sh _site
@@ -84,11 +88,17 @@ jobs:
                 python3 -c 'import json,sys; print(json.load(sys.stdin)["value"])')
           echo "::add-mask::$tok"
           python3 -c '
-          import base64, json, sys
+          import base64, json, os, sys
           p = sys.argv[1].split(".")[1]
           c = json.loads(base64.urlsafe_b64decode(p + "=" * (-len(p) % 4)))
           for k in ("iss", "aud", "sub", "repository", "ref", "event_name"):
               if k in c: print(f"{k:11} {c[k]}")
+          iss, aud, sub = c.get("iss"), c.get("aud"), c.get("sub")
+          # also an annotation and a job summary, so the claims can be read without opening the log
+          print(f"::notice title=OIDC claims for the AWS trust policy::iss={iss} aud={aud} sub={sub}")
+          rows = "".join(f"| `{k}` | `{c[k]}` |\n" for k in ("iss", "aud", "sub") if k in c)
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf8") as f:
+              f.write("### OIDC claims sent to AWS\n\n| claim | value |\n| --- | --- |\n" + rows)
           ' "$tok"
           case "${{ secrets.AWS_ROLE_ARN }}" in
             arn:aws:iam::[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]:role/*)
@@ -113,7 +123,7 @@ jobs:
              --cache-control "public,max-age=31536000,immutable" --content-type "text/javascript"
           $S --exclude "*" --include "public/previews/*" --cache-control "public,max-age=86400"
           $S --exclude "*" --include "docs/*" --cache-control "public,max-age=3600"
-          # the page, its copy and the README: short cache, refreshed by the invalidation below
+          # the page and the README: short cache, refreshed by the invalidation below
           $S --exclude "lib/*" --exclude "public/previews/*" --exclude "docs/*" \
              --cache-control "public,max-age=300,must-revalidate"
           # remove objects that are no longer part of the site (uploads above are newer, so this only deletes)
@@ -134,6 +144,10 @@ jobs:
 
       - name: Smoke test
         run: |
+          if [ -z "$PROD_URL" ]; then
+            echo "::warning::the repository variable PROD_URL is not set, so the deployed site was not checked"
+            exit 0
+          fi
           # the edges may serve the previous page for a moment after the invalidation, so retry
           for i in 1 2 3 4 5 6; do
             curl -fsS "$PROD_URL/?smoke=$GITHUB_RUN_ID.$i" -o page.html &&
