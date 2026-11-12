@@ -3,8 +3,10 @@
 # Branch model: int is integration (GitHub Pages, pages.yml); merging int into main deploys here.
 # Who may deploy: pushes to main are controlled by the branch protection of main (pull request +
 # review); a manual run additionally requires the admin role on the repository.
-# AWS access: OIDC only (no stored keys). The IAM trust policy is limited to
-# repo:swisstopo/topo-swisseobrowser:ref:refs/heads/main, so this workflow must run from main.
+# AWS access: OIDC only (no stored keys). The IAM trust policy is limited to the subject
+# repo:<owner>@<owner id>/<repo>@<repo id>:ref:refs/heads/main, so this workflow must run from main.
+# The ids are part of the subject because this repository uses GitHub's immutable subject claims; the
+# step below prints the exact subject, which is what the trust policy has to accept.
 # (Alternative: a "production" environment with required reviewers; that changes the OIDC sub claim
 # to "...:environment:production" and needs the IAM trust policy updated first.)
 # Secrets: AWS_ROLE_ARN (the role to assume), CLOUDFRONT_DISTRIBUTION_ID.
@@ -157,8 +159,15 @@ jobs:
           done
           grep -q 'const VERIFIED_IDS = \[' page.html ||
             { echo "::error::the deployed page does not carry the injected VERIFIED_IDS"; exit 1; }
-          mjs=$(grep -oE '"lib/maplibre-gl-[0-9.]+\.mjs"' page.html | tr -d '"' | head -1)
-          curl -fsS "$PROD_URL/$mjs" -o lib.mjs -D headers.txt
+          # the page names the module without the folder (libUrl("maplibre-gl-x.y.z.mjs")), so match the
+          # bare file name and prepend lib/ here
+          mjs=$(grep -oE 'maplibre-gl-[0-9]+\.[0-9]+\.[0-9]+\.mjs' page.html | head -1)
+          [ -n "$mjs" ] ||
+            { echo "::error::no MapLibre module file name found in the deployed page"; exit 1; }
+          curl -fsS "$PROD_URL/lib/$mjs" -o lib.mjs -D headers.txt
           tr -d '\r' < headers.txt | grep -i '^content-type:' | grep -qi 'text/javascript' ||
-            { echo "::error::$mjs is not served as text/javascript:"; grep -i '^content-type:' headers.txt; exit 1; }
-          echo "smoke test OK: $PROD_URL"
+            { echo "::error::lib/$mjs is not served as text/javascript:"; grep -i '^content-type:' headers.txt; exit 1; }
+          # the help page is reached as docs/index.html, and only that name is uploaded
+          curl -fsS -o /dev/null "$PROD_URL/docs/index.html" ||
+            { echo "::error::the help page is missing from the deployed site"; exit 1; }
+          echo "smoke test OK: $PROD_URL (page, lib/$mjs, docs/index.html)"
