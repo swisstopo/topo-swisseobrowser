@@ -691,16 +691,16 @@ works under a Content-Security-Policy without `'unsafe-eval'` (it needs `worker-
 
 | Library | Version | Licence | Source | Used for |
 | --- | --- | --- | --- | --- |
-| [MapLibre GL JS](https://github.com/maplibre/maplibre-gl-js) | 6.16.0 | BSD-3-Clause | npm `maplibre-gl` | map and its workers |
+| [MapLibre GL JS](https://github.com/maplibre/maplibre-gl-js) | 6.17.0 | BSD-3-Clause | npm `maplibre-gl` | map and its workers |
 | [proj4js](https://github.com/proj4js/proj4js) | 2.22.0 | MIT | npm `proj4` | LV95 coordinates, also in the workers |
-| [geotiff.js](https://github.com/geotiffjs/geotiff.js) | 2.1.3 | MIT | npm `geotiff` | reading the COGs |
+| [geotiff.js](https://github.com/geotiffjs/geotiff.js) | 2.1.3 | MIT | npm `geotiff` | reading the COGs (held at 2.x, see [`dependabot.yml`](.github/dependabot.yml)) |
 | [pbf](https://github.com/mapbox/pbf) | 5.1.2 | BSD-3-Clause | npm `pbf` | label tiles (workers) |
 | [vector-tile](https://github.com/mapbox/vector-tile-js) | 3.0.0 | BSD-3-Clause | npm `@mapbox/vector-tile` | label tiles (workers) |
 | [vt-pbf](https://github.com/maplibre/vt-pbf) | 4.3.3 | MIT | npm `@maplibre/vt-pbf` | label tiles (workers) |
 | [togeojson](https://github.com/placemark/togeojson) | 5.8.1 | BSD-2-Clause | npm `@tmcw/togeojson` | KML / GPX import |
-| [JSZip](https://github.com/Stuk/jszip) | 3.10.1 | MIT (dual MIT / GPL-3.0-or-later; used under MIT) | npm `jszip` | KMZ / Shapefile import |
-| [shpjs](https://github.com/calvinmetcalf/shapefile-js) | 4.0.4 | MIT | npm `shpjs` | Shapefile import |
-| [mgrs](https://github.com/proj4js/mgrs) | 2.1.0 | MIT | npm `mgrs` | MGRS grid references |
+| [JSZip](https://github.com/Stuk/jszip) | 3.10.2 | MIT (dual MIT / GPL-3.0-or-later; used under MIT) | npm `jszip` | KMZ / Shapefile import |
+| [shpjs](https://github.com/calvinmetcalf/shapefile-js) | 6.2.0 | MIT | npm `shpjs` | Shapefile import |
+| [mgrs](https://github.com/proj4js/mgrs) | 2.2.0 | MIT | npm `mgrs` | MGRS grid references |
 | [gifenc](https://github.com/mattdesl/gifenc) | 1.0.3 | MIT | npm `gifenc` | timelapse GIF export |
 | [Forest Disturbance Classification](https://github.com/sentinel-hub/custom-scripts) | commit `0a071cf` | CC BY-SA 4.0 | sentinel-hub/custom-scripts (Joanneum Research, EvoLand) | `fdc` layer model, 150 decision trees converted to a module |
 | [WMS / WMTS provider list](https://github.com/geoadmin/web-mapviewer) | commit `3e5a2900` | BSD-3-Clause | geoadmin/web-mapviewer | WMS / WMTS panel suggestions |
@@ -713,6 +713,11 @@ works under a Content-Security-Policy without `'unsafe-eval'` (it needs `worker-
 - **Dependency alerts**: Dependabot watches the pinned GitHub Actions and the library versions in
   `tools/vendor/package.json` ([`.github/dependabot.yml`](.github/dependabot.yml)); CodeQL analyses the
   page's JavaScript weekly and on every push ([`.github/workflows/codeql.yml`](.github/workflows/codeql.yml)).
+- **Vendored libraries are reproducible**: [`.github/workflows/vendor-check.yml`](.github/workflows/vendor-check.yml)
+  rebuilds `lib/` from the pinned versions on every pull request that touches `lib/` or `tools/vendor/` and
+  fails if the result differs, so nothing can be edited into `lib/` by hand. A Dependabot pull request that
+  bumps a library is therefore only half the change: run `cd tools/vendor && npm ci && node vendor.mjs`, commit
+  the new `lib/`, and update the file names in the `LIB_CDN` map of the page and in the SBOM table above.
 - **Update process**: the application owner reviews new Dependabot and CodeQL alerts weekly and on
   notification. A critical vulnerability in a shipped library is fixed within 48 hours: bump the version in
   `tools/vendor/package.json`, regenerate `lib/`, update the `LIB_CDN` map in the page and the SBOM table

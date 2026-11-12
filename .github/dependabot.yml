@@ -19,3 +19,12 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    ignore:
+      # geotiff.js 3 changed how a decoder is obtained and constructed: getDecoder now takes
+      # (compression, fileDirectory), and the JPEG decoder built from it loses the JPEGTables of the
+      # COG ("No quantization table found"), which breaks the native JPEG path of the TCI tiles and,
+      # with it, the fallback to geotiff.js' own decoder. Reading COGs otherwise works unchanged, so
+      # this is only about that decoder: lift the entry once the wrapper in the page (jpegReady) has
+      # been ported and tested against a real TCI COG.
+      - dependency-name: geotiff
+        versions: [">=3.0.0"]
