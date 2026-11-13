@@ -11,6 +11,7 @@ on:
     branches: [int]
     paths:
       - swisseo-browser.html
+      - catalog/**
       - README.md
       - public/previews/**
       - docs/**
@@ -37,6 +38,9 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      - name: Python dependencies of the build
+        run: python3 -m pip install --quiet --disable-pip-version-check "PyYAML==6.0.3"
+
       - name: Assemble site
         run: |
           mkdir -p _site/public/previews
@@ -44,9 +48,9 @@ jobs:
           cp swisseo-browser.html _site/swisseo-browser.html
           # the README is fetched by the page when VERIFIED_IDS is not injected, and read by people
           cp README.md _site/README.md
-          # layer thumbnails: only the Copernicus Browser previews the page references
-          grep -oE '"[A-Z-]+-[0-9a-f]{6}-[^"]+\.png"' swisseo-browser.html | tr -d '"' | sort -u |
-            while read -r f; do cp "public/previews/$f" _site/public/previews/; done
+          # layer thumbnails of the layers this environment offers (the catalogue knows which)
+          python3 tools/build-catalog.py --env int --previews "$RUNNER_TEMP/previews.txt"
+          while read -r f; do cp "public/previews/$f" _site/public/previews/; done < "$RUNNER_TEMP/previews.txt"
           ls _site/public/previews
           # help and tutorial, opened by the (i) button of the map
           cp -r docs _site/docs
@@ -54,11 +58,31 @@ jobs:
           cp -r lib _site/lib
           touch _site/.nojekyll
 
-      - name: Apply the layer verification checklist of README.md
-        run: python3 tools/apply-verification.py _site/index.html _site/swisseo-browser.html
+      # Writes the catalogue into the page: which configurations exist, in which order, with which
+      # layers, and which layers are verified (the BETA labels). Integration offers everything.
+      # --check first, so a hand edit of a generated block is reported before anything is published.
+      - name: Apply the catalogue
+        run: |
+          python3 tools/build-catalog.py --env int --check
+          python3 tools/build-catalog.py --env int --page _site/index.html --page _site/swisseo-browser.html
+
+      # Only the integration version carries this: production must stay indexable. The committed files
+      # therefore look like production and this step adds the tag, so a broken step can at worst let
+      # the integration version be indexed, never hide production from search engines.
+      # (A robots.txt cannot do this here: on a project page it is served under /topo-swisseobrowser/
+      # and crawlers only read the one at the root of swisstopo.github.io, which is another repository.)
+      - name: Keep the integration version out of search engines
+        run: |
+          for f in _site/index.html _site/swisseo-browser.html _site/docs/index.html; do
+            grep -q '^<!-- robots:marker' "$f" || { echo "::error::the robots marker is missing from $f"; exit 1; }
+            sed -i 's|^<!-- robots:marker.*-->$|<meta name="robots" content="noindex, nofollow">|' "$f"
+            grep -q '^<meta name="robots" content="noindex, nofollow">$' "$f" ||
+              { echo "::error::noindex was not inserted into $f"; exit 1; }
+          done
+          echo "noindex set on the integration version"
 
       - name: Check the site serves its libraries itself
-        run: bash tools/check-dist.sh _site
+        run: bash tools/check-dist.sh _site int
 
       - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
 

@@ -8,8 +8,10 @@
 - UI and documentation texts are in English. Highlight stories have at most ten lines and credit their
   source.
 - Keep the "Not for operational use" notice and the AI note ("Please note that AI (Claude Code with the Opus 5.5 model,
-  medium effort) was used extensively to prepare this website ...") in the Info tab, the README and the help page; do
-  not add other mentions of Claude to the page or the documentation.
+  medium effort) was used extensively to prepare this website ...") in the README and the help page; do
+  not add other mentions of Claude to the page or the documentation. In the application itself the warning is the red
+  integration bar, and the Info tab only links to the README and the help page (issue #39): it holds four short cards
+  (Feedback, Selected date, How this works, Terms) and no explanations of its own, so nothing is written twice.
 
 ## Repository
 
@@ -66,10 +68,17 @@
 - **Reflectance**: ρ = DN × 0.0001 − 0.1 for the swissEO S2-SR bands; negative ρ is clamped to 0 before
   an index is computed. Sentinel Hub custom scripts that work on DN expect 10000 × ρ, i.e.
   `max(0, DN − 1000)` of the swissEO bands.
-- **New layers**: add them to `LAYERS`, give them a description in `COP_META`, put them into a
-  configuration in `CONFIGS`, and add them unchecked to the README verification checklist (the deploy
-  warns about missing entries) and to the README layer lists.
-- **Layer verification**: only the user ticks a layer as verified in the README checklist.
+- **The catalogue decides what is offered**: `catalog/layers.yaml` (which layers exist, `verified`) and
+  `catalog/configurations.yaml` (the pull-down, its order, its groups, `beta`). `tools/build-catalog.py`
+  writes them into the page between `/* catalog:configs:start */` and `/* catalog:configs:end */` and into
+  the README checklist; never edit those blocks by hand, CI fails on it. After editing `catalog/`, run
+  `python3 tools/build-catalog.py --env int --write-readme` and commit page and README together. Every id
+  is quoted in the YAML: `true` is a layer id and YAML would read it as a boolean.
+- **New layers**: add them to `LAYERS`, give them a description in `COP_META`, add them to
+  `catalog/layers.yaml` with `verified: false`, put them into a configuration in
+  `catalog/configurations.yaml`, regenerate, and add them to the README layer lists.
+- **Layer verification**: only the user ticks a layer as verified (`verified: true` in
+  `catalog/layers.yaml`). Unverified means the BETA label on integration and not offered in production.
 - Data that is not in STAC (e.g. NDVIdiff v200 BETA) gets a fixed item list in `SOURCES`.
 
 ## Testing

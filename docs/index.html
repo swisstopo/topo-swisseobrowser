@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>swissEO Browser Help</title>
 <meta name="description" content="Tutorial and overview of the swissEO Browser, the web viewer for swisstopo's swissEO Sentinel-2 products.">
+<!-- robots:marker (the integration deploy replaces this line with a noindex tag; production keeps it) -->
+<!-- Which environment this copy runs in, as in the app: production is the only one without the
+     integration bar. Set before the body is parsed, so the bar never flashes. -->
+<script>
+document.documentElement.dataset.env =
+  ["swisseobrowser.swisstopo.admin.ch", "d2i2rebzl46jfr.cloudfront.net"].indexOf(location.hostname) >= 0 ? "prod" : "int";
+</script>
 <!-- official favicon of the Swiss Confederation (www.admin.ch/favicon.ico), as in the app -->
 <link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACxElEQVR4nMVWz2vUUBCemfe2m2yabNcfVKEg7UEEvetZ8CL+CcL+ASqCoIee1ItQBAV7EI8KRQQPHvQPUBB7sL0Uqh7qr4PabevW3U26yUtGIrptNkmz3WbrBxPy5s3L972XyWQA/jNwJ8F87izUX722Cq47QszDQ8obCv2uLLQDhGZb0+r7Tp9p4NMnuxdgl4xDwnVPCg5OAfMxADiKzBPIrG0rEtFhxCUA+ACI73ykWb9YeFNq2T8y1TjF4oQnxA2FNBcABgEA52E+YKCI5jwS10OOVAGK6GFepGnmET3ayim7NBQyjyk8Zk0DKBajzo0NwHY7cy0Ci61j6prvHidjagqo/jNicPFSX2knu2aD3p6B8fzt9Xti4NQdI4APAwYjuKkCAgBn0ALCbEkVAADNQbMzYiM9BxCXI8GmCVAuxx9iGHFfGDc2FmdcWwO07U0KwPSC5AlRjRSQyUneLfxqNVoHhDif/goQv0WHkDsY8XuqAFfIzzBgeEJ+SRXgWOYSI/4aZAIqc/hjqoADtZrHiAudBfz30m3RWrIZnGD8J74jYLG8suJtq9IjcbOThETsSxkzNT0dSzZ19VpirI/YSUAlxG3Iqv2+FM/+3Yc/ZFQqblt21Ynl7Fgf6UWmAHH8xNuAaB5yRoC4ZFcqLzMFFObnICC6m7cAJnGvUltWmQJCtKzyTEC0CDmBEb86uv4gaY6SnJW1VeULeTk53cNy5gG321FTsc11oKS8YjUbm/W4V3hC3E9srYg4kDJqoS+pBRPicX3iCPSFplnWFNFs380o0ULDHDZhN3D00qiPuLhjcsRPG0W9z613wdb0w2Fb3Ts5vXc0bRzyhG2UrPB9ZpErQc8dXd8Pg8Dq+Di6slD1EWsJR153pbywfnA00nYPBC3DqHhC3vIR133EphLijq2XRmGv0bRGjJZlWXtOnCd+A9DAdAW2nwDLAAAAAElFTkSuQmCC">
 <style>
@@ -16,6 +23,10 @@
 html{scroll-behavior:smooth;scroll-padding-top:94px}
 body{margin:0;font:15px/1.6 Arial,Helvetica,"Noto Sans",sans-serif;color:var(--text);background:var(--bg)}
 a{color:var(--blue)}
+/* Integration warning, as in the app: shown everywhere except production (see the script in the head) */
+#envbar{background:var(--red);color:#fff;font-size:12px;line-height:1.35;padding:5px 10px;text-align:center}
+#envbar a{color:#fff}
+:root[data-env="prod"] #envbar{display:none}
 header{position:sticky;top:0;z-index:10;background:#fff;border-bottom:3px solid var(--red);box-shadow:0 1px 4px rgba(0,0,0,.08)}
 .hbar{max-width:1240px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:10px 16px}
 /* Confederation logo as on map.geo.admin.ch (ConfederationFullLogo.vue) and in the menu of the app */
@@ -88,6 +99,8 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
 </style>
 </head>
 <body>
+<div id="envbar"><b>Integration version for testing.</b> Not for operational use: the layers and values
+  shown here are not validated and may be wrong. The official version is not yet published.</div>
 <header><div class="hbar">
   <!-- the links back to the browser point at the site root, which serves it on every deployment;
        in a local copy they are rewritten to the file itself (see the script at the end of the page) -->

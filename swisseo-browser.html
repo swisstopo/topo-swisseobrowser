@@ -3,7 +3,28 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- robots:marker (the integration deploy replaces this line with a noindex tag; production keeps it) -->
 <title>swissEO Browser</title>
+<meta name="description" content="Browser-only viewer for swisstopo's swissEO Sentinel-2 products: true colour, indices, vegetation health, drought and forest layers, statistics, exports and 3D terrain, in LV95." />
+<!-- Preview when a link is shared. The address is rewritten by the deploy of each environment;
+     committed with the integration address so a local copy and a file:// copy still preview. -->
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="swissEO Browser" />
+<meta property="og:title" content="swissEO Browser" />
+<meta property="og:description" content="Browser-only viewer for swisstopo's swissEO Sentinel-2 products: true colour, indices, vegetation health, drought and forest layers, statistics, exports and 3D terrain, in LV95." />
+<meta property="og:url" content="https://swisstopo.github.io/topo-swisseobrowser/" />
+<meta property="og:image" content="https://swisstopo.github.io/topo-swisseobrowser/docs/img/og-image.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<!-- Which environment this copy runs in: production is the only one without the integration bar.
+     Set before the body is parsed, so the bar never flashes. Without JavaScript the attribute stays
+     unset and the bar is shown, which is the safe direction. At go-live the swisstopo domain is the
+     only production host and the CloudFront one can be dropped. -->
+<script>
+document.documentElement.dataset.env =
+  ["swisseobrowser.swisstopo.admin.ch", "d2i2rebzl46jfr.cloudfront.net"].indexOf(location.hostname) >= 0 ? "prod" : "int";
+</script>
 <!-- official favicon of the Swiss Confederation (www.admin.ch/favicon.ico) -->
 <link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACxElEQVR4nMVWz2vUUBCemfe2m2yabNcfVKEg7UEEvetZ8CL+CcL+ASqCoIee1ItQBAV7EI8KRQQPHvQPUBB7sL0Uqh7qr4PabevW3U26yUtGIrptNkmz3WbrBxPy5s3L972XyWQA/jNwJ8F87izUX722Cq47QszDQ8obCv2uLLQDhGZb0+r7Tp9p4NMnuxdgl4xDwnVPCg5OAfMxADiKzBPIrG0rEtFhxCUA+ACI73ykWb9YeFNq2T8y1TjF4oQnxA2FNBcABgEA52E+YKCI5jwS10OOVAGK6GFepGnmET3ayim7NBQyjyk8Zk0DKBajzo0NwHY7cy0Ci61j6prvHidjagqo/jNicPFSX2knu2aD3p6B8fzt9Xti4NQdI4APAwYjuKkCAgBn0ALCbEkVAADNQbMzYiM9BxCXI8GmCVAuxx9iGHFfGDc2FmdcWwO07U0KwPSC5AlRjRSQyUneLfxqNVoHhDif/goQv0WHkDsY8XuqAFfIzzBgeEJ+SRXgWOYSI/4aZAIqc/hjqoADtZrHiAudBfz30m3RWrIZnGD8J74jYLG8suJtq9IjcbOThETsSxkzNT0dSzZ19VpirI/YSUAlxG3Iqv2+FM/+3Yc/ZFQqblt21Ynl7Fgf6UWmAHH8xNuAaB5yRoC4ZFcqLzMFFObnICC6m7cAJnGvUltWmQJCtKzyTEC0CDmBEb86uv4gaY6SnJW1VeULeTk53cNy5gG321FTsc11oKS8YjUbm/W4V3hC3E9srYg4kDJqoS+pBRPicX3iCPSFplnWFNFs380o0ULDHDZhN3D00qiPuLhjcsRPG0W9z613wdb0w2Fb3Ts5vXc0bRzyhG2UrPB9ZpErQc8dXd8Pg8Dq+Di6slD1EWsJR153pbywfnA00nYPBC3DqHhC3vIR133EphLijq2XRmGv0bRGjJZlWXtOnCd+A9DAdAW2nwDLAAAAAElFTkSuQmCC">
 <link rel="icon" type="image/png" sizes="64x64" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAFrUlEQVR4nO2bWWhcZRTHzznfd+fOktmSxrS2aU0x5qFVq3aJ4oOoFSlVBH0Q1BcRnxR8VHx0eRBEEMQ3RZ+KYqEiCEJVsESpta3W2trFpdpkkjSTzD53+b4jExVK683cO5nMZn5wX+Y733L+fMu5534DsMoq/2twJRvnvXvo0nfHUqFcvt/QOuUSJgzHiSrTTIZcx5CWtTgE1zTBktI2qtW8bYRKknXeknLBSaazg+O3L+BHH3DHCjC/fkNYFvLD0rLGQOtRBBglhi3IejMyDxGzAYvD5yu647pD4dpPiLZGnGai8xrgJAOcYyHO6FDojJWK/zlw4WK1pQJkh4bWxBZy46DVTmC4g1hvF0oloQ0oIRYY6QgDTLCkw5Vk8pv09MxcUwW4cO162Z/L3WzY1n2o+X7S+k5iTdCBaCStCQ+xoE8dw/wsm0j8sHFq0m2osZlUKlUNhV5whDiqELUG4G56FKB2SByxjNDzM4lEOrAA+Wj07nY70ZQHkQvR6L1efpJXgek4YegFmAFcZXoVk2dFRAE9glGbCx5IrwKHSBpNHAQbBui1axd3Xb5iB778gGSlQExONq9jBGAiEVgA4OYGSXpkBOTpU3UPHp2ZAr1+A1Bt6jYL9O5UetdpcpS4GNTUPz0R6aoQaVnUGmPwXAPkVaCxueNoK6p2igcUQDI3FkB0HAiuIA4sgNBaQa9AZHkWgQeulA70CIohuAAW6NLKviy3EMRqA3sAVlc4XdAaEMAlKgYWwEaR74VjQAOCJCwF3wQNWdSAXa8BI9hubTkH3gSBa3tAAboeXLBj8WrgSDDUv6aCxWItu5LwslE7dgAKf+9MenjY/zvDrvH/SJl52OfyIE795FmOCNmBTaNVyGQgMC6Jw54JB0TWxSK3G+fzg1xbql7jdIT4aikfaUl1EaaXVKg7DonZhgVAgCnodhAzDQugiC5CV4O1Y3CyYQE04m9dMs09YFCIvzcsgCPk+SbnRVpKbexayF8aFsDui51mAM8gouNBKKlY9GzDAqyZnb3ERL9Cl8JEfyT27plZyobqNoL4PXQpGvEkvvc+LEsAhXjEu1AD6ACP75GrAO16R4wa8Gi9rmQ9AzsSPmg6V+dGkBnU4CD4RY2OgnniRF07ncmAOzLiOyu8+NHOI2x2THMC3CbkdRwhzy33E5UzdoOv0FZPTbFbC7OX2Z9LYq6ybWvdFxXyI4BG+AS6DI34ReT4j6opAqiQ+SEjBljEbQZr57/42I8p+TEyxsa+1kTHoUtQiJlKMnmgeQIcO6qVEEufJx2EFmJfenYm58eW/DZaSg+8q4kuQYfDiLYVjb7l1578Gg5MT+WVMN6GDkdJuS+Ry53za09BGi/H+97QREuGlu2EEStVM/xqkDoUxDidnZu3Q6HXOjUV5BjynUSx8HOQOhS0k0Iq9aYS5J2FbBOKaKYSi78YtJ4MWmEok3EKsb6no+XSl8jsuz4rDTqX+3vuXHlf8rJrIzqfDzqkxVZs03wuPZ/1tfM3hWrIfD3obS1lmqzMcJ3HDBz2Woaxf2Hzptauy7l1wyFbymPtvgbnCHEx3z/QlpuqUIwnN7pEc+1yXiFWC/G+26CdlGJ9dylEq+XOA+hyJPoEdAKVSPQxhei2UoCqGQ68468olXD4KYWoWuF8xQy/Uth6S+cFI+Vw5EmF6KzktK+Ewy9nb7q185z/l3Ik+pCLmFuBDc+qhCPP8u57oOMpx6LjthBnm+W8QzRdiUQegG4i3z9wjS2NA//kbht3XsqJYiI5Ct3I3MiItEzzmUZiBZeobIXMl3KDQ1Hodkrx5PW2Yez35zyyLY1DxVjfdugleMdOKMViux1pfOvluCPkmXIk8mhubKwj/5PUFOY2XicrkciDtmFMXLbOf6yEI4/Pr13XG/9S8QM//AgUE8kbS4n4ruyWbZ17rq+yCvQ0fwHdHxy2M1Sf1AAAAABJRU5ErkJggg==">
@@ -30,6 +51,21 @@ a{color:var(--blue)}
 svg{display:block}
 
 #app{display:flex;flex-direction:column;height:100%}
+
+/* Integration warning: a row above everything else, so it shortens the map instead of covering its
+   controls at any width. Hidden only in production (see the script in the head). */
+#envbar{flex:0 0 auto;background:var(--red);color:#fff;font-size:12px;line-height:1.35;
+  padding:5px 10px;text-align:center}
+#envbar a{color:#fff;text-decoration:underline}
+:root[data-env="prod"] #envbar{display:none}
+@media (max-width:700px){#envbar{font-size:11px;padding:4px 8px;text-align:left}}
+
+/* What a link asked for and this version does not offer: below the integration bar, dismissible */
+#linkbar{flex:0 0 auto;display:flex;align-items:flex-start;gap:8px;background:#FFF4CE;color:#5C4400;
+  border-bottom:1px solid #E6D08A;font-size:12px;line-height:1.35;padding:5px 10px}
+#linkbar[hidden]{display:none}
+#linkbar span{flex:1}
+#linkbar button{border:0;background:none;color:inherit;font-size:16px;line-height:1;cursor:pointer;padding:0 2px}
 
 .beta-badge{color:var(--red);font-size:.6rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;
   border:1.5px solid var(--red);padding:.05rem .3rem;border-radius:2px;line-height:1;flex-shrink:0;align-self:center}
@@ -548,6 +584,16 @@ table.kv td:first-child{color:var(--muted)}
 <body>
 <div id="app">
 
+  <!-- Shown on GitHub Pages, on a local server and on a local copy, never in production.
+       At go-live add: The official version is <a href="https://…">…</a>. -->
+  <div id="envbar"><b>Integration version for testing.</b> Not for operational use: the layers and values
+    shown here are not validated and may be wrong. The official version is not yet published.</div>
+
+  <!-- Filled when a link asks for something this version does not offer (an old link, or a layer that
+       is still being verified and therefore not in production). -->
+  <div id="linkbar" hidden><span id="linkbarTxt"></span>
+    <button type="button" id="linkbarX" title="Hide this message">&times;</button></div>
+
   <div id="main">
     <aside id="side">
       <div id="sideHead">
@@ -600,7 +646,8 @@ table.kv td:first-child{color:var(--muted)}
 
         <div class="card">
           <div class="dc-head">
-            <h4>Configuration:</h4>
+            <h4>Configuration:<span class="ver" id="cfgBeta" hidden
+              title="BETA: this configuration is still being prepared and is only shown on the integration version">BETA</span></h4>
             <button class="dc-ico on" data-v="layers" id="dcLayers" title="Layers"></button>
             <button class="dc-ico" data-v="compare" id="dcCompare" title="Compare"><span class="badge" id="cmpBadge" hidden></span></button>
             <button class="dc-ico" data-v="external" id="dcExternal" title="WMS / WMTS: layers of other map services"></button>
@@ -646,21 +693,8 @@ table.kv td:first-child{color:var(--muted)}
       </div>
 
       <div class="panel" id="p-info">
-        <div class="card warn"><h4>Not for operational use</h4>
+        <div class="card"><h4>Feedback</h4>
           <div style="font-size:12px">
-            <p>This is an experimental <b>beta</b> prototype. It is <b>not intended for operational use</b>: values, renderings and
-              statistics are computed in the browser, are not validated and may be wrong or incomplete. For authoritative data use the
-              swisstopo products and services directly.</p>
-            <p><b>Layer verification:</b> we will check every layer in depth: data access, scaling and no-data, formula,
-              masks and rendering, compared with reference implementations (e.g. GDAL / rasterio reads and the original
-              scripts). Every layer that has <b>not yet</b> passed this check carries the label
-              <span class="ver">BETA</span> behind its name: it still needs to be verified, and its values may be wrong.
-              Verified layers carry no label. The status is kept as a checklist in the
-              <a href="https://github.com/swisstopo/topo-swisseobrowser#layer-verification" target="_blank" rel="noopener">README</a>
-              and applied to the website on every deployment.</p>
-            <p>Please note that AI (Claude Code with the Opus 5.5 model, medium effort) was used extensively to prepare this
-              website, adapting it from the Copernicus Browser. The indices were edited and tested manually in QGIS or with
-              rasterio and GDAL.</p>
             <div class="fb-row">
               <button class="action-btn" id="btnFeedback" title="Write an e-mail with the link to your current view (opens your mail app)">Feedback</button>
               <div class="fb-wrap"><button class="action-btn" id="btnIssue" title="Open a GitHub issue with the link to your current view">Report an issue / improvement</button>
@@ -679,177 +713,16 @@ table.kv td:first-child{color:var(--muted)}
           </div></div>
         <div class="card"><h4>Selected date</h4>
           <div id="sceneInfo" style="font-size:12px;color:var(--muted)">No acquisition selected.</div></div>
-        <div class="card"><h4>Scaling and no-data</h4>
+        <div class="card"><h4>How this works, data and scaling</h4>
           <div style="font-size:12px">
-            <p style="margin:0 0 8px">Taken from the swisstopo <i>Additional Content Information</i> sheets
-              (<a href="https://www.swisstopo.admin.ch/dam/en/sd-web/-i2Y10KmboPf/swissEO_S2-SR_AdditionalContentInfo_v200.pdf" target="_blank">S2-SR v200</a>,
-              <a href="https://www.swisstopo.admin.ch/dam/en/sd-web/vtF6jZqH7L4V/swissEO_VHI_AdditionalContentInfo.pdf" target="_blank">VHI</a>,
-              <a href="https://www.swisstopo.admin.ch/dam/en/sd-web/bODfHY8ioFyS/swissEO_NDVIdiff_AdditionalContentInfo.pdf" target="_blank">NDVIdiff</a>,
-              <a href="https://www.swisstopo.admin.ch/dam/en/sd-web/mZTj7kABmTrD/swissEO_NDVIz_AdditionalContentInfo.pdf" target="_blank">NDVIz</a>).
-              Physical value = DN × scale + offset.</p>
-            <table class="kv">
-              <tr><th>Asset</th><th>Scale</th><th>Offset</th><th>No-data</th></tr>
-              <tr><td>B01–B12, B8A</td><td>0.0001</td><td>−0.1</td><td>0 (uint16)</td></tr>
-              <tr><td>AOT</td><td>0.001</td><td>0</td><td>0 (uint16)</td></tr>
-              <tr><td>SCL</td><td>1</td><td>0</td><td>0 (uint8)</td></tr>
-              <tr><td>Cloud mask</td><td>1</td><td>0</td><td>0 = clear · 1 thick · 2 thin · 3 shadow</td></tr>
-              <tr><td>Terrain mask</td><td>1</td><td>0</td><td>255 · 0–180° lit · 200 shadow</td></tr>
-              <tr><td>TCI</td><td>1</td><td>0</td><td>0 (uint8)</td></tr>
-              <tr><td>VHI (WMS)</td><td>n/a</td><td>n/a</td><td>110 = no data</td></tr>
-              <tr><td>VHI (COG)</td><td>1</td><td>0</td><td>255 · 0–100 VHI</td></tr>
-              <tr><td>NDVIdiff</td><td>0.001</td><td>0</td><td>32701 · 32700 missing</td></tr>
-              <tr><td>NDVIz</td><td>0.01</td><td>0</td><td>32701 · 32700 missing</td></tr>
-            </table>
+            <p style="margin:0">The <a href="docs/index.html" target="_blank" rel="noopener">help page</a> explains every
+              function with screenshots and has a tutorial for a first visit. The
+              <a href="https://github.com/swisstopo/topo-swisseobrowser#readme" target="_blank" rel="noopener">README</a>
+              describes the products and services behind the layers, the scaling and no-data values of every asset, the
+              formulas, the limits of the browser and the
+              <a href="https://github.com/swisstopo/topo-swisseobrowser#layer-verification" target="_blank" rel="noopener">layer verification</a>
+              that decides which layers carry the <span class="ver">BETA</span> label.</p>
           </div></div>
-        <div class="card"><h4>How this works</h4>
-          <div style="font-size:12px">
-            <p>Everything on screen comes from public services of swisstopo and the federal geoportal (geo.admin.ch).
-              There is no other backend.</p>
-            <p><b>Basemaps:</b> the layer button at the top right of the map (as in the Copernicus Browser) switches between
-              <i>Map</i>, <i>SWISSIMAGE</i>, <i>Map Grey</i> (<code>wmts.geo.admin.ch</code>: pixelkarte-farbe, swissimage,
-              pixelkarte-grau, from the native LV95 tile grid, also beyond the border) and <i>None</i>.</p>
-            <p><b>Map overlay:</b> <i>Labels</i> are the place, road, peak and lake names of swisstopo's base map vector tiles
-              (<code>vectortiles.geo.admin.ch</code>, <code>ch.swisstopo.base.vt</code>) in the style of swisstopo's imagery base map,
-              drawn as text above the data layers. The tiles are in Web Mercator and are moved into the LV95 grid in the browser.
-              The basic image download can include them; the high-res print and the timelapse, which are drawn away from the
-              map, are without labels.</p>
-            <p><b>3D terrain:</b> the <i>3D</i> button drapes the map over swissALTIRegio, swisstopo's 10 m height model
-              (one COG on <code>data.geo.admin.ch</code>, <a href="https://www.geocat.ch/datahub/dataset/f7f058e9-288b-4c55-8f4e-6360880dbb59"
-              target="_blank" rel="noopener">metadata on geocat.ch</a>), turned into terrain in the browser. Tilt and turn the map with the
-              right mouse button or Ctrl + drag; the compass resets it; <i>2D</i> returns to the flat map. In 3D the compare
-              list uses the opacity effect, and three more tools appear: <i>3D settings</i> (gear: the height model,
-              swissALTIRegio or the swissSURFACE3D surface model at 10 m on the swissEO bucket; sun shading and its
-              parameters; vertical terrain scaling), <i>Sun shading</i> (light bulb: a hillshade lit from the sun at the map
-              centre) and <i>Sun time</i> (sun: date and time of that sun; by default the time of the scene shown, the middle of
-              two orbits). Switching to 3D also switches the labels on. A sky, shadows cast by mountains, a lens flare
-              and anaglyph stereo of the Copernicus Browser are not available in MapLibre.</p>
-            <p><b>Map layout:</b> at the top left the date and acquisitions on the map, the <i>Copy link</i> (chain) and
-              <i>Pixel inspector</i> ((i) with a pointer) buttons;
-              at the top right the place search, the layer button and the help (<i>i</i>), below it the area of interest and
-              the tools (with <i>3D</i>); at the bottom right the zoom buttons, the mouse
-              position (LV95 easting and northing) and the scale bar; the attribution at the bottom left. The chevron in the
-              menu header collapses the menu, the round button at the top left of the map opens it again (on small screens
-              the menu starts collapsed).</p>
-            <p><b>Place search:</b> the location search of map.geo.admin.ch (<code>api3.geo.admin.ch</code> SearchServer,
-              <code>type=locations</code>): municipalities, districts, cantons, place names and addresses. Choosing a result
-              zooms to its extent or to its point and drops a pin there.</p>
-            <p><b>WMS / WMTS:</b> the third button of the configuration card (next to Compare) opens layers of other map services,
-              as in the Copernicus Browser. The swisstopo WMS (<code>wms.geo.admin.ch</code>) is preset; the pull-down lists the
-              external providers of map.geo.admin.ch (loaded when the panel is opened) and can be searched, and <b>+</b> adds any
-              other WMS or WMTS URL (the service must allow cross-origin requests, CORS). The layers can be searched and paged;
-              a click shows a layer on the map and a second click hides it (the panel opens without an active layer), <i>Add to Compare</i> puts it into the compare list, the chevron shows its legend and
-              description, and <i>Metadata</i> opens its metadata. Layers are drawn from LV95 when the service offers it,
-              otherwise from LV03, Web Mercator, UTM 32N or WGS84, placed on the LV95 grid. Services without CORS headers
-              cannot be shown: the map is drawn with WebGL, which needs them. The services you add are remembered in this browser; the
-              open service and layer, and the external layers in the compare list, are part of the link.</p>
-            <p><b>Dates:</b> without a date in the link the latest date with data opens. The calendar and ‹ › only offer days whose
-              acquisitions reach the map view: the data footprint of each relative orbit is read once from the coarsest B04 overview
-              (the STAC geometry is only the rectangular extent). The calendar and the ‹ › buttons query the STAC API
-              <code>data.geo.admin.ch/api/stac/v0.9</code>. Cloud cover is <code>CLOUDPERCENTAGE</code> from each mosaic's
-              <code>metadata.json</code> (OmniCloudMask). When several orbits were acquired on the same day, all of them are
-              mosaicked, most recent on top.</p>
-            <p><b>True color (TCI):</b> the JPEG tiles are decoded by the browser itself and kept in a cache, so each COG
-              tile is decoded once; the map uses 512 px tiles like the COGs. The TCI's internal mask decides what is data, so
-              black pixels stay black. On days with more than one scene (orbit), dark strips along a swath edge (mean RGB below 40
-              within 2 km of the scene edge) are replaced by the other scene of the day, as in the swissEO cloud-free mosaics;
-              where no other scene has data they stay.</p>
-            <p><b>Spectral layers:</b> the band COGs are read straight from <code>data.geo.admin.ch</code> over HTTP range requests
-              (geotiff.js). Only the overview matching the zoom and the tiles in view are fetched.</p>
-            <p><b>Masks:</b> <i>Clouds</i> hides cloud-mask codes 1 and 2, <i>Cloud shadows</i> code 3, and <i>Terrain shadow</i>
-              terrain-mask value 200 (cast or self-shadow from swissSURFACE3D at acquisition time).
-              The <i>vegetation mask</i> keeps forest or all vegetation of the habitat maps that the swissEO VHI processor
-              uses (COGs in <code>s3-topo-satromo-prod</code>, inside = value ≠ 0): the <i>Habitat Map</i> of the date, as in
-              swissEO VHI (v1-0 before 2024-07-12, v1-1 before 2025-12-11, v1-2 since; in a time series per date). Or the swissTLM3D forest
-              (WMS <code>ch.swisstopo.swisstlm3d-wald</code>, any of Wald, Wald offen, Gebüschwald); conifer, mixed or broadleaf
-              forest of <i>Forest Type NFI 2023</i> (WSL: probability of broadleaf trees per 10 m pixel, vegetation above 3 m;
-              two limits on a slider, 30 and 85 % by default, 85 % being the LFI's pure broadleaf; larch counts as conifer;
-              optionally averaged over 3 × 3 pixels; within a forest mask of your choice;
-              <a href="https://doi.org/10.16904/1000001.7" target="_blank" rel="noopener">Waser et al. 2025</a>); conifer, mixed
-              or broadleaf forest by the broadleaf basal-area share of the <i>ETH tree species</i> maps, or their dominant tree
-              species (30 m, forest pixels only; <a href="https://arxiv.org/abs/2611.08095" target="_blank" rel="noopener">Zhou et al. 2026</a>,
-              CC BY-NC 4.0); or Nutzungsflächen main categories (BLW, data of the cantons, WMS
-              <code>ch.blw.landwirtschaftliche-nutzungsflaechen</code> on wms.geo.admin.ch, read at 2.5 m by the legend colours;
-              <a href="https://www.geocat.ch/datahub/dataset/ae183bc4-5c91-467e-89bc-85f390340efb" target="_blank"
-              rel="noopener">metadata</a>). The two-date layers use the mask of the
-              selected date on both dates.</p>
-            <p><b>VHI:</b> <code>wms.geo.admin.ch</code> layers <code>ch.swisstopo.swisseo_vhi_v100</code> and
-              <code>…_vegetation</code> with the <code>item=</code> day selector. Titles and abstracts come from the WMS GetCapabilities document.</p>
-            <p><b>Area of interest:</b> the pentagon button on the map draws a rectangle (axis-aligned in LV95) or polygon,
-              or imports KML/KMZ, GPX, WKT, GeoJSON, zipped Shapefiles (from a file or a URL), an MGRS/GEOREF cell or a bounding box
-              (WGS84, LV95, LV03). Limits: files up to 50 MB, areas up to 100,000 vertices. An area imported from a file is only part of a
-              copied link when it is small (about 270 vertices); one loaded from a URL is shared as the URL.
-              Vertices stay editable; drawing again adds a polygon. <i>Statistical info</i> reads the COGs over the area for the
-              selected date (statistics, histogram) and over a date range (time series, CSV); swissEO VHI statistics come from the
-              <code>forest-10m</code> / <code>vegetation-10m</code> COGs. A large area is sampled on a coarser grid (up to 320 cells
-              across, from the COG overviews); <i>Compute at 10 m</i> then processes the selected date at full resolution in chunks of
-              1024 × 1024 cells, for every layer; one choice at the top of the dialog (<i>Fast</i> or <i>Full resolution</i>)
-              applies to the selected date and the time series, and the statistics can be downloaded as CSV. The <i>spectral explorer</i> plots mean reflectance of
-              all 12 bands. The image download can be clipped to the area.</p>
-            <p><b>Configurations:</b> as the themes of the Copernicus Browser, a configuration lists the layers for a task:
-              <i>Default</i>, <i>Agriculture</i>, <i>Drought</i>, <i>Drought 2026</i> with highlights, and <i>Forest</i>. Each layer keeps its own
-              data source and dates.</p>
-            <p><b>VHI season sums (Forest):</b> per pixel, over the daily swissEO VHI forest maps from 1 April to the selected day
-              (at most 31 October): the cumulative deficit Σ max(0, 40 − VHI) and the days with VHI below 10, as in the
-              <a href="https://waldtrockenheit-dashboard.vercel.app/vhi.html" target="_blank" rel="noopener">Waldtrockenheit dashboard</a>
-              (which shows them per warning region). Only days with a VHI value count. They are computed in the browser from the daily
-              COGs, so the first view of a season takes a while.</p>
-            <p><b>Forest Disturbance Classification:</b> the Sentinel Hub custom script of Joanneum Research (EvoLand), run in the
-              browser on swissEO S2-SR: the model expects Sentinel Hub DN as 10000 × reflectance, which is swissEO DN − 1000.
-              Its 150 trees are loaded on first use from jsDelivr, pinned to a commit.</p>
-            <p><b>Coordinates:</b> positions are given in LV95 (EPSG:2056) everywhere, also in the permalink
-              (<code>center=2703331.08,1133878.99</code>, as on map.geo.admin.ch).</p>
-            <p><b>Custom mask:</b> the fifth mask of every layer keeps the data inside (or, inverted, outside) your own polygons
-              (e.g. a forest map), loaded from a file or URL like an area of interest (up to 50 MB and 1,000,000 vertices).
-              It applies to the map, statistics, exports and the timelapse.</p>
-            <p><b>Highlights:</b> click a story to open it on the map (the card turns blue; a split comparison of two dates, drag
-              the handle); the chevron shows the text, whose last line opens the compare settings. Texts after watson.ch
-              (10 August 2026) and SRF Meteo (9 July 2026), credited in each story.</p>
-            <p><b>NDDI:</b> by default with the NIR/SWIR NDWI of Gu et al. (2007). The green/NIR NDWI of the openEO notebook is
-              selectable, but saturates (99.8 % of the pixels at ±1 in a test, with or without the reflectance offset).</p>
-            <p><b>Loading:</b> the box at the bottom left counts the tiles still rendering and the requests in flight, and flags a
-              slow connection after 6 s.</p>
-            <p><b>NDVIdiff / NDVIz:</b> monthly products for the end of July, August and September (forest perimeter); the product
-              nearest to the selected date is shown, also in compare (each entry gives the date of its product), timelapse and export. <b>NDVIdiff v200 BETA</b> (beta data, example
-              COGs on cms.geo.admin.ch, not in STAC): the NDVI change of two-month first-quartile cloud-free mosaics (June/July, July/August,
-              August/September) against the same window one year earlier.</p>
-            <p><b>Two-date layers:</b> <i>NDDI change</i> and the <i>NDVI difference to a reference date</i> compare the selected date with a reference:
-              the acquisitions within ±20 days of the same day one year earlier (or of a chosen date), clearest first, per pixel the
-              first clear one (on the map and in the statistics). For a large area of interest the change report is first computed
-              on a coarser grid; <i>Compute at 10 m</i> gives it at full resolution (see <i>Area of interest</i>).</p>
-            <p><b>Compare:</b> each entry shows the date of the data it actually shows: the nearest NDVIdiff, NDVIz or NDVIdiff v200
-              BETA product, the VHI day (the nearest one if the chosen day has none) or the S2-SR date.</p>
-            <p><b>Permalink:</b> the address bar is rewritten on every change (view, date, cloud filter, layer, legend range, masks,
-              effects, compare list including WMS / WMTS layers, the open WMS / WMTS service and layer, area of interest, 3D view), so copying
-              the URL reproduces the view.</p>
-            <p><b>Projection:</b> EPSG:2056 (CH1903+ / LV95), the native CRS of the basemaps and the COGs, so nothing is
-              reprojected. The map is drawn by MapLibre GL JS with a custom projection for EPSG:2056 and its own tile grid
-              (10 m per pixel at zoom 8), into which the page draws the swisstopo tiles and the swissEO layers.</p>
-          </div></div>
-        <div class="card"><h4>Based on and uses</h4>
-          <ul class="links">
-            <li><a href="https://github.com/eu-cdse/copernicus-browser" target="_blank" rel="noopener">eu-cdse/copernicus-browser</a>:
-              the Copernicus Browser, model for the user interface, themes, layer descriptions and previews</li>
-            <li><a href="https://github.com/swisstopo/topo-swisseobrowser" target="_blank" rel="noopener">swisstopo/topo-swisseobrowser</a>: this website</li>
-            <li><a href="https://github.com/swisstopo/topo-satromo-v2" target="_blank" rel="noopener">swisstopo/topo-satromo-v2</a>:
-              processing of the swissEO products (S2-SR, VHI, NDVIdiff, NDVIz, vegetation masks)</li>
-            <li><a href="https://github.com/swisstopo/topo-drought-briefing" target="_blank" rel="noopener">swisstopo/topo-drought-briefing</a>: colour scheme</li>
-            <li><a href="https://github.com/geoadmin/web-mapviewer" target="_blank" rel="noopener">geoadmin/web-mapviewer</a>
-              (map.geo.admin.ch): location search, Confederation logo and the list of external WMS / WMTS providers</li>
-            <li><a href="https://github.com/RaffiBienz/ndvi_analyst" target="_blank" rel="noopener">RaffiBienz/ndvi_analyst</a>:
-              NDVI Analyst of the Canton of Aargau (method of the NDVI difference to a reference date layer)</li>
-            <li><a href="https://github.com/Open-EO/openeo-community-examples/blob/main/python/50_thematic-notebooks/drought-nddi/drought-nddi.ipynb" target="_blank" rel="noopener">Open-EO/openeo-community-examples</a>:
-              NDDI drought notebook</li>
-            <li><a href="https://github.com/sentinel-hub/custom-scripts" target="_blank" rel="noopener">sentinel-hub/custom-scripts</a>: index definitions and visualisations</li>
-            <li><a href="https://github.com/maplibre/maplibre-gl-js" target="_blank" rel="noopener">MapLibre GL JS</a>
-              (custom projection EPSG:2056),
-              <a href="https://github.com/proj4js/proj4js" target="_blank" rel="noopener">proj4js</a>: map</li>
-            <li><a href="https://github.com/geotiffjs/geotiff.js" target="_blank" rel="noopener">geotiff.js</a>: reading the COGs</li>
-            <li><a href="https://github.com/placemark/togeojson" target="_blank" rel="noopener">togeojson</a>,
-              <a href="https://github.com/calvinmetcalf/shapefile-js" target="_blank" rel="noopener">shpjs</a>,
-              <a href="https://github.com/proj4js/mgrs" target="_blank" rel="noopener">mgrs</a>,
-              <a href="https://github.com/Stuk/jszip" target="_blank" rel="noopener">JSZip</a>,
-              <a href="https://github.com/mattdesl/gifenc" target="_blank" rel="noopener">gifenc</a>: import, export, timelapse</li>
-          </ul></div>
         <div class="card"><h4>Terms</h4>
           <div style="color:var(--muted);font-size:11.5px">© swisstopo,
             <a href="https://www.swisstopo.admin.ch/ogd-conditions" target="_blank">open government data</a>.
@@ -860,7 +733,9 @@ table.kv td:first-child{color:var(--muted)}
             © WSL (Waser et al. 2025, funded by the BAFU). <a href="https://arxiv.org/abs/2611.08095" target="_blank" rel="noopener">ETH tree
             species</a> © Zhou et al. 2026 (ETH Zürich), licensed CC BY-NC 4.0: for non-commercial use only. <a href="https://www.geocat.ch/datahub/dataset/ae183bc4-5c91-467e-89bc-85f390340efb" target="_blank" rel="noopener">Nutzungsflächen</a>
             © BLW and the cantons.
-            Layers of other WMS / WMTS services: © their providers. Not for operational use.</div>
+            Layers of other WMS / WMTS services: © their providers. Not for operational use.
+            Source code, documentation and issues:
+            <a href="https://github.com/swisstopo/topo-swisseobrowser" target="_blank" rel="noopener">github.com/swisstopo/topo-swisseobrowser</a>.</div>
           <div class="legal">
             <a href="https://www.swisstopo.admin.ch/en/impressum-federal-office-of-topography" target="_blank" rel="noopener">Impressum</a>
             <a href="https://www.swisstopo.admin.ch/en/legal-framework" target="_blank" rel="noopener">Legal framework</a>
@@ -2630,65 +2505,91 @@ LAYERS.forEach(r => { if (r.steps) r.ramp = stepsRamp(r.steps, r.min, r.max); })
 
 /* Configurations, as the themes of the Copernicus Browser: each lists its layers in groups; a
    configuration can carry highlights (presets that open a comparison at a place). */
+/* Highlight stories: presets that open a split comparison of two dates at a place. The
+   configurations reference them by key. The ids are stable, so a story survives an edit of its
+   title; the catalogue validates them and the texts are the ones that get translated later. */
+const HIGHLIGHTS = {
+  drought2026: [
+      { id: "baselland", title: "Baselland", left: "2026-05-23", right: "2026-07-04", layer: "true",
+        center: [2627792.59, 1257232.72], res: 13.06,          // map.geo.admin.ch z = 5.615
+        text: "Satellite images from the end of May and the beginning of July 2026. Sissach lies in the centre, Liestal in the far north-west. Within six weeks much of the green farmland in the Ergolz valley and its side valleys turned brown." },
+      { id: "gurbetal-and-aare-valley", title: "Gürbetal and Aare valley", left: "2026-05-28", right: "2026-07-04", layer: "true",
+        center: [2607100, 1190200], res: 12,
+        text: "Brown instead of green on fields and meadows: before and after the June heat. In many places June brought only 20–50 % of the normal rainfall, with temperatures about 3 °C above the long-term average. The view south of Bern shows the Gürbetal, the Belpberg and the Aare valley at Münsingen, the area of the SRF image. (Source: SRF Meteo, 9 July 2026)" },
+      { id: "great-aletsch-glacier", title: "Great Aletsch Glacier", left: "2019-08-18", right: "2026-08-13", layer: "true",
+        center: [2645270.03, 1149206.31], res: 27.29,          // map.geo.admin.ch z = 4.661
+        text: "From the slopes of Bettmeralp and Fiescheralp to the glacier itself, the comparison shows one of the most striking changes. After another winter with little snow, early summer heat removed the protective snow cover from the glacier by the end of June, much earlier than usual. Dark, bare ice now covers a far larger area instead of bright old snow. (Source: watson.ch)" },
+      { id: "konstanz-and-untersee", title: "Konstanz and Untersee", left: "2025-08-08", right: "2026-08-08", layer: "true",
+        center: [2721000, 1281000], res: 25,
+        text: "The water level of the Untersee is the lowest of the 1991–2020 reference period. Wide, pale strips of exposed shore appear where water normally stands; boat jetties were already lying on dry ground in April. 8 August 2025 compared with the same day in 2026. (Source: watson.ch, 10 August 2026)" },
+      { id: "lake-constance-untersee", title: "Lake Constance – Untersee", left: "2025-08-08", right: "2026-08-08", layer: "true",
+        center: [2723342.09, 1282467.43], res: 11.82,          // map.geo.admin.ch z = 5.759
+        text: "Persistent drought has pushed the Untersee to a historic low. Around the island of Werd, wide gravel banks lie dry. At 25 centimetres below the previous record, the water level in August is lower than at any time since at least 1930. 8 August 2025 compared with the same day in 2026. (Source: Blick, 12 August 2026)" },
+      { id: "zurich-airport", title: "Zurich Airport", left: "2025-08-08", right: "2026-08-08", layer: "true",
+        center: [2685500, 1257000], res: 12,
+        text: "Where lush green fields surrounded the airport a year ago, brown and beige now dominate this intensively farmed area. The change is most visible on the unirrigated meadows next to the runways. (Source: watson.ch, 10 August 2026)" },
+      { id: "forests-near-brugg-ag", title: "Forests near Brugg AG", left: "2025-08-08", right: "2026-08-08", layer: "true",
+        center: [2658500, 1259300], res: 12,
+        text: "The forests around Brugg look brown and thinned. Beech, the second most common tree in Switzerland, is hit hardest: the leaves of exposed trees have turned yellow, orange and brown, and some trees have already dropped them. (Source: watson.ch, 10 August 2026)" },
+      { id: "upper-lake-zurich", title: "Upper Lake Zurich", left: "2025-08-08", right: "2026-08-08", layer: "true",
+        center: [2711000, 1230500], res: 20,
+        text: "Very little rain fell here in the preceding weeks; thunderstorms visible on the radar often brought little or nothing. The result is dried-out meadows and brown fields around the upper lake. (Source: watson.ch, 10 August 2026)" },
+      { id: "wil-sg-and-surroundings", title: "Wil SG and surroundings", left: "2025-08-08", right: "2026-08-08", layer: "true",
+        center: [2721500, 1258500], res: 13,
+        text: "The hilly landscape of streams and pastures around Wil is clearly browner than a year ago. Small streams react quickly to a lack of rain because, unlike large lakes, they have no buffer. (Source: watson.ch, 10 August 2026)" },
+      { id: "lake-lucerne", title: "Lake Lucerne", left: "2025-08-08", right: "2026-08-08", layer: "true",
+        center: [2671000, 1207500], res: 25,
+        text: "Less brown than other regions: local thunderstorms brought some relief, and the wooded slopes of the Rigi and Pilatus stay green in places. Many meadows and fields have nevertheless dried out. (Source: watson.ch, 10 August 2026)" },
+      { id: "lakes-neuchatel-and-murten", title: "Lakes Neuchâtel and Murten", left: "2025-08-08", right: "2026-08-11", layer: "true",
+        center: [2568000, 1199000], res: 30,
+        text: "One of Switzerland’s main vegetable-growing areas: lighter and brown patches show between the plots of the Three Lakes Region, and the foot of the Jura is among the areas with the largest soil-moisture deficit. Watson compares 8 August; the nearest clear swissEO image of 2026 here is from 11 August. (Source: watson.ch, 10 August 2026)" },
+      { id: "interlaken-be", title: "Interlaken BE", left: "2025-08-08", right: "2026-08-08", layer: "true",
+        center: [2632000, 1170500], res: 20,
+        text: "In the Bernese Oberland the drought is much less visible than in the Mittelland, partly because strong glacier melt keeps streams and rivers high and local storms brought moisture. South-facing slopes still show drier meadows and thinner forests. (Source: watson.ch, 10 August 2026)" },
+      { id: "all-of-switzerland", title: "All of Switzerland", left: "2025-08-08", right: "2026-07-24", layer: "true",
+        center: [2660000, 1190000], res: 340,
+        text: "By late July a brown-yellow belt stretched across much of Switzerland, above all the Mittelland and the Jura, where last year’s meadows and fields have visibly dried out. The 2026 image is from 24 July, when two cloud-free orbits covered the country; a narrow strip in the west lies between them. (Source: watson.ch, 10 August 2026)" }
+  ]
+};
+
+/* Configurations, as the themes of the Copernicus Browser: each lists its layers in groups, may
+   carry highlights and may be marked beta (shown only on integration, see catalog/).
+   catalog:configs is generated by tools/build-catalog.py from catalog/configurations.yaml.
+   Do not edit between the markers: the next deploy overwrites it and CI fails on a hand edit. */
+/* catalog:configs:start */
 const CONFIGS = {
-  DEFAULT: { name: "Default", groups: [
+  DEFAULT: { name: "Default", beta: false, groups: [
     ["Composites", ["true", "nir", "urban", "swir", "agri", "geo"]],
     ["Indices", ["ndvi", "ndwi", "ndmi", "ndsi", "nbr", "aot", "vhi", "vhiveg", "ndvidiff"]],
     ["Masks & quality", ["scl", "cloud", "terrain"]]] },
-  AGRICULTURE: { name: "Agriculture", groups: [
+  AGRICULTURE: { name: "Agriculture", beta: false, groups: [
     ["Layers", ["true", "nir", "ndvi", "evi", "barren", "mstress", "ndmi", "agri", "savi"]]] },
-  DROUGHT: { name: "Drought", groups: [
+  DROUGHT: { name: "Drought", beta: false, groups: [
     ["Layers", ["true", "ndvi", "evi", "ndmi", "vhi", "vhiveg", "ndvidiff", "ndvidiff2", "ndviz", "nddi", "nddichg", "analyst"]]] },
-  DROUGHT2026: { name: "Drought 2026", groups: [
-    ["Layers", ["true", "ndmi", "ndwi", "mstress", "ndvi", "swir", "urban", "hon"]]],
-    highlights: [
-      { title: "Baselland", left: "2026-05-23", right: "2026-07-04", layer: "true",
-        center: [2627792.59, 1257232.72], res: 13.06,          // map.geo.admin.ch z = 5.615
-        text: "Satellite images from the end of May and the beginning of July 2026. Sissach lies in the centre, Liestal in the far north-west. Within six weeks much of the green farmland in the Ergolz valley and its side valleys turned brown." },
-      { title: "Gürbetal and Aare valley", left: "2026-05-28", right: "2026-07-04", layer: "true",
-        center: [2607100, 1190200], res: 12,
-        text: "Brown instead of green on fields and meadows: before and after the June heat. In many places June brought only 20–50 % of the normal rainfall, with temperatures about 3 °C above the long-term average. The view south of Bern shows the Gürbetal, the Belpberg and the Aare valley at Münsingen, the area of the SRF image. (Source: SRF Meteo, 9 July 2026)" },
-      { title: "Great Aletsch Glacier", left: "2019-08-18", right: "2026-08-13", layer: "true",
-        center: [2645270.03, 1149206.31], res: 27.29,          // map.geo.admin.ch z = 4.661
-        text: "From the slopes of Bettmeralp and Fiescheralp to the glacier itself, the comparison shows one of the most striking changes. After another winter with little snow, early summer heat removed the protective snow cover from the glacier by the end of June, much earlier than usual. Dark, bare ice now covers a far larger area instead of bright old snow. (Source: watson.ch)" },
-      { title: "Konstanz and Untersee", left: "2025-08-08", right: "2026-08-08", layer: "true",
-        center: [2721000, 1281000], res: 25,
-        text: "The water level of the Untersee is the lowest of the 1991–2020 reference period. Wide, pale strips of exposed shore appear where water normally stands; boat jetties were already lying on dry ground in April. 8 August 2025 compared with the same day in 2026. (Source: watson.ch, 10 August 2026)" },
-      { title: "Lake Constance – Untersee", left: "2025-08-08", right: "2026-08-08", layer: "true",
-        center: [2723342.09, 1282467.43], res: 11.82,          // map.geo.admin.ch z = 5.759
-        text: "Persistent drought has pushed the Untersee to a historic low. Around the island of Werd, wide gravel banks lie dry. At 25 centimetres below the previous record, the water level in August is lower than at any time since at least 1930. 8 August 2025 compared with the same day in 2026. (Source: Blick, 12 August 2026)" },
-      { title: "Zurich Airport", left: "2025-08-08", right: "2026-08-08", layer: "true",
-        center: [2685500, 1257000], res: 12,
-        text: "Where lush green fields surrounded the airport a year ago, brown and beige now dominate this intensively farmed area. The change is most visible on the unirrigated meadows next to the runways. (Source: watson.ch, 10 August 2026)" },
-      { title: "Forests near Brugg AG", left: "2025-08-08", right: "2026-08-08", layer: "true",
-        center: [2658500, 1259300], res: 12,
-        text: "The forests around Brugg look brown and thinned. Beech, the second most common tree in Switzerland, is hit hardest: the leaves of exposed trees have turned yellow, orange and brown, and some trees have already dropped them. (Source: watson.ch, 10 August 2026)" },
-      { title: "Upper Lake Zurich", left: "2025-08-08", right: "2026-08-08", layer: "true",
-        center: [2711000, 1230500], res: 20,
-        text: "Very little rain fell here in the preceding weeks; thunderstorms visible on the radar often brought little or nothing. The result is dried-out meadows and brown fields around the upper lake. (Source: watson.ch, 10 August 2026)" },
-      { title: "Wil SG and surroundings", left: "2025-08-08", right: "2026-08-08", layer: "true",
-        center: [2721500, 1258500], res: 13,
-        text: "The hilly landscape of streams and pastures around Wil is clearly browner than a year ago. Small streams react quickly to a lack of rain because, unlike large lakes, they have no buffer. (Source: watson.ch, 10 August 2026)" },
-      { title: "Lake Lucerne", left: "2025-08-08", right: "2026-08-08", layer: "true",
-        center: [2671000, 1207500], res: 25,
-        text: "Less brown than other regions: local thunderstorms brought some relief, and the wooded slopes of the Rigi and Pilatus stay green in places. Many meadows and fields have nevertheless dried out. (Source: watson.ch, 10 August 2026)" },
-      { title: "Lakes Neuchâtel and Murten", left: "2025-08-08", right: "2026-08-11", layer: "true",
-        center: [2568000, 1199000], res: 30,
-        text: "One of Switzerland’s main vegetable-growing areas: lighter and brown patches show between the plots of the Three Lakes Region, and the foot of the Jura is among the areas with the largest soil-moisture deficit. Watson compares 8 August; the nearest clear swissEO image of 2026 here is from 11 August. (Source: watson.ch, 10 August 2026)" },
-      { title: "Interlaken BE", left: "2025-08-08", right: "2026-08-08", layer: "true",
-        center: [2632000, 1170500], res: 20,
-        text: "In the Bernese Oberland the drought is much less visible than in the Mittelland, partly because strong glacier melt keeps streams and rivers high and local storms brought moisture. South-facing slopes still show drier meadows and thinner forests. (Source: watson.ch, 10 August 2026)" },
-      { title: "All of Switzerland", left: "2025-08-08", right: "2026-07-24", layer: "true",
-        center: [2660000, 1190000], res: 340,
-        text: "By late July a brown-yellow belt stretched across much of Switzerland, above all the Mittelland and the Jura, where last year’s meadows and fields have visibly dried out. The 2026 image is from 24 July, when two cloud-free orbits covered the country; a narrow strip in the west lies between them. (Source: watson.ch, 10 August 2026)" }] }
+  DROUGHT2026: { name: "Drought 2026", beta: false, highlights: HIGHLIGHTS.drought2026, groups: [
+    ["Layers", ["true", "ndmi", "ndwi", "mstress", "ndvi", "swir", "urban", "hon"]]] },
+  FOREST: { name: "Forest", beta: false, groups: [
+    ["Layers", ["true", "ndvi", "evi", "vhi", "vhidef", "vhiext", "ndvidiff", "ndvidiff2", "ndviz", "analyst", "nbr", "ndmi", "fdc"]]] },
 };
-CONFIGS.FOREST = { name: "Forest", groups: [
-  ["Layers", ["true", "ndvi", "evi", "vhi", "vhidef", "vhiext", "ndvidiff", "ndvidiff2", "ndviz", "analyst", "nbr", "ndmi", "fdc"]]] };
+/* catalog:configs:end */
 const cfgLayers = id => CONFIGS[id].groups.flatMap(g => g[1]);
 
-/* Verification status of the layers: the checklist "Layer verification" in README.md (checked = verified).
-   The Pages workflow writes the checked layer ids into VERIFIED_IDS on every deploy; a copy that was not
-   deployed (VERIFIED_IDS still null) reads README.md next to the page itself. */
+/* Which layers this build offers. The configurations are the only place a layer is offered, and the
+   production build is generated without the ones that are not verified yet (tools/build-catalog.py),
+   so the set follows from CONFIGS and can never drift from it. Integration and a local copy carry
+   every layer. A link that names a layer which is not offered here falls back and says so. */
+const PUBLISHED = new Set(Object.keys(CONFIGS).flatMap(cfgLayers));
+const isPublished = rec => !!rec && (rec.ext || PUBLISHED.has(rec.id));
+
+/* Reasons a link could not be opened as it asked, shown once under the header after the boot. */
+const linkWarn = [];
+const warnUnavailable = what => linkWarn.push(what + " is not available in this version");
+
+/* Which layers have been verified: "verified: true" in catalog/layers.yaml, from which the checklist
+   "Layer verification" in README.md is generated. Every deploy writes the ids here
+   (tools/build-catalog.py); a copy that was not deployed (VERIFIED_IDS still null) reads the checklist
+   out of README.md next to the page itself. An unverified layer carries the BETA label here and is not
+   offered at all in the production build, whose configurations are generated without it. */
 const VERIFIED_IDS = null; // replaced on deploy
 const VERIFIED = new Set(VERIFIED_IDS || []);
 function parseVerified(md) {
@@ -4496,7 +4397,8 @@ function layerBody(rec) {
   if (!VERIFIED.has(rec.id)) {                  // BETA: not yet verified in depth (README checklist)
     const vr = el("div", "verrow");
     vr.innerHTML = '<span class="ver">BETA</span><span>This layer has <b>not yet been verified</b> in depth (data access, ' +
-      "scaling, formula, masks, rendering, statistics): its values may be wrong. See Info.</span>";
+      "scaling, formula, masks, rendering, statistics): its values may be wrong. " +
+      '<a href="https://github.com/swisstopo/topo-swisseobrowser#layer-verification" target="_blank" rel="noopener">What is checked</a>.</span>';
     body.append(vr);
   }
   if (showCode.has(rec.id)) {
@@ -4737,13 +4639,15 @@ function renderLayerList() {
   const scroll = $("#p-vis").scrollTop;
   box.innerHTML = "";
   const conf = CONFIGS[configId];
-  if (conf.highlights) {
+  /* a story whose layer is not offered in this build is left out (the catalogue also refuses it) */
+  const stories = (conf.highlights || []).filter(h => isPublished(LAYER[h.layer]));
+  if (stories.length) {
     box.append(el("div", "ghead", "Highlights"));
-    conf.highlights.forEach(h => box.append(highlightCard(h)));
+    stories.forEach(h => box.append(highlightCard(h)));
   }
   if (layerOff && !compareMode) box.append(el("div", "hint", "No layer is shown, only the background map. Click a layer to show it."));
   conf.groups.forEach(([gname, ids]) => {
-    if (gname || conf.highlights) box.append(el("div", "ghead", gname || "Layers"));
+    if (gname || stories.length) box.append(el("div", "ghead", gname || "Layers"));
     ids.map(id => LAYER[id]).forEach(rec => layerItem(box, rec));
   });
   $("#p-vis").scrollTop = scroll;
@@ -4890,12 +4794,21 @@ function showView(v) {
 $("#dcLayers").onclick = () => showView("layers");
 /* Configuration pull-down, as the themes of the Copernicus Browser: each lists the layers for a task. */
 const lastLayer = {};              // configuration -> last selected layer
-$("#cfgSel").innerHTML = Object.keys(CONFIGS).map(k => '<option value="' + k + '">' + CONFIGS[k].name + "</option>").join("");
+/* A configuration marked beta in the catalogue is only offered on integration; the pull-down says so,
+   because an <option> cannot carry the styled label the layers use. */
+$("#cfgSel").replaceChildren(...Object.keys(CONFIGS).map(k => {
+  const o = document.createElement("option");
+  o.value = k;
+  o.textContent = CONFIGS[k].name + (CONFIGS[k].beta ? " (BETA)" : "");
+  return o;
+}));
+const cfgBadge = () => { $("#cfgBeta").hidden = !CONFIGS[configId] || !CONFIGS[configId].beta; };
 const configOf = id => cfgLayers(configId).includes(id) ? configId : Object.keys(CONFIGS).find(k => cfgLayers(k).includes(id)) || "DEFAULT";
 function setConfig(id) {
   if (!CONFIGS[id]) return;
   configId = id;
   $("#cfgSel").value = id;
+  cfgBadge();
   showView("layers");
   const ids = cfgLayers(id);
   const rec = ids.includes(currentRec.id) ? currentRec : LAYER[lastLayer[id]] || LAYER[ids[0]];
@@ -7421,9 +7334,16 @@ function readUrl() {
   const cc = parseFloat(q.get("cloudCoverage"));
   if (isFinite(cc)) state.cc = clamp(Math.round(cc), 0, 100);
   const th = (q.get("themeId") || "").toUpperCase().replace(/-/g, "");
-  if (Object.hasOwn(LAYER, q.get("layerId") || "")) currentRec = LAYER[q.get("layerId")];
-  else if (Object.hasOwn(CONFIGS, th || "")) currentRec = LAYER[cfgLayers(th)[0]];
-  configId = Object.hasOwn(CONFIGS, th || "") && cfgLayers(th).includes(currentRec.id) ? th : configOf(currentRec.id);
+  /* A layer or configuration of the link may be unknown (an old link) or not offered in this build
+     (a beta layer on production). Both fall back to the default view, but say so. */
+  const wantL = q.get("layerId") || "", wantT = th;
+  const haveL = Object.hasOwn(LAYER, wantL) && isPublished(LAYER[wantL]);
+  const haveT = Object.hasOwn(CONFIGS, wantT);
+  if (wantL && !haveL) warnUnavailable("The layer “" + wantL + "” of this link");
+  if (wantT && !haveT) warnUnavailable("The configuration “" + wantT + "” of this link");
+  if (haveL) currentRec = LAYER[wantL];
+  else if (haveT) currentRec = LAYER[cfgLayers(wantT)[0]];
+  configId = haveT && cfgLayers(wantT).includes(currentRec.id) ? wantT : configOf(currentRec.id);
   lastLayer[configId] = currentRec.id;
   const o = {};
   SETTING_KEYS.forEach(k => { if (q.has(k)) o[k] = q.get(k); });
@@ -7443,7 +7363,9 @@ function readUrl() {
       try { cl = JSON.parse(q.get("comparedClipping") || "[]"); } catch (e) { /* defaults */ }
       const recOf = it => it.l === "ext"
         ? (it.x && isHttp(it.x.u) && it.x.n ? extRec({ u: it.x.u, k: it.x.k === "WMTS" ? "WMTS" : "WMS", n: String(it.x.n), t: String(it.x.t || it.x.n) }) : null)
-        : LAYER[it.l];
+        : (isPublished(LAYER[it.l]) ? LAYER[it.l] : null);     // a beta layer is not offered here
+      const dropped = items.filter(it => !recOf(it) || !DATE_RE.test(it.d)).length;
+      if (dropped) warnUnavailable(dropped + (dropped === 1 ? " entry" : " entries") + " of the compare list of this link");
       compare = items.filter(it => recOf(it) && DATE_RE.test(it.d)).map((it, i) => ({
         layerId: recOf(it).id, date: it.d, cc: isFinite(it.c) ? it.c : 100,
         s: objToSettings(recOf(it), it.s || {}),
@@ -9008,6 +8930,14 @@ if (!VERIFIED_IDS) {
 renderCompare();
 renderAoiTool();
 if (xp.boot) showView("external");
+cfgBadge();
+/* What the link asked for and this version cannot show: said once, not as a toast that disappears. */
+if (linkWarn.length) {
+  $("#linkbarTxt").textContent = linkWarn.join("; ") +
+    ". The default view is shown instead; the full set of layers is on the integration version.";
+  $("#linkbar").hidden = false;
+  $("#linkbarX").onclick = () => { $("#linkbar").hidden = true; map.resize(); };
+}
 booted = true;
 if (aoiUrlPending) loadGeoUrl(aoiUrlPending, "aoi");
 if (maskUrlPending) loadGeoUrl(maskUrlPending, "mask");
