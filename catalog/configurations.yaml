@@ -1,0 +1,48 @@
+# The configurations of the swissEO Browser: what the pull-down offers, in this order.
+#
+# A configuration lists its layers in groups; the same layer can appear in several configurations.
+# The layers themselves are in catalog/layers.yaml; a layer that is not verified there carries the
+# BETA label and is removed from these groups in the production build.
+#
+#   beta: true   the whole configuration is only offered on integration, with a BETA label
+#   highlights   the key of a story set in HIGHLIGHTS in the page (texts stay there)
+#
+# The key is also the themeId of a permalink (upper case, no dashes). tools/build-catalog.py
+# writes this into the page; never edit the generated block there by hand.
+
+configurations:
+  - key: DEFAULT
+    name: "Default"
+    beta: false
+    groups:
+      - title: "Composites"
+        layers: ["true", "nir", "urban", "swir", "agri", "geo"]
+      - title: "Indices"
+        layers: ["ndvi", "ndwi", "ndmi", "ndsi", "nbr", "aot", "vhi", "vhiveg", "ndvidiff"]
+      - title: "Masks & quality"
+        layers: ["scl", "cloud", "terrain"]
+  - key: AGRICULTURE
+    name: "Agriculture"
+    beta: false
+    groups:
+      - title: "Layers"
+        layers: ["true", "nir", "ndvi", "evi", "barren", "mstress", "ndmi", "agri", "savi"]
+  - key: DROUGHT
+    name: "Drought"
+    beta: false
+    groups:
+      - title: "Layers"
+        layers: ["true", "ndvi", "evi", "ndmi", "vhi", "vhiveg", "ndvidiff", "ndvidiff2", "ndviz", "nddi", "nddichg", "analyst"]
+  - key: DROUGHT2026
+    name: "Drought 2026"
+    beta: false
+    highlights: drought2026
+    groups:
+      - title: "Layers"
+        layers: ["true", "ndmi", "ndwi", "mstress", "ndvi", "swir", "urban", "hon"]
+  - key: FOREST
+    name: "Forest"
+    beta: false
+    groups:
+      - title: "Layers"
+        layers: ["true", "ndvi", "evi", "vhi", "vhidef", "vhiext", "ndvidiff", "ndvidiff2", "ndviz", "analyst", "nbr", "ndmi", "fdc"]

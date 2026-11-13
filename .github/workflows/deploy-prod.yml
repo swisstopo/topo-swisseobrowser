@@ -18,6 +18,7 @@ on:
     branches: [main]
     paths:
       - swisseo-browser.html
+      - catalog/**
       - README.md
       - public/previews/**
       - docs/**
@@ -62,22 +63,50 @@ jobs:
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      - name: Python dependencies of the build
+        run: python3 -m pip install --quiet --disable-pip-version-check "PyYAML==6.0.3"
+
       - name: Assemble the site
         run: |
           mkdir -p _site/public/previews
           # production serves the page only as index.html, under no second name
           cp swisseo-browser.html _site/index.html
           cp README.md _site/README.md
-          grep -oE '"[A-Z-]+-[0-9a-f]{6}-[^"]+\.png"' swisseo-browser.html | tr -d '"' | sort -u |
-            while read -r f; do cp "public/previews/$f" _site/public/previews/; done
+          # only the thumbnails of the layers production offers: the catalogue decides, not a grep over
+          # the page, which still carries the definitions of the layers that are held back
+          python3 tools/build-catalog.py --env prod --previews "$RUNNER_TEMP/previews.txt"
+          while read -r f; do cp "public/previews/$f" _site/public/previews/; done < "$RUNNER_TEMP/previews.txt"
           cp -r docs _site/docs
           cp -r lib _site/lib
 
-      - name: Apply the layer verification checklist of README.md
-        run: python3 tools/apply-verification.py _site/index.html
+      # Writes the catalogue into the page. Production offers only the configurations that are not
+      # marked beta and, within them, only the layers that are ticked as verified in catalog/layers.yaml.
+      # The layer definitions stay in the file; the page refuses to open one that is not offered.
+      - name: Apply the catalogue
+        run: |
+          python3 tools/build-catalog.py --env prod --check
+          python3 tools/build-catalog.py --env prod --page _site/index.html
+
+      # The link preview (Open Graph) needs absolute addresses. They are committed with the integration
+      # address, so a local copy and the integration site preview correctly; here they become this site's
+      # own address. Without PROD_URL the committed addresses stay: the preview then shows the
+      # integration image, which is wrong but harmless, so this never fails the deploy.
+      - name: Point the link preview at this site
+        run: |
+          site="${PROD_URL%/}"
+          if [ -z "$site" ]; then
+            echo "::warning::PROD_URL is not set, so the link preview still names the integration site"
+            exit 0
+          fi
+          for f in _site/index.html _site/docs/index.html; do
+            sed -i "s|https://swisstopo.github.io/topo-swisseobrowser|$site|g" "$f"
+          done
+          grep -q "og:url\" content=\"$site" _site/index.html ||
+            { echo "::error::the Open Graph address was not rewritten"; exit 1; }
+          echo "link preview points at $site"
 
       - name: Check the site serves its libraries itself
-        run: bash tools/check-dist.sh _site
+        run: bash tools/check-dist.sh _site prod
 
       # Prints the claims of the OIDC token (never the token itself). The "sub" and "aud" below are exactly
       # what the trust policy of the AWS role has to accept; a mismatch is reported by STS as

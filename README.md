@@ -3,7 +3,9 @@
 A minimal, browser-only viewer for swisstopo's **swissEO** satellite products, modelled on the
 [Copernicus Browser](https://browser.dataspace.copernicus.eu/) workflow.
 
-**Live version: <https://swisstopo.github.io/topo-swisseobrowser/>**
+**Integration version (for testing): <https://swisstopo.github.io/topo-swisseobrowser/>**
+It carries a red bar at the top and is **not for operational use**. The production version will be
+`swisseobrowser.swisstopo.admin.ch`; it is not yet communicated and not yet reachable.
 
 [![Ask DeepWiki](https://img.shields.io/badge/DeepWiki-Ask%20about%20this%20repo-003F6B)](https://deepwiki.com/swisstopo/topo-swisseobrowser)
 **Search and ask questions about this repository:** [DeepWiki](https://deepwiki.com/swisstopo/topo-swisseobrowser)
@@ -156,6 +158,7 @@ sheets ([S2-SR v200](https://www.swisstopo.admin.ch/dam/en/sd-web/-i2Y10KmboPf/s
 | --- | --- | --- | --- |
 | B01–B12, B8A | 0.0001 | −0.1 | 0 |
 | AOT | 0.001 | 0 | 0 |
+| TCI (uint8 RGB) | 1 | 0 | 0 (the internal mask of the asset decides what is data) |
 | SCL | 1 | 0 | 0 (Sen2Cor classes 1–11) |
 | Cloud mask (OmniCloudMask) | 1 | 0 | 0 clear · 1 thick cloud · 2 thin cloud · 3 cloud shadow |
 | Terrain mask | 1 | 0 | 0–180 solar incidence angle (°) · 200 shadow · 255 no data |
@@ -568,26 +571,77 @@ The swissEO Browser therefore always uses the physical reflectance.
     issues opened directly on GitHub, each with a required permalink field. Pre-filling the form fields from the URL
     did not work, hence the text; for it blank issues have to stay enabled (`config.yml`). Issues need a GitHub account,
     and *Issues* must be switched on in the repository settings.
-- **Info tab**: the *not for operational use* notice (with the meaning of the BETA label, Feedback and issue links), the
-  acquisitions of the selected date with their metadata, the scaling / no-data table, a description of the services used and links to all
-  repositories and libraries the website builds on.
+- **Info tab**: four short cards. *Feedback* (the two ways to report something, with the privacy note), *Selected
+  date* (the acquisitions of the selected date with their metadata), *How this works, data and scaling* (links to the
+  help page and to this README, which describe the services, the scaling and no-data values, the formulas and the
+  layer verification) and *Terms*. The explanations themselves live in the help page and here, so they exist once
+  instead of three times.
 - Colours follow the Swiss Confederation scheme used by
   [swisstopo/topo-drought-briefing](https://github.com/swisstopo/topo-drought-briefing).
+
+## The catalogue
+
+Two files decide what the application offers, and the deploy writes them into the page. They are the only
+place to change it; the blocks they generate are marked in the page and in this README and are overwritten
+on every deploy.
+
+| File | What it decides |
+| --- | --- |
+| [`catalog/layers.yaml`](catalog/layers.yaml) | which layers exist and whether each is **verified**. Not verified means the BETA label on integration and not offered in production. |
+| [`catalog/configurations.yaml`](catalog/configurations.yaml) | what the pull-down offers, in which order, with which layers in which groups, and whether a whole configuration is **beta** (integration only). |
+
+The layer definitions themselves stay in `swisseo-browser.html`: bands, formulas, colour ramps and the
+JavaScript of an index are code and belong there. The catalogue holds only the structure, so the same layer
+can appear in several configurations and be held back everywhere at once.
+
+```
+python3 tools/build-catalog.py --env int --write-readme   # after editing catalog/: page + checklist
+python3 tools/build-catalog.py --env int --check          # what CI runs
+```
+
+To see what a deploy would publish, [`tools/assemble-local.ps1`](tools/assemble-local.ps1) builds either
+site locally, with the same steps as the workflows (on Windows; the deploys themselves run the same
+commands on Linux):
+
+```
+powershell -File tools/assemble-local.ps1 -Env prod -Out _prod
+cd _prod; python -m http.server 8000
+```
+
+It needs PyYAML (`python3 -m pip install "PyYAML==6.0.3"`; the workflows install the same pinned version).
+It refuses a catalogue that names a layer the page does not define, a duplicate id, a configuration key
+that is not a valid `themeId`, or a production build with no layers left, and it warns about a layer that
+is in no configuration. Every id must be quoted in the YAML: `true` is a layer id, and YAML would
+otherwise read it as a boolean.
 
 ## Layer verification
 
 The layers are being checked one by one, in depth: data access (assets, dates, nearest product), scaling and
 no-data, the formula and its source, masks, rendering and legend, statistics and exports, compared with
 reference implementations where possible (GDAL / rasterio reads of the COGs, the original scripts). Until a
-layer has passed this check it carries the label **BETA** behind its name, and its description and the Info tab say
-that it still needs to be verified; a verified layer carries no label.
+layer has passed this check it carries the label **BETA** behind its name, and its description says that it still
+needs to be verified and links to this section; a verified layer carries no label.
 
-**This checklist is the source of the BETA labels.** Tick a box (`[x]`) to remove the label of a layer when it is verified and push: the
-Pages workflow reads the list between the two markers below on every deploy (also when only this README
-changed) and writes the checked layer ids into the published page. The workflow warns when a layer of the
-page is missing here or an id here is unknown. A local copy of `swisseo-browser.html` reads this README itself:
-the copy next to the page when it is served from the repository, otherwise (e.g. opened as a file) the README of
-`main` on GitHub.
+**Tick a layer in [`catalog/layers.yaml`](catalog/layers.yaml)**, not in the checklist below: set
+`verified: true` there and run
+
+```
+python3 tools/build-catalog.py --env int --write-readme
+```
+
+which regenerates both the checklist below and the configuration block of the page, then commit both.
+The checklist is generated, and CI (`catalog-check.yml`) fails when it is edited by hand or does not
+match the catalogue. Every deploy writes the ticked ids into the published page.
+
+**A layer that is not ticked is not offered in production.** It carries the BETA label on the
+integration version, where everything is visible for testing, and the production build leaves it out of
+the configurations; a link that names it opens the default view and says that the layer is not available
+in this version. The layer definitions stay in the file either way, so nothing changes about how a layer
+works, only about where it is offered.
+
+A local copy of `swisseo-browser.html` that was not deployed reads this README itself to find the ticks:
+the copy next to the page when it is served from the repository, otherwise (for example opened as a file)
+the README of `main` on GitHub.
 
 <!-- verification:start -->
 - [x] `true`: True color *(Default, Agriculture, Drought, Drought 2026, Forest)*
@@ -607,20 +661,20 @@ the copy next to the page when it is served from the repository, otherwise (e.g.
 - [x] `terrain`: Terrain / solar incidence *(Default)*
 - [x] `vhi`: swissEO VHI forest *(Default, Drought, Forest)*
 - [x] `vhiveg`: swissEO VHI vegetation *(Default, Drought)*
-- [x] `vhidef`: VHI cumulative deficit *(Forest)*, checked by FOEN
-- [x] `vhiext`: VHI days in extreme stress *(Forest)*, checked by FOEN
 - [ ] `evi`: EVI *(Agriculture, Drought, Forest)*
 - [ ] `savi`: SAVI *(Agriculture)*
 - [ ] `barren`: Barren Soil *(Agriculture)*
 - [ ] `mstress`: Moisture Stress *(Agriculture, Drought 2026)*
 - [ ] `hon`: Highlight Optimized Natural Color *(Drought 2026)*
 - [x] `ndvidiff`: swissEO NDVIdiff *(Default, Drought, Forest)*
-- [ ] `ndvidiff2`: swissEO NDVIdiff v200 BETA *(Drought, Forest)*
 - [x] `ndviz`: swissEO NDVIz *(Drought, Forest)*
+- [ ] `ndvidiff2`: swissEO NDVIdiff v200 BETA *(Drought, Forest)*
+- [x] `vhidef`: VHI cumulative deficit *(Forest)*, checked by FOEN
+- [x] `vhiext`: VHI days in extreme stress *(Forest)*, checked by FOEN
+- [ ] `fdc`: Forest Disturbance Classification *(Forest)*
 - [ ] `nddi`: NDDI *(Drought)*
 - [ ] `nddichg`: NDDI change vs. previous year *(Drought)*
 - [ ] `analyst`: NDVI difference to a reference date *(Drought, Forest)*
-- [ ] `fdc`: Forest Disturbance Classification *(Forest)*
 <!-- verification:end -->
 
 ### Limits of the browser
@@ -683,9 +737,36 @@ Both deploys assemble the same site: `swisseo-browser.html` as `index.html`, thi
 `public/previews/`; the upstream Copernicus Browser sources are never published. Integration additionally
 keeps the page under its own name, so older links to `swisseo-browser.html` still work there; production
 serves it only as `index.html`. On every
-deploy the [layer verification](#layer-verification) checklist of this README is applied to the page
-(`tools/apply-verification.py`) and `tools/check-dist.sh` verifies that no library is loaded from a CDN.
-All GitHub Actions are pinned to commit SHAs.
+deploy `tools/build-catalog.py` writes the catalogue of [`catalog/`](catalog/) into the page (the
+configurations and the [layer verification](#layer-verification)) and `tools/check-dist.sh` verifies that
+no library is loaded from a CDN and that the build matches its environment. All GitHub Actions are pinned
+to commit SHAs.
+
+The two builds differ in what they offer: integration carries every layer and every configuration, with
+BETA labels on the ones that are not verified yet, and production carries only the verified layers and
+the configurations that are not marked beta. The layer definitions remain in both files; what the
+production build changes is the generated configuration block, which is the only place a layer is
+offered, so a hidden layer cannot be reached through the interface or through a link.
+
+Three things differ between the two environments:
+
+- **The red bar at the top.** The page and the help page decide at load time from the host name: every
+  environment except production carries it, which includes GitHub Pages, a local server and a copy opened
+  as a file. The production hosts are the list in the small script in the head of both files; at go-live
+  the CloudFront host can be dropped from it, and the sentence can name the production address.
+- **Search engines.** The committed files look like production, and the Pages deploy replaces the
+  `robots:marker` comment with `<meta name="robots" content="noindex, nofollow">`, so only integration is
+  kept out of search results. A failure of that step can at worst let the integration version be indexed,
+  never hide production. A `robots.txt` cannot do this here: on a project page it is served under
+  `/topo-swisseobrowser/`, while crawlers read only the one at the root of `swisstopo.github.io`, which is
+  a different repository.
+- **The link preview.** The Open Graph tags (title, description and `docs/img/og-image.jpg`, a 1200 × 630
+  view of the application) need absolute addresses. They are committed with the integration address, so a
+  local copy previews correctly, and the production deploy rewrites them to `PROD_URL`. Without that
+  variable the deploy only warns: the preview then shows the integration image.
+
+`tools/check-dist.sh` takes the environment as its second argument (`int` or `prod`) and refuses a build
+whose noindex tag, integration bar or preview image does not match it.
 
 ### Libraries (SBOM)
 

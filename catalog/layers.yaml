@@ -1,0 +1,108 @@
+# The layers of the swissEO Browser: which exist, and whether they are verified.
+#
+# The layer DEFINITIONS (bands, formulas, colour ramps, the JavaScript of an index) stay in
+# swisseo-browser.html. This file decides only what is shown where:
+#   verified: false  the layer carries the BETA label and is NOT offered in production
+#   verified: true   no label, offered everywhere
+# Only tick a layer as verified when it has really been checked (see README, Layer verification).
+#
+# label and note are used for the generated checklist in README.md. The order is the order of the
+# layer definitions in the page. tools/build-catalog.py reads this file; never edit the generated
+# block in the page or the checklist in the README by hand.
+
+layers:
+  - id: "true"
+    label: "True color"
+    verified: true
+  - id: "nir"
+    label: "False color"
+    verified: true
+  - id: "urban"
+    label: "False color (urban)"
+    verified: false
+  - id: "swir"
+    label: "SWIR"
+    verified: true
+  - id: "agri"
+    label: "Agriculture"
+    verified: false
+  - id: "geo"
+    label: "Geology 12, 8, 2"
+    verified: false
+  - id: "ndvi"
+    label: "NDVI"
+    verified: true
+  - id: "ndwi"
+    label: "NDWI"
+    verified: false
+  - id: "ndmi"
+    label: "Moisture index"
+    verified: false
+  - id: "ndsi"
+    label: "NDSI"
+    verified: false
+  - id: "nbr"
+    label: "Normalized Burn Ratio (NBR)"
+    verified: false
+  - id: "aot"
+    label: "Aerosol optical thickness"
+    verified: false
+  - id: "scl"
+    label: "Scene classification map"
+    verified: true
+  - id: "cloud"
+    label: "Cloud mask"
+    verified: true
+  - id: "terrain"
+    label: "Terrain / solar incidence"
+    verified: true
+  - id: "vhi"
+    label: "swissEO VHI forest"
+    verified: true
+  - id: "vhiveg"
+    label: "swissEO VHI vegetation"
+    verified: true
+  - id: "evi"
+    label: "EVI"
+    verified: false
+  - id: "savi"
+    label: "SAVI"
+    verified: false
+  - id: "barren"
+    label: "Barren Soil"
+    verified: false
+  - id: "mstress"
+    label: "Moisture Stress"
+    verified: false
+  - id: "hon"
+    label: "Highlight Optimized Natural Color"
+    verified: false
+  - id: "ndvidiff"
+    label: "swissEO NDVIdiff"
+    verified: true
+  - id: "ndviz"
+    label: "swissEO NDVIz"
+    verified: true
+  - id: "ndvidiff2"
+    label: "swissEO NDVIdiff v200 BETA"
+    verified: false
+  - id: "vhidef"
+    label: "VHI cumulative deficit"
+    verified: true
+    note: "checked by FOEN"
+  - id: "vhiext"
+    label: "VHI days in extreme stress"
+    verified: true
+    note: "checked by FOEN"
+  - id: "fdc"
+    label: "Forest Disturbance Classification"
+    verified: false
+  - id: "nddi"
+    label: "NDDI"
+    verified: false
+  - id: "nddichg"
+    label: "NDDI change vs. previous year"
+    verified: false
+  - id: "analyst"
+    label: "NDVI difference to a reference date"
+    verified: false

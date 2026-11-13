@@ -34,3 +34,36 @@ for h in 'cdn.jsdelivr.net:14' 'cdnjs.cloudflare.com:1' 'raw.githubusercontent.c
     { echo "::error::$host appears $n times in the page, expected $want (file:// fallbacks and prose only)"; exit 1; }
 done
 echo "dist check OK: all libraries self-hosted, CDN URLs are fallbacks only"
+
+# 4. Environment: only the integration version may carry a noindex tag, and the integration bar must
+#    be switchable in both the page and the help page (the production hosts are listed in each file).
+env=${2:-}
+if [ -n "$env" ]; then
+  # the catalogue must have been written into the page: a forgotten build step is caught here and
+  # not by a visitor whose layer list is empty
+  grep -q '^const VERIFIED_IDS = \[' "$page" ||
+    { echo "::error::the page still has the VERIFIED_IDS placeholder: tools/build-catalog.py did not run"; exit 1; }
+  grep -q '^const CONFIGS = {' "$page" ||
+    { echo "::error::the page has no configurations"; exit 1; }
+  for f in "$page" "$site/docs/index.html"; do
+    [ -f "$f" ] || continue
+    if [ "$env" = int ]; then
+      grep -q '^<meta name="robots" content="noindex, nofollow">$' "$f" ||
+        { echo "::error::$f carries no noindex tag, but the integration version must not be indexed"; exit 1; }
+    else
+      # production keeps the marker comment untouched; what it must not have is the tag itself
+      ! grep -q 'name="robots"' "$f" ||
+        { echo "::error::$f carries a robots tag: production must stay indexable"; exit 1; }
+    fi
+    grep -q 'swisseobrowser.swisstopo.admin.ch' "$f" ||
+      { echo "::error::$f does not name the production host, so it cannot hide the integration bar"; exit 1; }
+    grep -q 'id="envbar"' "$f" ||
+      { echo "::error::$f has no integration bar"; exit 1; }
+  done
+  # the link preview image must exist in the site, whatever address the tag carries
+  img=$(grep -oE 'property="og:image" content="[^"]+"' "$page" | sed -E 's/.*content="(.*)"/\1/' |
+        sed -E 's#^https?://[^/]+/##; s#^topo-swisseobrowser/##')
+  [ -f "$site/$img" ] ||
+    { echo "::error::the link preview image $img is referenced but missing from the site"; exit 1; }
+  echo "environment check OK ($env)"
+fi
