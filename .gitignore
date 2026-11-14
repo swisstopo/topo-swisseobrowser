@@ -41,3 +41,8 @@ yarn-error.log*
 /.playwright-cli/
 
 /temp/*
+
+# local builds of tools/assemble-local.ps1
+/_int/
+/_prod/
+/_site/

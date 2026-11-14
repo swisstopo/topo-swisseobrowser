@@ -191,7 +191,7 @@ The swissEO Browser therefore always uses the physical reflectance.
 
 - **Layout as in the Copernicus Browser**: the menu on the left has the Confederation logo of map.geo.admin.ch
   ([ConfederationFullLogo.vue](https://github.com/geoadmin/web-mapviewer/blob/3e5a2900/packages/mapviewer/src/modules/menu/components/header/ConfederationFullLogo.vue)),
-  the language (*EN* only for now), the collapse chevron and the title *swissEO Browser*; there is no header bar above the
+  the language selector (EN, DE, FR, IT; see [Languages](#languages)), the collapse chevron and the title *swissEO Browser*; there is no header bar above the
   map. The chevron collapses the menu and a round button at the top left of the map opens it again; on small screens
   (up to 760 px) the menu starts collapsed and covers the map when opened. On the map:
   - top left: the date and the number of acquisitions on the map, the *Copy link* (chain) and *Pixel inspector* ((i) with a pointer) icon buttons;
@@ -698,16 +698,96 @@ folder with any static web server:
 ```bash
 python -m http.server 8000
 # then open http://localhost:8000/swisseo-browser.html
+#   in German:      http://localhost:8000/swisseo-browser.html?lang=de
+#   the help page:  http://localhost:8000/docs/index.html?lang=fr
 ```
 
 A current desktop browser (Firefox, Chrome, Edge) with **WebGL2** is required: the map is drawn by MapLibre GL JS.
 Browsers switch WebGL2 off on computers without a usable graphics card (virtual machines, remote desktop sessions;
 Firefox reports `AllowWebgl2:false`). The page then says so in the map area. In Firefox, `about:config` →
 `webgl.force-enabled` = `true` switches it on (software rendering, slower); in Chrome / Edge, *Use graphics
-acceleration when available*. Opening the file directly (`file://`) works as well as serving the folder.
+acceleration when available*. Opening the file directly (`file://`) works too, but only in English: a page
+opened from disk cannot read the translation files, so serve the folder to see the other languages.
 
 Conventions for further development (for people and for AI coding assistants) are in [`CLAUDE.md`](CLAUDE.md):
 no em-dashes in any text, LV95 coordinates, pushes only to this repository, how to add a layer.
+
+### Languages
+
+The application and the help page are in **English, German, French and Italian**, with
+[i18next](https://www.i18next.com/) (self-hosted in `lib/`, see the SBOM below) and a small shared script,
+[`js/i18n.js`](js/i18n.js). The language comes from `?lang=` in the address, then from the earlier choice in this
+browser (`localStorage`), then from the browser's own languages, else English. The selector at the top of the
+menu (and in the header of the help page) switches without a reload: the map, the date, the layers, the
+compare list and every other part of the address stay as they are, and the address gains `lang=`.
+
+**Where the texts are.** English is the source and stays in the code: the text of every element marked with
+`data-i18n` and the English argument of every `t("key", "English")` / `tn(...)` call in the page, plus the
+English of the data the page renders (layer names, subtitles and descriptions, highlight stories,
+configurations, class and mask labels). The translations are JSON files, one per language and page:
+
+```
+locales/en/app.json   locales/en/help.json     generated from the pages: never edit by hand
+locales/de/app.json   locales/de/help.json     German (Swiss spelling: "ss", no "ß")
+locales/fr/...        locales/it/...           French, Italian
+```
+
+Keys are readable and grouped by area (`status.lookingUp`, `layers.ndvi.description`, `classes.scl.4`,
+`vocab.lnf.dw`, help blocks by section: `t3.p2`, `vis-masks.li4`). A missing key, a missing file or a failed
+request shows the English, never a key or a blank; a page opened from disk stays English. Dates and numbers
+on screen follow the language (`de-CH` 15.07.2026 and 12'345.6); exports, links and coordinates keep their
+machine format. Not translated, by rule: product and collection ids, band names, index names (NDVI, VHI…),
+COG, STAC, WMS, URLs, formulas and units. The titles and abstracts of the VHI layers are swisstopo's own, from
+the GetCapabilities of wms.geo.admin.ch in each language; external WMS / WMTS services keep their titles. The
+GitHub issue texts stay English, since the team reads them.
+
+**Changing a translation.** Edit `locales/<lng>/<page>.json` and check it:
+
+```bash
+python tools/check-locales.py            # validate de, fr, it against the English
+python tools/check-locales.py --extract  # after changing English in a page: regenerate locales/en
+python tools/check-locales.py --check    # what CI runs: also fails when locales/en is stale
+```
+
+It reports invalid JSON, keys the English does not have, empty values, `{{placeholders}}` and HTML tags
+that differ from the English, missing plural forms (French and Italian need `_one`, `_many` and `_other`) and
+a German `ß` as errors, and keys still to translate and protected names missing from a translation as
+warnings. To see a translation, serve the folder (`python -m http.server`) and open
+`swisseo-browser.html?lang=de`; on non-production hosts every key missing in the current language is named
+once in the browser console.
+
+**Production** offers only the languages a native speaker has reviewed, today English and German. The list
+is the line `offered='["en","de"]'` in [`deploy-prod.yml`](.github/workflows/deploy-prod.yml) (step *The
+languages production offers*), which writes it into the page and the help page as `const LANGS_OFFERED`;
+[`tools/assemble-local.ps1`](tools/assemble-local.ps1) reads the same line for a local production build. All
+translation files are deployed anyway, and integration offers all four languages.
+
+To offer **French or Italian** in production once a native speaker has reviewed it:
+
+1. Check the translation on integration (`?lang=fr`, the help page included) and run
+   `python tools/check-locales.py`: it must report no errors and no keys still to translate.
+2. Add the language to that one line, e.g. `offered='["en","de","fr"]'` or `offered='["en","de","fr","it"]'`.
+3. Optionally check the result locally: `powershell -File tools/assemble-local.ps1 -Env prod -Out _prod`
+   (it runs `tools/check-dist.sh`, which fails if a file of an offered language is missing).
+4. Commit on `int` and merge into `main` through the pull request; the production deploy does the rest.
+
+Taking a language out again is the same edit in reverse. With one language the selector shows only EN.
+
+**The help screenshots** are in `docs/img/` (English) and `docs/img/<lng>/` (the others, under the same
+names); a missing one falls back to English. [`tools/screenshots/`](tools/screenshots/screenshots.mjs) takes all
+22 views in every language from permalinks (`cd tools/screenshots && npm ci && npx playwright install chromium &&
+node screenshots.mjs --lang de --only calendar`); after a change of the interface, reshoot the affected views.
+
+**Adding a fifth language**, e.g. Romansh (`rm`):
+
+1. Copy `locales/de/` to `locales/rm/` and translate both files (or start from the English files); run
+   `python tools/check-locales.py` until it is clean. Romansh plurals use `_one` and `_other`.
+2. In [`js/i18n.js`](js/i18n.js), add `rm` to `ALL`, its label to `NAMES` and its locale (`rm-CH`) to `LOCALE`.
+3. In [`tools/check-locales.py`](tools/check-locales.py), add it to `LANGS` and its plural forms to `PLURALS`;
+   add it to the list of offered languages in [`tools/check-dist.sh`](tools/check-dist.sh).
+4. Take the screenshots: `node screenshots.mjs --lang rm`.
+
+No other code changes: every text of the pages already goes through the keys.
 
 ### Deployment
 
@@ -715,7 +795,7 @@ Two environments, two branches:
 
 - **Integration** <https://swisstopo.github.io/topo-swisseobrowser/> (GitHub Pages): published by
   [`.github/workflows/pages.yml`](.github/workflows/pages.yml) on every push to **`int`** that changes the page,
-  this README, `docs/`, `lib/` or `tools/`, and manually from the *Actions* tab. The repository's
+  this README, `docs/`, `lib/`, `js/`, `locales/` or `tools/`, and manually from the *Actions* tab. The repository's
   *Settings → Pages → Source* must be set to **GitHub Actions**.
 - **Production** <https://swisseobrowser.swisstopo.admin.ch> (S3 bucket `s3-topo-satromo-swisseobrowser`,
   eu-central-1, behind CloudFront): published by
@@ -733,7 +813,8 @@ Two environments, two branches:
   trust ever has to be rebuilt.
 
 Both deploys assemble the same site: `swisseo-browser.html` as `index.html`, this README, the help pages in
-`docs/`, the self-hosted libraries in `lib/` and the layer thumbnails the page references from
+`docs/`, the self-hosted libraries in `lib/`, the language script `js/i18n.js`, the translations in `locales/`
+and the layer thumbnails the page references from
 `public/previews/`; the upstream Copernicus Browser sources are never published. Integration additionally
 keeps the page under its own name, so older links to `swisseo-browser.html` still work there; production
 serves it only as `index.html`. On every
@@ -792,6 +873,7 @@ works under a Content-Security-Policy without `'unsafe-eval'` (it needs `worker-
 | [shpjs](https://github.com/calvinmetcalf/shapefile-js) | 6.2.0 | MIT | npm `shpjs` | Shapefile import |
 | [mgrs](https://github.com/proj4js/mgrs) | 2.2.0 | MIT | npm `mgrs` | MGRS grid references |
 | [gifenc](https://github.com/mattdesl/gifenc) | 1.0.3 | MIT | npm `gifenc` | timelapse GIF export |
+| [i18next](https://github.com/i18next/i18next) | 26.5.11 | MIT | npm `i18next` | languages of the page and the help page |
 | [Forest Disturbance Classification](https://github.com/sentinel-hub/custom-scripts) | commit `0a071cf` | CC BY-SA 4.0 | sentinel-hub/custom-scripts (Joanneum Research, EvoLand) | `fdc` layer model, 150 decision trees converted to a module |
 | [WMS / WMTS provider list](https://github.com/geoadmin/web-mapviewer) | commit `3e5a2900` | BSD-3-Clause | geoadmin/web-mapviewer | WMS / WMTS panel suggestions |
 
@@ -830,6 +912,7 @@ Parameter names follow the Copernicus Browser where an equivalent exists.
 
 | Parameter | Example | Meaning |
 | --- | --- | --- |
+| `lang` | `de` | Language: `en`, `de`, `fr`, `it` (of those the build offers); written only when it is not English, see [Languages](#languages) |
 | `center` | `2703331.08,1133878.99` | Map centre in LV95 (E,N), as on map.geo.admin.ch |
 | `zoom` | `17` | Zoom level of the swisstopo LV95 grid (8 to 27; about 17 to 18 for a region; fractional values give resolutions between the grid levels, interpolated in scale; written with three decimals) |
 | `3d`, `pitch`, `bearing` | `true`, `60`, `160` | 3D terrain mode, with the tilt (0–75°) and the direction of view (degrees from north) |
@@ -897,7 +980,8 @@ Example:
   the LV95 grid per tile (accurate to about a pixel), not reprojected per pixel. Services whose images come without
   CORS headers cannot be shown at all (WebGL); the timelapse, statistics and pixel inspector only work with the swissEO layers.
   Only the default style and the default time of a layer are used.
-- The language is English only (the *EN* pull-down has no other language yet).
+- The French and Italian translations have not yet been reviewed by native speakers, so production offers
+  English and German only (see [Languages](#languages)).
 
 ## Credits and terms
 

@@ -1,0 +1,12 @@
+{
+  "name": "swisseo-browser-screenshots",
+  "private": true,
+  "description": "Takes the screenshots of the help page (docs/img) in every language. Not part of the site.",
+  "type": "module",
+  "scripts": {
+    "shots": "node screenshots.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.65.0"
+  }
+}

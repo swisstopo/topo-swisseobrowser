@@ -1,4 +1,8 @@
-# Checks that the generated blocks match catalog/: the configurations in swisseo-browser.html and the
+# Checks the two things the pages are generated from.
+#   locales/  the translations: valid JSON, the same keys as English, no empty values, placeholders and
+#             plural forms complete, Swiss spelling; and locales/en/*.json is what the pages say (it is
+#             generated: python3 tools/check-locales.py --extract).
+#   catalog/  the generated blocks: the configurations in swisseo-browser.html and the
 # layer verification checklist in README.md are written by tools/build-catalog.py and must not be
 # edited by hand. After changing catalog/, run
 #   python3 tools/build-catalog.py --env int --write-readme
@@ -6,23 +10,29 @@
 # It also builds the production variant, so a catalogue that would leave production without layers is
 # caught before it is merged into main.
 # Actions are pinned to commit SHAs: tags can be moved, commits cannot.
-name: Catalogue
+name: Catalogue and translations
 
 on:
   push:
     branches: [main, int]
     paths:
       - catalog/**
+      - locales/**
+      - docs/index.html
       - swisseo-browser.html
       - README.md
       - tools/build-catalog.py
+      - tools/check-locales.py
       - .github/workflows/catalog-check.yml
   pull_request:
     paths:
       - catalog/**
+      - locales/**
+      - docs/index.html
       - swisseo-browser.html
       - README.md
       - tools/build-catalog.py
+      - tools/check-locales.py
       - .github/workflows/catalog-check.yml
 
 permissions:
@@ -38,6 +48,9 @@ jobs:
 
       - name: The page and the README must match catalog/
         run: python3 tools/build-catalog.py --env int --check
+
+      - name: The translations are complete and consistent
+        run: python3 tools/check-locales.py --check
 
       - name: The production build must still offer something
         run: |

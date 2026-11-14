@@ -13,7 +13,11 @@ param(
 $ErrorActionPreference = "Stop"
 Set-Location (Join-Path $PSScriptRoot "..")
 
-if (Test-Path $Out) { Remove-Item -Recurse -Force $Out }
+# Empty the folder rather than delete it: a shell sitting in it holds a handle on Windows and the
+# delete then fails, which would stop the build for no good reason.
+if (Test-Path $Out) {
+  Get-ChildItem -Force $Out | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+}
 New-Item -ItemType Directory -Force -Path "$Out/public/previews" | Out-Null
 
 Copy-Item swisseo-browser.html "$Out/index.html"
@@ -21,6 +25,8 @@ if ($Env -eq "int") { Copy-Item swisseo-browser.html "$Out/swisseo-browser.html"
 Copy-Item README.md "$Out/README.md"
 Copy-Item -Recurse docs "$Out/docs"
 Copy-Item -Recurse lib "$Out/lib"
+Copy-Item -Recurse js "$Out/js"
+Copy-Item -Recurse locales "$Out/locales"
 
 # the thumbnails of the layers this build offers
 $prev = Join-Path $env:TEMP "previews-$Env.txt"
@@ -54,6 +60,14 @@ if ($Env -eq "int") {
   # point the link preview at this site
   foreach ($f in @("$Out/index.html", "$Out/docs/index.html")) {
     Edit-Utf8 $f { param($t) $t.Replace("https://swisstopo.github.io/topo-swisseobrowser", $Site) }
+  }
+  # production offers only the reviewed languages: the list is the `offered=` line of deploy-prod.yml
+  $m = Select-String -Path ".github/workflows/deploy-prod.yml" -Pattern "^\s*offered='(\[[^\]]*\])'" | Select-Object -First 1
+  if (-not $m) { throw "deploy-prod.yml has no offered='[...]' line" }
+  $offered = $m.Matches[0].Groups[1].Value
+  foreach ($f in @("$Out/index.html", "$Out/docs/index.html")) {
+    Edit-Utf8 $f { param($t) $t.Replace("const LANGS_OFFERED = null; // replaced on deploy",
+      "const LANGS_OFFERED = $offered; // offered in production") }
   }
 }
 
