@@ -1,48 +1,18 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# swissEO Browser: only what is built or installed locally
 
-# dependencies
-/node_modules
+# dependencies of the tools (tools/vendor, tools/screenshots)
+node_modules/
 
-# misc
-/build
-/deploy
-.env*
-!.env*.example
-.npm
-.DS_Store
-.idea
-.vscode
-.claude/worktrees/
-.claude/settings.local.json
-
-scripts/*.csv
-scripts/*.txt
-scripts/*.xlsx
-
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.github
-
-/scripts/clms*.json
-
-# RRD config-generation run artifacts (live API data)
-/scripts/rrd/rrd-state.json
-/scripts/rrd/rrd-config-mapping.json
-
-# private-collection-access-share.ts userId -> accountId resolve cache (CI-cache-backed, see
-# scripts/PRIVATE_COLLECTION_ACCESS.md)
-/scripts/.cache/
-
-# playwright
-/playwright-report/
-/test-results/
-/e2e/.auth/
-/.playwright-cli/
-
-/temp/*
-
-# local builds of tools/assemble-local.ps1
+# local builds of tools/assemble-local.ps1, and scratch
 /_int/
 /_prod/
 /_site/
+/temp/
+
+# editors and local settings
+.DS_Store
+.idea
+.vscode
+.env*
+.claude/worktrees/
+.claude/settings.local.json

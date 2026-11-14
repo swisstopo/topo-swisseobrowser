@@ -2663,8 +2663,8 @@ const LAYERS = [
     formula:"NDVI = (ρ(B08) − ρ(B04)) / (ρ(B08) + ρ(B04)), ρ < 0 → 0\nΔNDVI = NDVI(date) − NDVI(reference)\nchange = ΔNDVI < threshold (−0.08), then 3 × 3 majority filter (edge-effect removal)" }
 ];
 const LAYER = Object.fromEntries(LAYERS.map(r => [r.id, r]));
-/* Titles, descriptions and preview thumbnails as in the Copernicus Browser (src/assets/layers_metadata.js,
-   src/assets/cache/configuration.json, public/previews). Layers without a Copernicus equivalent link to the
+/* Titles, descriptions and preview thumbnails as in the Copernicus Browser (in the upstream repository:
+   src/assets/layers_metadata.js, src/assets/cache/configuration.json, public/previews). Layers without a Copernicus equivalent link to the
    swisstopo product page instead. */
 const COP_META = {
   true: { name: "True color", sub: "TCI, based on bands B4, B3, B2", thumb: "DEFAULT-THEME-a91f72-1_TRUE_COLOR.png",

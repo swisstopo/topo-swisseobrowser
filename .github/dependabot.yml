@@ -1,6 +1,4 @@
-# Dependabot watches the two places where our dependencies are pinned (issue #21).
-# The root package.json is the frozen upstream Copernicus Browser and deliberately has no entry here:
-# it is never deployed, and update pull requests against it would only churn the reference copy.
+# Dependabot watches the two places where our deployed dependencies are pinned (issue #21).
 version: 2
 updates:
   # The commit-SHA pins of the GitHub Actions workflows.
