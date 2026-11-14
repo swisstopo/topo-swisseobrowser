@@ -18,8 +18,9 @@
 - The app is the single file `swisseo-browser.html` (no build, no backend). It belongs together with
   `README.md`, `CLAUDE.md`, the workflows in `.github/workflows/`, the issue forms in `.github/ISSUE_TEMPLATE/`, the
   help pages in `docs/`, the self-hosted libraries in `lib/`, the language script `js/i18n.js`, the translations in `locales/`, the scripts in `tools/` and the thumbnails it
-  references in `public/previews/`. Everything else is the upstream Copernicus Browser, kept only as a reference:
-  do not modify it.
+  references in `public/previews/` (only those: `build-catalog.py --check` fails on a missing one). The upstream
+  Copernicus Browser sources are no longer in the tree; read them with `git fetch upstream --no-tags` and
+  `git show upstream/main:<path>`.
 - **Git: push only to the remote `origin`** (github.com/swisstopo/topo-swisseobrowser); local `main`
   tracks `origin/main`. Never commit for or push to `upstream` (eu-cdse/copernicus-browser); its push URL
   is disabled on purpose. `davidoesch` (github.com/davidoesch/swisseobrowser) is the former repository.
@@ -36,7 +37,9 @@
   if it needs copying or bundling), into the `LIB_CDN` map of the page (the `file://` fallback), and into the
   README SBOM table; `tools/check-dist.sh` holds the expected CDN-hostname counts of the page and fails the
   deploys when they drift. GitHub Actions in the workflows are pinned to commit SHAs.
-- The upstream `.gitignore` ignores `.github`, so workflow and issue-form changes need `git add -f`.
+- **Releases**: the production deploy creates a GitHub release per merge into `main` (`tools/release.sh`: semver,
+  minor by default, labels `release: patch` / `major` / `none` on the PR, notes from the commit subjects, so write
+  subjects a reader of the release notes understands). The first release is v1.0.0.
 - Issues: the Info tab writes the issue text itself (`ISSUE_KINDS` / `issueBody()` in the page, passed as `title` and
   `body`; pre-filling issue form fields by id did not work), always starting with the permalink. Keep its sections in
   sync with the forms in `.github/ISSUE_TEMPLATE/` (each with a required `permalink` field) and keep

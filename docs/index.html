@@ -35,7 +35,7 @@ header{position:sticky;top:0;z-index:10;background:#fff;border-bottom:3px solid 
 .conf-txt{display:flex;flex-direction:column;font-size:7.5pt;line-height:10.35pt;letter-spacing:.078em;white-space:nowrap}
 .hbar .sep{width:1px;align-self:stretch;background:var(--border);margin:0 4px}
 .hbar .t{font-size:18px;font-weight:700;color:var(--blue)}
-.hbar .t small{font-weight:400;color:var(--muted);font-size:14px;margin-left:6px}
+.hbar .t small{font-weight:400;color:var(--muted);font-size:14px;margin-left:10px}
 .beta{display:inline-block;border:1.5px solid var(--red);color:var(--red);font-size:10px;font-weight:700;letter-spacing:.8px;
   padding:0 4px;line-height:15px;vertical-align:2px;margin-left:6px}
 /* language selector, as in the app */
@@ -113,7 +113,7 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
       <span>Confederazione Svizzera</span><span>Confederaziun svizra</span></div>
   </a>
   <span class="sep" aria-hidden="true"></span>
-  <div class="t">swissEO Browser<span class="beta">BETA</span><small data-i18n="header.small1">Help and tutorial</small></div>
+  <div class="t">swissEO Browser<small data-i18n="header.small1">Help and tutorial</small></div>
   <select id="langSel" class="lang" aria-label="Language" data-i18n="[aria-label]header.language"><option value="en">EN</option></select>
   <a data-i18n="[html]header.a1" class="open" data-home href="../">Open the <span class="long">swissEO </span>Browser</a>
 </div></header>
@@ -300,7 +300,8 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
     <li data-i18n="[html]t8.li1">Click <span class="key">3D</span>: the map tilts and the place names (labels) appear. The button now says
       <span class="key">2D</span>, which brings back the flat map; the labels stay until you switch them off in the layers button.</li>
     <li data-i18n="[html]t8.li2">Drag with the <b>right mouse button</b> (or hold <span class="key">Ctrl</span> and drag) to tilt and turn the
-      view; on a touch screen use two fingers. The compass above the zoom buttons turns it back to north.</li>
+      view; on a touch screen use two fingers. Without a right mouse button, use the <b>3D navigation</b> above the zoom
+      buttons: the upper disc moves the map, the lower one turns and tilts it; its red tab points north.</li>
     <li data-i18n="[html]t8.li3">Three more buttons appear above the tools: the <b>3D settings</b> (gear), the <b>sun shading</b> (light bulb)
       and the <b>sun time</b> (sun). The terrain is lit by the sun at the time of the satellite image; with the sun time
       you can light the mountains as in the morning or the evening.</li>
@@ -495,8 +496,11 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
     <li data-i18n="[html]vis-3d.li1">Select a layer, then click the <span class="key">3D</span> button below the tools. The map tilts and the labels
       are switched on; the button now says <span class="key">2D</span> and returns to the flat map (the labels stay on).</li>
     <li data-i18n="[html]vis-3d.li2">Drag with the <b>right mouse button</b>, or hold <span class="key">Ctrl</span> and drag, to tilt and turn the
-      view; on a touch screen use two fingers. Move and zoom as usual. The compass above the zoom buttons turns the map
-      back to north and flat.</li>
+      view; on a touch screen use two fingers. Move and zoom as usual. The <b>3D navigation</b> above the zoom buttons does
+      the same with the mouse alone: the upper disc moves the map, the lower one turns it (left, right) and tilts it (up,
+      down). Click an arrow for one step or hold it down; drag the knob in the middle, the farther the faster. The red tab
+      always points north: a click on it turns the map back to north, a double-click on the lower knob also makes it flat
+      again (seen from straight above). The zoom buttons sit below the discs.</li>
     <li data-i18n="vis-3d.li3">A first 3D view takes a few seconds: the heights are read from the height model and turned into terrain in your
       browser.</li>
   </ul>
@@ -646,7 +650,8 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
   <h3 data-i18n="share.title3">Feedback and issues</h3>
   <p data-i18n="[html]share.p2">At the top of the <b>Info</b> tab, below the <i>not for operational use</i> notice:</p>
   <ul>
-    <li data-i18n="[html]share.li1"><b>Feedback</b> opens an e-mail to the swissEO team in the mail app of your computer;</li>
+    <li data-i18n="[html]share.li1"><b>Feedback</b> opens an e-mail to the swissEO team in the mail app of your computer, and a window with the
+      addresses and the prepared text to copy, in case no mail app is set up;</li>
     <li data-i18n="[html]share.li2"><b>Report an issue / improvement</b> opens a GitHub issue form of one of four kinds: <i>Fix or change a layer</i>,
       <i>Change a text or translation</i>, <i>Report a general problem</i> or <i>Suggest an improvement</i>. This needs a
       free GitHub account.</li>

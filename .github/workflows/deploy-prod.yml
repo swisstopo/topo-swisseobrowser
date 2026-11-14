@@ -231,3 +231,24 @@ jobs:
           python3 -c 'import json,sys; json.load(open("de.json", encoding="utf8"))' ||
             { echo "::error::locales/de/app.json is not valid JSON"; exit 1; }
           echo "smoke test OK: $PROD_URL (page, lib/$mjs, docs/index.html, locales/de/app.json)"
+
+  # A GitHub release for every production deploy of a push to main (README, Releases): the version (semver, minor by
+  # default; the labels "release: patch", "release: major" and "release: none" on the int -> main pull request) and
+  # the notes (the commits since the previous release) come from tools/release.sh. A job of its own, so only it may
+  # write to the repository, and only after the deploy succeeded; a manual redeploy makes no release, and a re-run
+  # finds the tag and stops.
+  release:
+    needs: deploy
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash tools/release.sh

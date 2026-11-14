@@ -312,6 +312,18 @@
       "visualisation": "Visualizzazione",
       "week": "settimana",
       "year": "anno"
+    },
+    "feedback": {
+      "title": "Riscontro via e-mail",
+      "close": "Chiudi",
+      "intro": "Il tuo programma di posta dovrebbe aprirsi ora con un messaggio già preparato. Se non succede nulla (su questo computer non è configurato alcun programma di posta), copia gli indirizzi e il testo in un programma di posta qualsiasi.",
+      "to": "A",
+      "cc": "Cc",
+      "subject": "Oggetto",
+      "copy": "Copia",
+      "copyText": "Copia il testo",
+      "copied": "Copiato",
+      "openMailApp": "Apri il programma di posta"
     }
   },
   "env": {
@@ -839,7 +851,20 @@
     "sunTime": "Ora solare",
     "thisAreaIsToo": "Quest'area è troppo grande per un link (più di circa 270 vertici) e non viene condivisa quando copiate il link. Caricatela da un URL per condividerla.",
     "zoomIn": "Ingrandisci",
-    "zoomOut": "Riduci"
+    "zoomOut": "Riduci",
+    "nav3d": {
+      "up": "Sposta in alto",
+      "left": "Sposta a sinistra",
+      "right": "Sposta a destra",
+      "down": "Sposta in basso",
+      "moveKnob": "Trascina per spostare la mappa: più lontano, più veloce",
+      "tiltUp": "Inclina verso l'orizzonte",
+      "turnLeft": "Ruota a sinistra",
+      "turnRight": "Ruota a destra",
+      "tiltDown": "Inclina verso una vista perpendicolare dall'alto",
+      "turnKnob": "Trascina per ruotare e inclinare la mappa; doppio clic: nord in alto, vista perpendicolare dall'alto",
+      "north": "Nord in alto"
+    }
   },
   "mask": {
     "all": "Tutte",

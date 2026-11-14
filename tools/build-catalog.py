@@ -19,7 +19,8 @@ What it writes:
   * with --write-readme, the checklist between <!-- verification:start --> and <!-- verification:end -->,
   * with --previews FILE, the thumbnails of the layers that are offered, one per line.
 
-  --check verifies that the files in the repository are what this script would write and exits 1
+  --check verifies that the files in the repository are what this script would write, and that every
+  thumbnail the page names is in public/previews/, and exits 1
   with an annotation otherwise. That is how a hand edit of a generated block is caught in CI.
 
 Usage:
@@ -224,6 +225,12 @@ def main():
             fail("the checklist in README.md is not what catalog/layers.yaml says. Tick layers in "
                  "catalog/layers.yaml, then run 'python3 tools/build-catalog.py --env int "
                  "--write-readme' and commit the result.", README)
+        # every thumbnail the page names must be in public/previews/ (only those are kept there)
+        for thumb in sorted(set(re.findall(r'\bthumb:\s*"([^"]+)"', page))):
+            if not os.path.isfile(os.path.join("public", "previews", thumb)):
+                fail("the thumbnail public/previews/{0} named in {1} is missing. Copy it from the upstream "
+                     "Copernicus Browser: git fetch upstream "
+                     "--no-tags && git restore --source=upstream/main public/previews/{0}".format(thumb, PAGE), PAGE)
         if errors:
             sys.exit(1)
         print("catalogue OK: {} layers ({} verified), {} configurations".format(

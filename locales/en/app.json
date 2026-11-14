@@ -201,6 +201,18 @@
       "tiff8Bit": "TIFF (8-bit)",
       "visualised": "Visualised"
     },
+    "feedback": {
+      "cc": "Cc",
+      "close": "Close",
+      "copied": "Copied",
+      "copy": "Copy",
+      "copyText": "Copy text",
+      "intro": "Your mail app should open now with a prepared message. If nothing happens (no mail app is set up on this computer), copy the addresses and the text into any mail program.",
+      "openMailApp": "Open mail app",
+      "subject": "Subject",
+      "title": "Feedback by e-mail",
+      "to": "To"
+    },
     "import": {
       "anAreaImportedFrom": "An area imported from a file is <b>not shared when you copy the link</b>: only small areas (up to about 270 vertices) fit into a link. To share an imported area, load it from a URL.",
       "boundingBox": "Bounding box",
@@ -820,6 +832,19 @@
     "helpAndTutorialAbout": "Help and tutorial: about the swissEO Browser",
     "importAnAreaOf": "Import an area of interest (file, geometry, grid reference, bounding box)",
     "labels": "Labels",
+    "nav3d": {
+      "down": "Move down",
+      "left": "Move left",
+      "moveKnob": "Drag to move the map: the farther, the faster",
+      "north": "North up",
+      "right": "Move right",
+      "tiltDown": "Tilt towards a view from straight above",
+      "tiltUp": "Tilt towards the horizon",
+      "turnKnob": "Drag to turn and tilt the map; double-click: north up, seen from straight above",
+      "turnLeft": "Turn left",
+      "turnRight": "Turn right",
+      "up": "Move up"
+    },
     "notInLink": "⚠ not in link",
     "openTheMenu": "Open the menu",
     "overlaysTitle": "Map overlays",

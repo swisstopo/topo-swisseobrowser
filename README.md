@@ -1,4 +1,4 @@
-# swissEO Browser `BETA`
+# swissEO Browser
 
 A minimal, browser-only viewer for swisstopo's **swissEO** satellite products, modelled on the
 [Copernicus Browser](https://browser.dataspace.copernicus.eu/) workflow.
@@ -24,12 +24,13 @@ The whole application is a single file: [`swisseo-browser.html`](swisseo-browser
 build step, no backend and no login. The page reads the swissEO Cloud Optimized GeoTIFFs (COGs) and
 the swisstopo WMS/WMTS services directly in the browser.
 
-> **About the rest of this repository:** this repo started as a clone of
-> [eu-cdse/copernicus-browser](https://github.com/eu-cdse/copernicus-browser). All files other than
-> `swisseo-browser.html` (`src/`, `public/`, `package.json`, …) are the upstream Copernicus Browser
-> sources. They are kept **only as a reference** for its user-interface behaviour and are not built,
-> used or modified by the swissEO Browser. Changes are pushed to this repository only, never upstream.
-> For the Copernicus Browser itself, see the [upstream README](https://github.com/eu-cdse/copernicus-browser#readme).
+> **Origin:** this repository started as a clone of
+> [eu-cdse/copernicus-browser](https://github.com/eu-cdse/copernicus-browser), whose user interface the
+> swissEO Browser follows. Its sources were kept as a reference at first and have since been removed from
+> the tree; only the layer thumbnails the page uses remain in `public/previews/`. The upstream sources are
+> still in the git history and in the upstream repository (see its
+> [README](https://github.com/eu-cdse/copernicus-browser#readme)). Changes are pushed to this repository
+> only, never upstream.
 
 ## Data
 
@@ -246,8 +247,8 @@ The swissEO Browser therefore always uses the physical reflectance.
   in 2D they stay on (the layer button switches them off). A link with `3d=true` keeps its own `labels` setting.
 
   In 3D the map can
-  be tilted and turned (right-drag or Ctrl+drag, two fingers on touch screens, the compass above the zoom buttons
-  resets it); the terrain beyond the basemaps takes the map's background colour. The split comparison needs the flat map, so 3D compares with opacity (switching 3D on turns a split into
+  be tilted and turned (right-drag or Ctrl+drag, two fingers on touch screens, or the 3D navigation above the zoom
+  buttons: a disc that moves the map and one that turns and tilts it, with a red tab pointing north, issue #43); the terrain beyond the basemaps takes the map's background colour. The split comparison needs the flat map, so 3D compares with opacity (switching 3D on turns a split into
   an opacity comparison; the highlights switch back to 2D). Statistics, analytical downloads, prints and the
   timelapse use the area around the centre of the view at its scale; the *Basic* download is the view as seen
   (without scale bar, an AOI crop clips all of it). The link keeps `3d`, `pitch`, `bearing`, `terrain` and
@@ -564,6 +565,8 @@ The swissEO Browser therefore always uses the physical reflectance.
   current view** and a one-line summary of what is on the map (layer, id, date of its data, BETA; the compare list or the
   WMS / WMTS layer), so a sentence or two is enough. A local copy links to the same view on the public website.
   - *Feedback*: an e-mail to david.oesch@swisstopo.ch and joan.sturm@swisstopo.ch, opened in the mail app of the computer;
+    a dialog shows the addresses, the subject and the text to copy as well, since a browser cannot tell whether a mail
+    app is set up (issue #44);
   - *Report an issue / improvement*: a new GitHub issue in this repository whose title and text the viewer writes
     (URL parameters `title` and `body`), with the permalink, the layer and, for problems, the browser already in it, and
     the choices as tick boxes: *Fix or change a layer*, *Change a text or translation*, *Report a general problem*,
@@ -815,7 +818,7 @@ Two environments, two branches:
 Both deploys assemble the same site: `swisseo-browser.html` as `index.html`, this README, the help pages in
 `docs/`, the self-hosted libraries in `lib/`, the language script `js/i18n.js`, the translations in `locales/`
 and the layer thumbnails the page references from
-`public/previews/`; the upstream Copernicus Browser sources are never published. Integration additionally
+`public/previews/`. Integration additionally
 keeps the page under its own name, so older links to `swisseo-browser.html` still work there; production
 serves it only as `index.html`. On every
 deploy `tools/build-catalog.py` writes the catalogue of [`catalog/`](catalog/) into the page (the
@@ -848,6 +851,28 @@ Three things differ between the two environments:
 
 `tools/check-dist.sh` takes the environment as its second argument (`int` or `prod`) and refuses a build
 whose noindex tag, integration bar or preview image does not match it.
+
+### Releases
+
+Every production deploy of a merge from `int` into `main` creates a
+[GitHub release](https://github.com/swisstopo/topo-swisseobrowser/releases) (job *release* in
+[`deploy-prod.yml`](.github/workflows/deploy-prod.yml), after the deploy has succeeded;
+[`tools/release.sh`](tools/release.sh)):
+
+- **Version**: semantic versioning, tags `vMAJOR.MINOR.PATCH`. The first release is v1.0.0; after that each merge
+  is a minor release (v1.1.0, v1.2.0, ...). A label on the `int` → `main` pull request changes that:
+  `release: patch` for fixes only, `release: major` for a break (links or URL parameters that no longer work, a
+  function removed), `release: none` for no release. The labels have to exist in the repository (Issues, Labels).
+- **Notes**: the title of the pull request, then one line per commit since the previous release (subject and short
+  hash; `#39` links to the issue), Dependabot updates in a section of their own, and the comparison with the
+  previous release. So commit subjects should say what changed for the viewer.
+- A manual run of the deploy makes no release, and a re-run finds the tag and stops. A merge that changes nothing
+  the deploy watches (e.g. only an issue form) deploys nothing and gets no release of its own; its commits are
+  listed in the next one.
+- The previous version is read from `origin`, never from local tags: a clone that also fetched the upstream
+  Copernicus Browser holds its tags (v1.10.4 ... v1.58.0); `git fetch upstream --no-tags` keeps them out.
+- To check what the next release would be: `bash tools/release.sh --dry-run` (with `RELEASE_LABELS="release: patch"`
+  or `RELEASE_PREV=v1.0.0` to try other cases).
 
 ### Libraries (SBOM)
 
@@ -885,16 +910,11 @@ works under a Content-Security-Policy without `'unsafe-eval'` (it needs `worker-
 - **Dependency alerts**: Dependabot watches the pinned GitHub Actions and the library versions in
   `tools/vendor/package.json` ([`.github/dependabot.yml`](.github/dependabot.yml)); CodeQL analyses the
   page's JavaScript weekly and on every push ([`.github/workflows/codeql.yml`](.github/workflows/codeql.yml)).
-- **Two dependency manifests, only one of them shipped**: this repository still carries the upstream
-  Copernicus Browser (`package.json` and `package-lock.json` at the root, around 2000 packages of a React
-  build), kept as a reference and never built, never installed and never deployed. GitHub's dependency graph
-  scans those files all the same, so most alerts on this repository point at them. Only alerts whose manifest
-  is `tools/vendor/package.json` or `tools/vendor/package-lock.json` concern code that reaches users, and
-  only the runtime dependencies there do: `esbuild` is a build tool that produces `lib/` on a developer
-  machine. The upstream tree contains older copies of libraries that are also in `lib/` (for example
-  `maplibre-gl` 1.15.3 against 6.17.0 in `lib/`), so an alert can name a library the site uses and still not
-  apply to it. Check the version and the manifest path of the alert, then dismiss an upstream one as "not
-  used" with that reason.
+- **Which alerts matter**: the dependency manifests are `tools/vendor/package.json` (the libraries in
+  `lib/`, which reach users; `esbuild` there is only a build tool that produces `lib/` on a developer
+  machine) and `tools/screenshots/package.json` (Playwright, run locally for the help screenshots). The
+  root `package.json` of the upstream Copernicus Browser has been removed, and GitHub closes the alerts
+  that pointed at it.
 - **Vendored libraries are reproducible**: [`.github/workflows/vendor-check.yml`](.github/workflows/vendor-check.yml)
   rebuilds `lib/` from the pinned versions on every pull request that touches `lib/` or `tools/vendor/` and
   fails if the result differs, so nothing can be edited into `lib/` by hand. A Dependabot pull request that
@@ -904,7 +924,7 @@ works under a Content-Security-Policy without `'unsafe-eval'` (it needs `worker-
   notification. A critical vulnerability in a shipped library is fixed within 48 hours: bump the version in
   `tools/vendor/package.json`, regenerate `lib/`, update the `LIB_CDN` map in the page and the SBOM table
   above, verify on integration, then merge to `main` (which deploys to production). Non-critical updates go
-  with the next regular release. Libraries change only through `tools/vendor`, never by editing `lib/`.
+  with the next regular [release](#releases). Libraries change only through `tools/vendor`, never by editing `lib/`.
 
 ## URL parameters
 
@@ -1016,4 +1036,5 @@ Example:
   (Roman Brogli, Timothy Schwitter, 9 July 2026) and [Blick](https://www.blick.ch/schweiz/ostschweiz/thurgau/untersee-faellt-auf-tiefsten-august-wert-seit-1930/49bvg7s)
   (12 August 2026), shortened and translated; the images are swissEO S2-SR TCI.
 - Please note that AI (Claude Code with the Opus 5.5 model, medium effort) was used extensively to prepare this website, adapting it from the Copernicus Browser. The indices were edited and tested manually in QGIS or with rasterio and GDAL. Not for operational use.
-- The repository keeps the upstream MIT license ([LICENSE.md](LICENSE.md)).
+- The repository keeps the upstream MIT license ([LICENSE.md](LICENSE.md)): the layer titles and
+  descriptions in `COP_META` and the thumbnails in `public/previews/` come from the Copernicus Browser.

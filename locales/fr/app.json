@@ -312,6 +312,18 @@
       "visualisation": "Visualisation",
       "week": "semaine",
       "year": "année"
+    },
+    "feedback": {
+      "title": "Retour par e-mail",
+      "close": "Fermer",
+      "intro": "Votre programme de messagerie devrait maintenant s'ouvrir avec un message préparé. Si rien ne se passe (aucune messagerie n'est configurée sur cet ordinateur), copiez les adresses et le texte dans le programme de messagerie de votre choix.",
+      "to": "À",
+      "cc": "Cc",
+      "subject": "Objet",
+      "copy": "Copier",
+      "copyText": "Copier le texte",
+      "copied": "Copié",
+      "openMailApp": "Ouvrir la messagerie"
     }
   },
   "env": {
@@ -839,7 +851,20 @@
     "sunTime": "Heure solaire",
     "thisAreaIsToo": "Cette zone est trop grande pour un lien (plus d'environ 270 sommets) et n'est pas transmise lorsque vous copiez le lien. Chargez-la depuis une URL pour la partager.",
     "zoomIn": "Zoom avant",
-    "zoomOut": "Zoom arrière"
+    "zoomOut": "Zoom arrière",
+    "nav3d": {
+      "up": "Déplacer vers le haut",
+      "left": "Déplacer vers la gauche",
+      "right": "Déplacer vers la droite",
+      "down": "Déplacer vers le bas",
+      "moveKnob": "Faire glisser pour déplacer la carte : plus loin, plus vite",
+      "tiltUp": "Incliner vers l'horizon",
+      "turnLeft": "Tourner à gauche",
+      "turnRight": "Tourner à droite",
+      "tiltDown": "Incliner vers une vue verticale d'en haut",
+      "turnKnob": "Faire glisser pour tourner et incliner la carte ; double-clic : nord en haut, vue verticale d'en haut",
+      "north": "Nord en haut"
+    }
   },
   "mask": {
     "all": "Toutes",
