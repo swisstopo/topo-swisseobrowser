@@ -67,8 +67,6 @@ svg{display:block}
 #linkbar span{flex:1}
 #linkbar button{border:0;background:none;color:inherit;font-size:16px;line-height:1;cursor:pointer;padding:0 2px}
 
-.beta-badge{color:var(--red);font-size:.6rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;
-  border:1.5px solid var(--red);padding:.05rem .3rem;border-radius:2px;line-height:1;flex-shrink:0;align-self:center}
 .action-btn{border:1px solid var(--border);background:var(--white);color:var(--blue);padding:0 .65rem;font-size:.82rem;height:36px;
   cursor:pointer;border-radius:4px;font-weight:700;transition:background .1s,color .1s;white-space:nowrap;box-shadow:var(--shadow)}
 .action-btn:hover,.action-btn.on{background:var(--blue);color:var(--white);border-color:var(--blue)}
@@ -298,6 +296,26 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 .bm-list input{accent-color:var(--blue);margin:2px 0 0;position:relative;top:1px}
 .bm-sep{height:0;border-top:1px solid #ddd;margin:5px -12px 5px -10px}
 /* bottom right: zoom, then coordinates and scale on one line (Copernicus Browser LeafletControls) */
+/* 3D navigation (issue #43): two discs above the zoom buttons */
+.nav3d-ctl{display:flex;flex-direction:column;align-items:center;gap:26px;margin:4px 16px 14px 0!important}
+.nav3d-disc{position:relative;width:66px;height:66px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.nav3d-disc .n3{position:absolute;width:22px;height:22px;padding:0;border:0;border-radius:50%;background:none;color:var(--blue);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:none}
+.nav3d-disc .n3:hover,.nav3d-disc .n3:focus-visible{background:var(--hover)}
+.nav3d-disc .n3 svg{width:15px;height:15px}
+.nav3d-disc .up{left:22px;top:1px}.nav3d-disc .down{left:22px;bottom:1px}
+.nav3d-disc .left{left:1px;top:22px}.nav3d-disc .right{right:1px;top:22px}
+.nav3d-disc .n3.knob{left:24px;top:24px;width:18px;height:18px;background:var(--blue-l);border:2px solid var(--blue);cursor:grab}
+.nav3d-disc .n3.knob:hover{background:#fff}
+.nav3d-disc .n3.knob.on{background:var(--blue);cursor:grabbing}
+.nav3d-ring{position:absolute;inset:-6px;border:2px solid var(--border);border-radius:50%;pointer-events:none}
+.nav3d-disc .nav3d-ring .north{pointer-events:auto;left:50%;top:-12px;width:16px;height:14px;margin-left:-8px;border-radius:0;
+  background:var(--red);clip-path:polygon(50% 0,100% 100%,0 100%)}
+.nav3d-disc .nav3d-ring .north:hover,.nav3d-disc .nav3d-ring .north:focus-visible{background:#B00000}
+body.is3d #inspect{bottom:270px}
+/* in 3D the zoom buttons sit centred under the discs: 16 px margin + 66/2 disc − 30/2 button = 34 px */
+body.is3d .maplibregl-ctrl-bottom-right .zoom-ctl{margin-right:34px}
+@media (max-width:700px){.nav3d-ctl{display:none}}
 .zoom-ctl{box-shadow:var(--shadow)}
 .maplibregl-ctrl.zoom-ctl button{display:block;width:30px;height:30px;padding:0 0 0 1px;border:0;border-radius:0;background:#fff;
   color:var(--blue);font:700 22px/30px "Lucida Console",Monaco,monospace;text-align:center;cursor:pointer}
@@ -458,6 +476,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 textarea.exdesc{height:46px;margin:4px 0 2px 24px;width:calc(100% - 24px);font-family:inherit;font-size:12px}
 .exgrid{display:grid;grid-template-columns:auto 1fr;gap:7px 10px;align-items:center;font-size:12px}
 .exgrid select,.exgrid input{width:100%}
+.exgrid .rng input[readonly]{flex:1 1 auto;min-width:0;background:var(--hover)}
 .exl{display:grid;grid-template-columns:1fr 1fr;gap:14px;font-size:12px}
 .exl label{display:flex;gap:6px;align-items:center;margin:3px 0;cursor:pointer}
 .exl input{accent-color:var(--blue)}
@@ -608,7 +627,7 @@ table.kv td:first-child{color:var(--muted)}
             <select data-i18n="[title]header.language" id="langSel" title="Language"><option value="en">EN</option></select>
             <button data-i18n="[title]header.collapseTheMenu" id="btnCollapse" title="Collapse the menu"></button>
           </div>
-          <div class="app-title">swissEO Browser <span class="beta-badge">BETA</span></div>
+          <div class="app-title">swissEO Browser</div>
         </div>
       </div>
       <div id="tabs">
@@ -832,6 +851,19 @@ table.kv td:first-child{color:var(--muted)}
         <div class="hint" id="sunLocal" style="margin-top:8px"></div>
         <div class="brow"><button data-i18n="dialogs.sunTime.close" class="btn" data-close>Close</button><button data-i18n="dialogs.sunTime.sceneTime" class="btn" id="sunScene">Scene time</button>
           <button data-i18n="dialogs.sunTime.currentTime" class="btn" id="sunNow">Current time</button></div>
+      </div></div>
+      <div class="modal" id="fbModal"><div class="box narrow">
+        <div class="mhead"><h3 data-i18n="dialogs.feedback.title">Feedback by e-mail</h3><button data-i18n="[title]dialogs.feedback.close" class="x" data-close title="Close">×</button></div>
+        <div data-i18n="dialogs.feedback.intro" class="hint" style="margin-bottom:10px">Your mail app should open now with a prepared message.
+          If nothing happens (no mail app is set up on this computer), copy the addresses and the text into any mail program.</div>
+        <div class="exgrid">
+          <span data-i18n="dialogs.feedback.to">To</span><span class="rng"><input type="text" id="fbTo" readonly><button data-i18n="dialogs.feedback.copy" class="btn sm sec" data-copy="fbTo">Copy</button></span>
+          <span data-i18n="dialogs.feedback.cc">Cc</span><span class="rng"><input type="text" id="fbCc" readonly><button data-i18n="dialogs.feedback.copy" class="btn sm sec" data-copy="fbCc">Copy</button></span>
+          <span data-i18n="dialogs.feedback.subject">Subject</span><span class="rng"><input type="text" id="fbSubj" readonly><button data-i18n="dialogs.feedback.copy" class="btn sm sec" data-copy="fbSubj">Copy</button></span>
+        </div>
+        <textarea id="fbBody" readonly style="margin-top:8px"></textarea>
+        <div class="brow"><button data-i18n="dialogs.feedback.close" class="btn sec" data-close>Close</button><button data-i18n="dialogs.feedback.copyText" class="btn sec" data-copy="fbBody">Copy text</button>
+          <a data-i18n="dialogs.feedback.openMailApp" class="btn" id="fbOpen" style="text-align:center;text-decoration:none">Open mail app</a></div>
       </div></div>
       <div class="modal" id="expModal"><div class="box narrow">
         <div class="mhead"><h3 data-i18n="dialogs.export.imageDownload">Image download</h3><button data-i18n="[title]dialogs.export.close" class="x" data-close title="Close">×</button></div>
@@ -1188,6 +1220,8 @@ const UI = {
   right:   svg('<path d="M9 5l7 7-7 7"/>', 2.2),
   down:    svg('<path d="M5 9l7 7 7-7"/>', 2.2),
   up:      svg('<path d="M5 15l7-7 7 7"/>', 2.2),
+  rotL:    svg('<path d="M4 4v5h5"/><path d="M4.6 9a8 8 0 1 1-.6 4"/>', 2.2),
+  rotR:    svg('<path d="M20 4v5h-5"/><path d="M19.4 9a8 8 0 1 0 .6 4"/>', 2.2),
   latest:  svg('<path d="M7 17L17 7M9 7h8v8"/>', 2.2),
   cloud:   '<svg viewBox="0 0 24 24"><path d="M6.8 19.5A4.8 4.8 0 0 1 7.3 10a6.2 6.2 0 0 1 11.8 1.7 3.9 3.9 0 0 1-.6 7.8z"/></svg>',
   layers:  svg('<path d="M12 3l9 5-9 5-9-5z"/><path d="M3 12.5l9 5 9-5"/><path d="M3 17l9 5 9-5"/>'),
@@ -1320,6 +1354,112 @@ map.addControl(control("zoom-ctl", (d, m) => {
   tset(zout, "map.zoomOut", "Zoom out", "title"); tset(zout, "map.zoomOut", "Zoom out", "aria-label");
   d.append(zin, zout);
 }), "bottom-right");
+
+/* 3D navigation (issue #43), modelled on the Copernicus Browser: above the zoom buttons a disc that moves the map and a
+   disc that turns and tilts it, whose red tab always points north. An arrow clicked takes one step, an arrow held
+   moves on until it is released; the knob in the middle is a joystick: the farther it is pulled, the faster.
+   Movement is relative to the screen, so "up" is always away from the viewer. */
+function nav3dControl() {
+  let box, vel = null, raf = 0, last = 0, ring;
+  const drive = now => {
+    if (!vel) { raf = 0; return; }
+    const dt = Math.min(0.1, last ? (now - last) / 1000 : 0); last = now;
+    const c = map.getCanvas(), W = c.clientWidth, H = c.clientHeight;
+    if (vel.x || vel.y) map.panBy([vel.x * W * dt, vel.y * H * dt], { duration: 0 });
+    if (vel.b || vel.p) map.jumpTo({ bearing: map.getBearing() + vel.b * dt, pitch: clamp(map.getPitch() + vel.p * dt, 0, map.getMaxPitch()) });
+    raf = requestAnimationFrame(drive);
+  };
+  // v: speeds x, y (view widths / heights per second), b (degrees of bearing per second), p (degrees of pitch per second)
+  const go = v => { vel = Object.assign({ x: 0, y: 0, b: 0, p: 0 }, v); last = 0; if (!raf) raf = requestAnimationFrame(drive); };
+  const halt = () => { vel = null; };
+  // an icon button; its title (set with tset below, so it follows the language) is also its accessible name
+  const btn = (cls, html) => { const b = el("button", "n3 " + cls); b.type = "button"; b.innerHTML = html; return b; };
+  // an arrow: a click (or Enter) is one animated step, a press held longer than 300 ms moves at constant speed
+  const arrow = (b, step, v) => {
+    let timer = 0, held = false;
+    b.addEventListener("pointerdown", e => {
+      if (e.button) return;
+      e.preventDefault(); b.setPointerCapture(e.pointerId); held = false;
+      timer = setTimeout(() => { held = true; timer = 0; go(v); }, 300);
+    });
+    const up = () => { if (timer) { clearTimeout(timer); timer = 0; step(); } if (held) { held = false; halt(); } };
+    b.addEventListener("pointerup", up);
+    b.addEventListener("pointercancel", () => { clearTimeout(timer); timer = 0; held = false; halt(); });
+    b.addEventListener("click", e => { if (!e.detail) step(); });    // keyboard
+    return b;
+  };
+  // the knob: dragged up to R px from the centre, speed proportional to the distance
+  const knob = (b, v) => {
+    const R = 20;
+    let x0 = 0, y0 = 0;
+    b.addEventListener("pointerdown", e => {
+      if (e.button) return;
+      e.preventDefault(); b.setPointerCapture(e.pointerId); b.classList.add("on");
+      x0 = e.clientX; y0 = e.clientY;
+    });
+    b.addEventListener("pointermove", e => {
+      if (!b.classList.contains("on")) return;
+      let dx = e.clientX - x0, dy = e.clientY - y0;
+      const r = Math.hypot(dx, dy);
+      if (r > R) { dx *= R / r; dy *= R / r; }
+      b.style.transform = "translate(" + dx + "px," + dy + "px)";
+      if (r > 2) go(v(dx / R, dy / R)); else halt();
+    });
+    const end = () => { b.classList.remove("on"); b.style.transform = ""; halt(); };
+    b.addEventListener("pointerup", end);
+    b.addEventListener("pointercancel", end);
+    return b;
+  };
+  // steps clicked quickly add up: while a step is still animating, the next one starts from its target
+  let tgt = {}, tgtEnd = 0;
+  const live = () => performance.now() < tgtEnd;
+  const ease = o => {
+    tgt = Object.assign(live() ? tgt : {}, o); tgtEnd = performance.now() + (o.duration || 300);
+    map.easeTo(Object.assign({ duration: 300 }, tgt));
+  };
+  const now3d = k => live() && tgt[k] !== undefined ? tgt[k] : k === "bearing" ? map.getBearing() : map.getPitch();
+  const pan = (fx, fy) => () => { const c = map.getCanvas(); map.panBy([fx * c.clientWidth, fy * c.clientHeight], { duration: 300 }); };
+  const turn = d => () => ease({ bearing: now3d("bearing") + d });
+  const tilt = d => () => ease({ pitch: clamp(now3d("pitch") + d, 0, map.getMaxPitch()) });
+  const sync = () => { ring.style.transform = "rotate(" + (-map.getBearing()) + "deg)"; };
+  return {
+    onAdd() {
+      box = el("div", "maplibregl-ctrl nav3d-ctl");
+      const mv = el("div", "nav3d-disc"), rt = el("div", "nav3d-disc rot");
+      // the upper disc moves the map
+      const mUp = btn("up", UI.up), mLeft = btn("left", UI.left), mRight = btn("right", UI.right), mDown = btn("down", UI.down);
+      const mKnob = btn("knob", "");
+      tset(mUp, "map.nav3d.up", "Move up", "title");
+      tset(mLeft, "map.nav3d.left", "Move left", "title");
+      tset(mRight, "map.nav3d.right", "Move right", "title");
+      tset(mDown, "map.nav3d.down", "Move down", "title");
+      tset(mKnob, "map.nav3d.moveKnob", "Drag to move the map: the farther, the faster", "title");
+      mv.append(arrow(mUp, pan(0, -0.25), { y: -0.5 }), arrow(mLeft, pan(-0.25, 0), { x: -0.5 }),
+        arrow(mRight, pan(0.25, 0), { x: 0.5 }), arrow(mDown, pan(0, 0.25), { y: 0.5 }),
+        knob(mKnob, (fx, fy) => ({ x: fx, y: fy })));
+      // the lower disc turns (left, right) and tilts (up, down); the ring's red tab points north
+      const rUp = btn("up", UI.up), rLeft = btn("left", UI.rotL), rRight = btn("right", UI.rotR), rDown = btn("down", UI.down);
+      const rKnob = btn("knob", ""), north = btn("north", "");
+      tset(rUp, "map.nav3d.tiltUp", "Tilt towards the horizon", "title");
+      tset(rLeft, "map.nav3d.turnLeft", "Turn left", "title");
+      tset(rRight, "map.nav3d.turnRight", "Turn right", "title");
+      tset(rDown, "map.nav3d.tiltDown", "Tilt towards a view from straight above", "title");
+      tset(rKnob, "map.nav3d.turnKnob", "Drag to turn and tilt the map; double-click: north up, seen from straight above", "title");
+      tset(north, "map.nav3d.north", "North up", "title");
+      north.onclick = () => ease({ bearing: 0 });
+      ring = el("div", "nav3d-ring");
+      ring.append(north);
+      rKnob.addEventListener("dblclick", () => ease({ bearing: 0, pitch: 0, duration: 600 }));
+      rt.append(ring, arrow(rUp, tilt(10), { p: 30 }), arrow(rLeft, turn(-15), { b: -60 }),
+        arrow(rRight, turn(15), { b: 60 }), arrow(rDown, tilt(-10), { p: -30 }),
+        knob(rKnob, (fx, fy) => ({ b: fx * 90, p: -fy * 45 })));
+      box.append(mv, rt);
+      map.on("rotate", sync); sync();
+      return box;
+    },
+    onRemove() { halt(); map.off("rotate", sync); box.remove(); }
+  };
+}
 
 /* Metres per pixel of the view; views are set in the zoom of the swisstopo levels (highlights open at the exact
    resolution of their map.geo.admin.ch link, between two levels). Boxes are fitted in LV95. */
@@ -1615,7 +1755,8 @@ function setDem(kind) {
   apply3D();
   writeUrlSoon();
 }
-/* 2D / 3D. In 3D the map can be tilted and turned (right-drag or Ctrl+drag, two fingers, the compass resets it);
+/* 2D / 3D. In 3D the map can be tilted and turned (right-drag or Ctrl+drag, two fingers, the 3D navigation above the
+   zoom buttons);
    the split comparison needs the flat map, so 3D compares with opacity. cam: { pitch, bearing } of a link. */
 function setTerrain3D(on, cam) {
   if (on === terrainOn) return;
@@ -1628,7 +1769,7 @@ function setTerrain3D(on, cam) {
     map.addLayer({ id: "ground", type: "background", paint: { "background-color": "#e9ecef" } }, map.getLayersOrder()[0]);
     map.setMaxPitch(75);
     map.dragRotate.enable(); map.touchPitch.enable(); map.touchZoomRotate.enableRotation(); map.keyboard.enableRotation();
-    navCtl = new maplibregl.NavigationControl({ showZoom: false, visualizePitch: true });
+    navCtl = nav3dControl();
     map.addControl(navCtl, "bottom-right");
     setTerrain();
     apply3D();
@@ -1644,6 +1785,7 @@ function setTerrain3D(on, cam) {
   }
   // in 3D, as in the Copernicus Browser: settings, sun shading and sun time above the tools, and "2D" to go back
   $$(".t3d").forEach(b => { b.hidden = !on; });
+  document.body.classList.toggle("is3d", on);        // the pixel inspector moves above the 3D navigation
   $("#btn3d").textContent = on ? "2D" : "3D";
   $("#btn3d").title = on ? t("terrain3d.back", "Back to the flat map (2D)") : t("terrain3d.on", "3D terrain");
   splitFor3D();
@@ -7603,11 +7745,13 @@ function viewSummary() {
   return currentRec.name + " (" + currentRec.id + "), " + day + (layerOff ? ", layer hidden" : "") +
     (VERIFIED.has(currentRec.id) ? "" : ", BETA");
 }
-/* Feedback: an e-mail in the mail app of the computer (no web-mail links, issue #13). */
-function feedbackMail() {
-  const subj = "Feedback swissEO Browser", e = encodeURIComponent;
-  const body = "Link to my view: " + viewLink() + "\nOn the map: " + viewSummary() + "\n\nMy feedback:\n";
-  return "mailto:" + FEEDBACK_TO + "?cc=" + FEEDBACK_CC + "&subject=" + e(subj) + "&body=" + e(body);
+/* Feedback: an e-mail in the mail app of the computer (no web-mail links, issue #13). The text stays English, like
+   the issue texts: swisstopo reads it. */
+const FEEDBACK_SUBJ = "Feedback swissEO Browser";
+const feedbackBody = () => "Link to my view: " + viewLink() + "\nOn the map: " + viewSummary() + "\n\nMy feedback:\n";
+function feedbackMail(body) {
+  const e = encodeURIComponent;
+  return "mailto:" + FEEDBACK_TO + "?cc=" + FEEDBACK_CC + "&subject=" + e(FEEDBACK_SUBJ) + "&body=" + e(body || feedbackBody());
 }
 function feedbackLinks() {
   const link = viewLink(), sum = viewSummary();
@@ -7647,7 +7791,22 @@ function issueBody(k, link, sum, browser) {
   return "### Link to the view (permalink)\n\n" + link + "\n\n" + k.parts.map(([h, t]) =>
     "### " + h + "\n\n" + t.replace("{sum}", sum).replace("{browser}", browser)).join("\n\n") + "\n";
 }
-$("#btnFeedback").onclick = () => { location.href = feedbackMail(); };
+/* A browser does not tell whether a program handles mailto: links; without a mail app nothing happens (issue #44).
+   So the dialog opens as well, with the addresses and the text to copy. */
+$("#btnFeedback").onclick = () => {
+  const body = feedbackBody(), href = feedbackMail(body);
+  $("#fbTo").value = FEEDBACK_TO; $("#fbCc").value = FEEDBACK_CC; $("#fbSubj").value = FEEDBACK_SUBJ; $("#fbBody").value = body;
+  $("#fbOpen").href = href;
+  openModal("fbModal");
+  location.href = href;
+};
+$$("#fbModal [data-copy]").forEach(b => b.onclick = async () => {
+  const f = $("#" + b.dataset.copy), text = b.textContent;
+  let ok = true;
+  try { await navigator.clipboard.writeText(f.value); } catch (e) { ok = false; f.select(); }
+  b.textContent = ok ? t("dialogs.feedback.copied", "Copied") : t("link.copyFailed", "Copy failed");
+  setTimeout(() => { b.textContent = text; }, 1500);
+});
 $("#btnIssue").onclick = e => {
   e.stopPropagation();
   const pop = $("#fbIssue"), open = pop.hidden;

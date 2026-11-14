@@ -309,6 +309,18 @@
       "visualisation": "Darstellung",
       "week": "Woche",
       "year": "Jahr"
+    },
+    "feedback": {
+      "title": "Rückmeldung per E-Mail",
+      "close": "Schliessen",
+      "intro": "Ihr Mailprogramm sollte sich jetzt mit einer vorbereiteten Nachricht öffnen. Falls nichts geschieht (auf diesem Computer ist kein Mailprogramm eingerichtet), kopieren Sie die Adressen und den Text in ein beliebiges Mailprogramm.",
+      "to": "An",
+      "cc": "Cc",
+      "subject": "Betreff",
+      "copy": "Kopieren",
+      "copyText": "Text kopieren",
+      "copied": "Kopiert",
+      "openMailApp": "Mailprogramm öffnen"
     }
   },
   "env": {
@@ -833,7 +845,20 @@
     "sunTime": "Sonnenzeit",
     "thisAreaIsToo": "Dieses Gebiet ist zu gross für einen Link (mehr als etwa 270 Stützpunkte) und wird beim Kopieren des Links nicht mitgegeben. Laden Sie es von einer URL, um es zu teilen.",
     "zoomIn": "Hineinzoomen",
-    "zoomOut": "Herauszoomen"
+    "zoomOut": "Herauszoomen",
+    "nav3d": {
+      "up": "Nach oben verschieben",
+      "left": "Nach links verschieben",
+      "right": "Nach rechts verschieben",
+      "down": "Nach unten verschieben",
+      "moveKnob": "Ziehen, um die Karte zu verschieben: je weiter, desto schneller",
+      "tiltUp": "Zum Horizont kippen",
+      "turnLeft": "Nach links drehen",
+      "turnRight": "Nach rechts drehen",
+      "tiltDown": "Zur Ansicht senkrecht von oben kippen",
+      "turnKnob": "Ziehen, um die Karte zu drehen und zu kippen; Doppelklick: Norden oben, Ansicht senkrecht von oben",
+      "north": "Norden oben"
+    }
   },
   "mask": {
     "all": "Alle",
