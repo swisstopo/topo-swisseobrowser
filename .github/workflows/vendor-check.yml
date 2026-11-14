@@ -12,11 +12,13 @@ on:
     paths:
       - lib/**
       - tools/vendor/**
+      - js/**
       - .github/workflows/vendor-check.yml
   pull_request:
     paths:
       - lib/**
       - tools/vendor/**
+      - js/**
       - .github/workflows/vendor-check.yml
 
 permissions:
@@ -49,5 +51,5 @@ jobs:
       - name: The page must use the rebuilt files
         run: |
           # a minimal site: the repository root cannot be used, its index.html is the upstream one
-          mkdir -p _check && cp swisseo-browser.html _check/index.html && cp -r lib _check/lib
+          mkdir -p _check && cp swisseo-browser.html _check/index.html && cp -r lib _check/lib && cp -r js _check/js
           bash tools/check-dist.sh _check

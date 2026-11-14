@@ -17,7 +17,7 @@
 
 - The app is the single file `swisseo-browser.html` (no build, no backend). It belongs together with
   `README.md`, `CLAUDE.md`, the workflows in `.github/workflows/`, the issue forms in `.github/ISSUE_TEMPLATE/`, the
-  help pages in `docs/`, the self-hosted libraries in `lib/`, the scripts in `tools/` and the thumbnails it
+  help pages in `docs/`, the self-hosted libraries in `lib/`, the language script `js/i18n.js`, the translations in `locales/`, the scripts in `tools/` and the thumbnails it
   references in `public/previews/`. Everything else is the upstream Copernicus Browser, kept only as a reference:
   do not modify it.
 - **Git: push only to the remote `origin`** (github.com/swisstopo/topo-swisseobrowser); local `main`
@@ -77,6 +77,19 @@
 - **New layers**: add them to `LAYERS`, give them a description in `COP_META`, add them to
   `catalog/layers.yaml` with `verified: false`, put them into a configuration in
   `catalog/configurations.yaml`, regenerate, and add them to the README layer lists.
+- **Languages** (i18next, README *Languages*): every user-facing text goes through a key, never a bare
+  literal: markup gets `data-i18n` (`key`, `[attr]key`, `[html]key`), script text `t("key", "English")` or
+  `tn("key", "one", "other", n)` with the English as one string literal, an element built once `tset(...)`.
+  English stays in the code; after changing it run `python tools/check-locales.py --extract` and commit
+  `locales/en/` with the page (CI fails otherwise), then add de, fr and it (Swiss spelling: "ss", never "ß";
+  French and Italian plurals need `_one`, `_many`, `_other`) until `tools/check-locales.py` is clean. Not
+  translated: product and collection ids, band and index names, URLs (swisstopo pages have a per-language
+  address: check it returns 200), formulas, units; the GitHub issue texts stay English. Dates and numbers on
+  screen through `fmtDay` / `fmtLoc` / `fmtTick`, exports and links keep the machine format. A function in the
+  page that declares its own `t` hides the helper: name such variables differently. A changed view in the
+  help needs its screenshots again in every language (`tools/screenshots`). Production offers only reviewed
+  languages: the `offered=` line in `deploy-prod.yml` (today `["en","de"]`), written into the page and the help
+  page as `LANGS_OFFERED` and read by `tools/assemble-local.ps1`.
 - **Layer verification**: only the user ticks a layer as verified (`verified: true` in
   `catalog/layers.yaml`). Unverified means the BETA label on integration and not offered in production.
 - Data that is not in STAC (e.g. NDVIdiff v200 BETA) gets a fixed item list in `SOURCES`.

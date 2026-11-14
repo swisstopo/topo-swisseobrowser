@@ -17,8 +17,9 @@ const mod = p => path.join(here, "node_modules", p);
 const meta = pkg => JSON.parse(fs.readFileSync(mod(path.join(pkg, "package.json")), "utf8"));
 const V = pkg => meta(pkg).version;
 
-/* The ten dist files copied as they are (UMD / classic / self-contained ESM / CSS). */
+/* The dist files copied as they are (UMD / classic / self-contained ESM / CSS). */
 const copies = [
+  ["i18next",     "dist/umd/i18next.min.js",     v => `i18next-${v}.min.js`],
   ["maplibre-gl", "dist/maplibre-gl.css",        v => `maplibre-gl-${v}.css`],
   ["maplibre-gl", "dist/maplibre-gl.mjs",        v => `maplibre-gl-${v}.mjs`],
   ["maplibre-gl", "dist/maplibre-gl-worker.mjs", v => `maplibre-gl-worker-${v}.mjs`],
@@ -127,6 +128,23 @@ for (const [pkg, , name, check] of bundles) {
   if (!Number.isFinite(trees[0](1200, 1500, 1800, 3000, 2200, 1500)))
     throw new Error("forest disturbance: a tree did not return a number");
   console.log("forest disturbance: " + trees.length + " trees");
+}
+{
+  /* i18next is a classic UMD script in the page (it must also load from disk): run it the way a
+     browser would, without module scope, and check it sets up a usable global */
+  const src = fs.readFileSync(path.join(lib, `i18next-${V("i18next")}.min.js`), "utf8");
+  const g = {};
+  new Function("window", "self", "globalThis", src)(g, g, g);
+  const i18next = g.i18next;
+  if (!i18next || typeof i18next.init !== "function" || typeof i18next.t !== "function")
+    throw new Error("i18next: the UMD build does not expose i18next.init / i18next.t");
+  await i18next.init({ lng: "de", fallbackLng: "en", resources: {
+    en: { app: { a: "Layer", n_one: "{{count}} layer", n_other: "{{count}} layers" } },
+    de: { app: { a: "Ebene", n_one: "{{count}} Ebene", n_other: "{{count}} Ebenen" } } }, defaultNS: "app" });
+  if (i18next.t("a") !== "Ebene" || i18next.t("n", { count: 2 }) !== "2 Ebenen" ||
+      i18next.t("missing", { defaultValue: "English" }) !== "English")
+    throw new Error("i18next: translation, plurals or defaultValue do not work");
+  console.log("i18next: translation, plurals and fallback OK");
 }
 console.log("self-test OK");
 

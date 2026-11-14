@@ -8,7 +8,7 @@
 #    When a library is added or removed, recount with e.g.
 #      grep -c 'cdn\.jsdelivr\.net' _site/index.html
 #    and update the numbers below: jsDelivr = LIB_CDN entries (11) + CSS onerror fallback (1) +
-#    document.write fallbacks (2); cdnjs = LIB_CDN JSZip (1); raw.githubusercontent = LIB_CDN
+#    document.write fallbacks (3: proj4, geotiff, i18next); cdnjs = LIB_CDN JSZip (1); raw.githubusercontent = LIB_CDN
 #    provider list (1) + README fallback (1) + two prose mentions of CORS examples (2).
 set -euo pipefail
 site=${1:?usage: check-dist.sh <site dir>}
@@ -16,7 +16,7 @@ page=$site/index.html
 
 # The page names a library either as a path in a tag (href="lib/x.css") or as a key of its LIB_CDN map,
 # which libUrl() resolves to lib/ over http(s). Both must exist in the assembled site.
-{ grep -oE '"lib/[^"]+"' "$page" | tr -d '"'
+{ grep -oE '"(lib|js)/[^"]+"' "$page" | tr -d '"'
   grep -oE 'libUrl\("[^"]+"\)' "$page" | sed -E 's/libUrl\("(.*)"\)/lib\/\1/'
 } | sort -u | while read -r f; do
   [ -f "$site/$f" ] || { echo "::error::$f is referenced by the page but missing from the site"; exit 1; }
@@ -27,7 +27,7 @@ done
 ! grep -qE '<link rel="stylesheet" href="https://' "$page" ||
   { echo "::error::a stylesheet loads from a CDN"; exit 1; }
 
-for h in 'cdn.jsdelivr.net:14' 'cdnjs.cloudflare.com:1' 'raw.githubusercontent.com:4'; do
+for h in 'cdn.jsdelivr.net:15' 'cdnjs.cloudflare.com:1' 'raw.githubusercontent.com:4'; do
   host=${h%%:*}; want=${h##*:}
   n=$(grep -o -F "$host" "$page" | wc -l)
   [ "$n" -eq "$want" ] ||
@@ -45,6 +45,27 @@ if [ -n "$env" ]; then
     { echo "::error::the page still has the VERIFIED_IDS placeholder: tools/build-catalog.py did not run"; exit 1; }
   grep -q '^const CONFIGS = {' "$page" ||
     { echo "::error::the page has no configurations"; exit 1; }
+  # the languages: production offers only reviewed ones (written by the deploy), integration all;
+  # every offered language needs its translation file, and English its reference
+  if [ "$env" = prod ]; then
+    grep -q '^const LANGS_OFFERED = \[' "$page" ||
+      { echo "::error::production must say which languages it offers (LANGS_OFFERED)"; exit 1; }
+    offered=$(grep -oE '^const LANGS_OFFERED = \[[^]]*\]' "$page" | grep -oE '"[a-z]{2}"' | tr -d '"')
+  else
+    offered="en de fr it"
+  fi
+  for l in $offered; do
+    for ns in app help; do
+      [ -f "$site/locales/$l/$ns.json" ] ||
+        { echo "::error::the site offers '$l' but $site/locales/$l/$ns.json is missing"; exit 1; }
+    done
+  done
+  # the help page offers the same languages as the app
+  if [ "$env" = prod ] && [ -f "$site/docs/index.html" ]; then
+    [ "$(grep -oE '^const LANGS_OFFERED = \[[^]]*\]' "$site/docs/index.html")" = \
+      "$(grep -oE '^const LANGS_OFFERED = \[[^]]*\]' "$page")" ] ||
+      { echo "::error::the help page offers other languages than the app (LANGS_OFFERED)"; exit 1; }
+  fi
   for f in "$page" "$site/docs/index.html"; do
     [ -f "$f" ] || continue
     if [ "$env" = int ]; then

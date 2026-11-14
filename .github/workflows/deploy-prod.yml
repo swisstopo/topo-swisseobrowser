@@ -23,6 +23,8 @@ on:
       - public/previews/**
       - docs/**
       - lib/**
+      - js/**
+      - locales/**
       - tools/**
       - .github/workflows/deploy-prod.yml
   workflow_dispatch:
@@ -78,6 +80,9 @@ jobs:
           while read -r f; do cp "public/previews/$f" _site/public/previews/; done < "$RUNNER_TEMP/previews.txt"
           cp -r docs _site/docs
           cp -r lib _site/lib
+          # the languages: all translation files are deployed, the page offers only the reviewed ones
+          cp -r js _site/js
+          cp -r locales _site/locales
 
       # Writes the catalogue into the page. Production offers only the configurations that are not
       # marked beta and, within them, only the layers that are ticked as verified in catalog/layers.yaml.
@@ -86,6 +91,21 @@ jobs:
         run: |
           python3 tools/build-catalog.py --env prod --check
           python3 tools/build-catalog.py --env prod --page _site/index.html
+
+      # Production offers only the languages a native speaker has reviewed. The translation files of
+      # the others are deployed too, so integration tests and later activation need no other change:
+      # to offer French or Italian, add "fr" or "it" to `offered` below (tools/assemble-local.ps1 reads
+      # the same line).
+      - name: The languages production offers
+        run: |
+          offered='["en","de"]'
+          marker='const LANGS_OFFERED = null; // replaced on deploy'
+          for f in _site/index.html _site/docs/index.html; do       # the app and its help page
+            grep -qF "$marker" "$f" || { echo "::error::the LANGS_OFFERED marker is missing in $f"; exit 1; }
+            sed -i "s|^$marker\$|const LANGS_OFFERED = $offered; // offered in production|" "$f"
+            grep -qxF "const LANGS_OFFERED = $offered; // offered in production" "$f" ||
+              { echo "::error::LANGS_OFFERED was not written in $f"; exit 1; }
+          done
 
       # The link preview (Open Graph) needs absolute addresses. They are committed with the integration
       # address, so a local copy and the integration site preview correctly; here they become this site's
@@ -154,8 +174,12 @@ jobs:
              --cache-control "public,max-age=31536000,immutable" --content-type "text/javascript"
           $S --exclude "*" --include "public/previews/*" --cache-control "public,max-age=86400"
           $S --exclude "*" --include "docs/*" --cache-control "public,max-age=3600"
-          # the page and the README: short cache, refreshed by the invalidation below
-          $S --exclude "lib/*" --exclude "public/previews/*" --exclude "docs/*" \
+          # translations: a JSON type the browser accepts for fetch(), and a short, revalidated cache so a
+          # corrected translation is seen right after a deploy (the page also asks with cache: no-cache)
+          $S --exclude "*" --include "locales/*" --content-type "application/json" \
+             --cache-control "public,max-age=300,must-revalidate"
+          # the page, the README and js/: short cache, refreshed by the invalidation below
+          $S --exclude "lib/*" --exclude "public/previews/*" --exclude "docs/*" --exclude "locales/*" \
              --cache-control "public,max-age=300,must-revalidate"
           # remove objects that are no longer part of the site (uploads above are newer, so this only deletes)
           aws s3 sync _site "s3://$BUCKET" --delete --no-progress
@@ -199,4 +223,11 @@ jobs:
           # the help page is reached as docs/index.html, and only that name is uploaded
           curl -fsS -o /dev/null "$PROD_URL/docs/index.html" ||
             { echo "::error::the help page is missing from the deployed site"; exit 1; }
-          echo "smoke test OK: $PROD_URL (page, lib/$mjs, docs/index.html)"
+          # a translation file: present, served as JSON, and valid
+          curl -fsS "$PROD_URL/locales/de/app.json" -o de.json -D jheaders.txt ||
+            { echo "::error::locales/de/app.json is missing from the deployed site"; exit 1; }
+          tr -d '\r' < jheaders.txt | grep -i '^content-type:' | grep -qi 'application/json' ||
+            { echo "::error::locales/de/app.json is not served as application/json"; exit 1; }
+          python3 -c 'import json,sys; json.load(open("de.json", encoding="utf8"))' ||
+            { echo "::error::locales/de/app.json is not valid JSON"; exit 1; }
+          echo "smoke test OK: $PROD_URL (page, lib/$mjs, docs/index.html, locales/de/app.json)"
