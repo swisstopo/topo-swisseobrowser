@@ -11,6 +11,11 @@
 #
 # The key is also the themeId of a permalink (upper case, no dashes). tools/build-catalog.py
 # writes this into the page; never edit the generated block there by hand.
+#
+# AFTER EDITING THIS FILE run, in the repository folder (Windows: python instead of python3):
+#   python3 tools/build-catalog.py --env int --write-readme
+# then reload localhost with Ctrl+F5 and commit this file, swisseo-browser.html and README.md together
+# (README, After editing the catalogue).
 
 configurations:
   - key: DEFAULT

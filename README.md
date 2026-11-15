@@ -220,8 +220,9 @@ The swissEO Browser therefore always uses the physical reflectance.
   pixelkarte-farbe, *SWISSIMAGE*, *Map Grey* = pixelkarte-grau, *None*; in 3D also the *swissTLM map for 3D*,
   `ch.swisstopo.swisstlm3d-karte-farbe.3d`, the background of map.geo.admin.ch's 3D view) and *Map overlays* (*Labels*,
   always drawn above the data). Defaults ([#18](https://github.com/swisstopo/topo-swisseobrowser/issues/18)): *Map* in 2D, the *swissTLM map for 3D* in 3D (back in 2D the basemap
-  of before returns); choosing *SWISSIMAGE* switches the labels on (another basemap switches them back off, unless they
-  were changed by hand). A link carries the basemap and the labels only where they differ from these defaults.
+  of before returns); *SWISSIMAGE* always brings the labels, however it becomes the basemap (the switcher, back from
+  3D, a link without `labels`), and they can then be switched off; choosing another basemap in the switcher takes them
+  away again unless they were changed by hand. A link carries the basemap and the labels only where they differ from these defaults.
 - **Labels**: the place, road, peak and lake names of swisstopo's base map vector tiles, in the style of swisstopo's imagery
   base map (white text with a dark halo), drawn by MapLibre as text: sharp at every scale and on high-DPI screens,
   without overlaps, and upright and facing the viewer in 3D. The tiles are in Web Mercator, so MapLibre's workers fetch the
@@ -315,8 +316,8 @@ The swissEO Browser therefore always uses the physical reflectance.
   | Baselland | 2026-05-23 ↔ 2026-07-04 | own |
   | Gürbetal and Aare valley | 2026-05-28 ↔ 2026-07-04 | [SRF Meteo](https://www.srf.ch/meteo/meteo-stories/trockenheit-in-der-schweiz-die-duerre-aus-der-vogelperspektive), 9 July 2026 (place identified from the SRF image) |
   | Great Aletsch Glacier | 2019-08-18 ↔ 2026-08-13 | [watson.ch](https://www.watson.ch/schweiz/klima/773592776-dieser-satellitenbilder-vergleich-zeigt-trockenheit-in-der-schweiz) |
-  | Konstanz and Untersee, Zurich Airport, Forests near Brugg AG, Upper Lake Zurich, Wil SG, Lake Lucerne, Interlaken BE | 2025-08-08 ↔ 2026-08-08 | watson.ch, 10 August 2026 |
-  | Lake Constance – Untersee | 2025-08-08 ↔ 2026-08-08 | [Blick](https://www.blick.ch/schweiz/ostschweiz/thurgau/untersee-faellt-auf-tiefsten-august-wert-seit-1930/49bvg7s), 12 August 2026 |
+  | Zurich Airport, Forests near Brugg AG, Upper Lake Zurich, Wil SG, Lake Lucerne, Interlaken BE | 2025-08-08 ↔ 2026-08-08 | watson.ch, 10 August 2026 |
+  | Lake Constance: Untersee | 2025-08-08 ↔ 2026-08-08 | [Blick](https://www.blick.ch/schweiz/ostschweiz/thurgau/untersee-faellt-auf-tiefsten-august-wert-seit-1930/49bvg7s), 12 August 2026 |
   | Lakes Neuchâtel and Murten | 2025-08-08 ↔ 2026-08-11 (no clear swissEO image on 8 August 2026 there) | watson.ch |
   | All of Switzerland | 2025-08-08 ↔ 2026-07-24 | watson.ch |
 
@@ -617,6 +618,37 @@ The layer definitions themselves stay in `swisseo-browser.html`: bands, formulas
 JavaScript of an index are code and belong there. The catalogue holds only the structure, so the same layer
 can appear in several configurations and be held back everywhere at once.
 
+### After editing the catalogue
+
+The page does not read the YAML files itself. Whatever you change, in `catalog/layers.yaml` (a layer verified, its
+default masks, its label) or in `catalog/configurations.yaml` (the configurations, their order, groups, *beta* flag
+or vegetation mask), has to be written into the page before you see it on localhost and before you commit:
+
+1. **Write it into the page and the README checklist**, in the repository folder (on Windows `python` instead of
+   `python3`; PyYAML is needed, see below):
+
+   ```
+   python3 tools/build-catalog.py --env int --write-readme
+   ```
+
+   This rewrites the block between `/* catalog:configs:start */` and `/* catalog:configs:end */` in
+   `swisseo-browser.html` (`CONFIGS` and `MASK_DEFAULTS`) and the checklist under [Layer verification](#layer-verification).
+   It stops with a message when the catalogue has an error (an unknown layer, a mask a layer cannot have, ...).
+2. **Look at it on localhost**: serve the folder (`python -m http.server 8000`, see [Running it](#running-it)) and
+   reload `http://localhost:8000/swisseo-browser.html` with Ctrl+F5, so the browser does not keep the old page. A
+   layer opened from an old link keeps the masks of that link; open it from the layer list. Integration shows every
+   layer, a newly verified one without its BETA label; what production would offer (only verified layers) shows
+   the local production build, `tools/assemble-local.ps1 -Env prod` (below).
+3. **Check and commit** the YAML, the page and the README together:
+
+   ```
+   python3 tools/build-catalog.py --env int --check
+   ```
+
+   CI runs the same check and fails when the page does not match the catalogue, for example when only the YAML was
+   committed. The deploys write the catalogue into the published page themselves, so this step is about the
+   repository, localhost and CI.
+
 ### Default masks
 
 A layer starts with the masks of its `masks` entry in `catalog/layers.yaml`; the user can change them in the
@@ -649,11 +681,7 @@ Today:
 | Terrain / solar incidence | clouds and cloud shadows (not the terrain mask, which it shows) | off |
 
 Links made before these defaults (November 2026) that carry no mask parameters open with the masks on.
-
-```
-python3 tools/build-catalog.py --env int --write-readme   # after editing catalog/: page + checklist
-python3 tools/build-catalog.py --env int --check          # what CI runs
-```
+After changing a `masks` entry: [After editing the catalogue](#after-editing-the-catalogue).
 
 To see what a deploy would publish, [`tools/assemble-local.ps1`](tools/assemble-local.ps1) builds either
 site locally, with the same steps as the workflows (on Windows; the deploys themselves run the same

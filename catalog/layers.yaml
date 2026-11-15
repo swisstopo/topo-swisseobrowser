@@ -16,6 +16,11 @@
 # label and note are used for the generated checklist in README.md. The order is the order of the
 # layer definitions in the page. tools/build-catalog.py reads this file; never edit the generated
 # block in the page or the checklist in the README by hand.
+#
+# AFTER EDITING THIS FILE run, in the repository folder (Windows: python instead of python3):
+#   python3 tools/build-catalog.py --env int --write-readme
+# then reload localhost with Ctrl+F5 and commit this file, swisseo-browser.html and README.md together
+# (README, After editing the catalogue).
 
 layers:
   - id: "true"

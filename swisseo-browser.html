@@ -1628,10 +1628,13 @@ const basemapCtl = (() => {
 map.addControl(basemapCtl, "top-right");
 const mapCanvas = map.getCanvas();
 tset(mapCanvas, "map.canvas", "Map", "aria-label");
-/* user: chosen in the switcher, so the labels follow the new basemap's default unless they were changed by hand */
+/* SWISSIMAGE always brings the labels (#18), however it is chosen: the switcher, back from 3D, a link (whose own
+   labels= is applied after it). user: chosen in the switcher, so leaving SWISSIMAGE takes the labels away again
+   unless they were changed by hand. */
 function setBasemap(name, user) {
   if (!(name in BASEMAPS) || (BASE_3D.has(name) && !terrainOn)) name = baseDefault();
-  const labelsWere = labelsDefault();
+  const labelsWere = labelsDefault(), was = basemap;
+  if (name === "swissimage" && was !== "swissimage" && !labelsOn()) setLabels(true);
   if (BASEMAPS[name] !== baseLayer || (BASEMAPS[name] && !baseMapLayer)) {
     removeRaster(baseMapLayer);
     baseMapLayer = BASEMAPS[name] ? wmtsRaster(BASEMAPS[name], "z-base") : null;
@@ -2841,10 +2844,7 @@ const HIGHLIGHTS = {
       { id: "great-aletsch-glacier", title: "Great Aletsch Glacier", left: "2019-08-18", right: "2026-08-13", layer: "true",
         center: [2645270.03, 1149206.31], res: 27.29,          // map.geo.admin.ch z = 4.661
         text: "From the slopes of Bettmeralp and Fiescheralp to the glacier itself, the comparison shows one of the most striking changes. After another winter with little snow, early summer heat removed the protective snow cover from the glacier by the end of June, much earlier than usual. Dark, bare ice now covers a far larger area instead of bright old snow. (Source: watson.ch)" },
-      { id: "konstanz-and-untersee", title: "Konstanz and Untersee", left: "2025-08-08", right: "2026-08-08", layer: "true",
-        center: [2721000, 1281000], res: 25,
-        text: "The water level of the Untersee is the lowest of the 1991–2020 reference period. Wide, pale strips of exposed shore appear where water normally stands; boat jetties were already lying on dry ground in April. 8 August 2025 compared with the same day in 2026. (Source: watson.ch, 10 August 2026)" },
-      { id: "lake-constance-untersee", title: "Lake Constance – Untersee", left: "2025-08-08", right: "2026-08-08", layer: "true",
+      { id: "lake-constance-untersee", title: "Lake Constance: Untersee", left: "2025-08-08", right: "2026-08-08", layer: "true",
         center: [2723342.09, 1282467.43], res: 11.82,          // map.geo.admin.ch z = 5.759
         text: "Persistent drought has pushed the Untersee to a historic low. Around the island of Werd, wide gravel banks lie dry. At 25 centimetres below the previous record, the water level in August is lower than at any time since at least 1930. 8 August 2025 compared with the same day in 2026. (Source: Blick, 12 August 2026)" },
       { id: "zurich-airport", title: "Zurich Airport", left: "2025-08-08", right: "2026-08-08", layer: "true",
