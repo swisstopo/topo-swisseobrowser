@@ -1,9 +1,16 @@
-# The layers of the swissEO Browser: which exist, and whether they are verified.
+# The layers of the swissEO Browser: which exist, whether they are verified, and the masks they start with.
 #
 # The layer DEFINITIONS (bands, formulas, colour ramps, the JavaScript of an index) stay in
-# swisseo-browser.html. This file decides only what is shown where:
+# swisseo-browser.html. This file decides only what is shown where, and how a layer starts:
 #   verified: false  the layer carries the BETA label and is NOT offered in production
 #   verified: true   no label, offered everywhere
+#   masks:           the masks that are on when the layer is opened (the user can still change them):
+#                      cloud, shadow, terrain   true or false (only Sentinel-2 layers can be masked)
+#                      vegetation               off, forest or vegetation (the habitat map of the date),
+#                                               or any other value of the vegetationMask URL parameter
+#                                               (README, URL parameters), e.g. tlm or lfi-broad:30.85
+#                    A layer without masks starts without any. A configuration can replace the vegetation
+#                    mask (catalog/configurations.yaml, masks: vegetation), except where it is off here.
 # Only tick a layer as verified when it has really been checked (see README, Layer verification).
 #
 # label and note are used for the generated checklist in README.md. The order is the order of the
@@ -14,39 +21,51 @@ layers:
   - id: "true"
     label: "True color"
     verified: true
+    masks: { cloud: false, shadow: false, terrain: false }
   - id: "nir"
     label: "False color"
     verified: true
+    masks: { cloud: false, shadow: false, terrain: false }
   - id: "urban"
     label: "False color (urban)"
     verified: false
+    masks: { cloud: false, shadow: false, terrain: false }
   - id: "swir"
     label: "SWIR"
     verified: true
+    masks: { cloud: false, shadow: false, terrain: false }
   - id: "agri"
     label: "Agriculture"
     verified: false
+    masks: { cloud: true, shadow: true, terrain: true }
   - id: "geo"
     label: "Geology 12, 8, 2"
     verified: false
+    masks: { cloud: true, shadow: true, terrain: true }
   - id: "ndvi"
     label: "NDVI"
     verified: true
+    masks: { cloud: true, shadow: true, terrain: true, vegetation: "vegetation" }
   - id: "ndwi"
     label: "NDWI"
     verified: false
+    masks: { cloud: true, shadow: true, terrain: true }
   - id: "ndmi"
     label: "Moisture index"
     verified: false
+    masks: { cloud: true, shadow: true, terrain: true, vegetation: "vegetation" }
   - id: "ndsi"
     label: "NDSI"
     verified: false
+    masks: { cloud: true, shadow: true, terrain: true }
   - id: "nbr"
     label: "Normalized Burn Ratio (NBR)"
     verified: false
+    masks: { cloud: true, shadow: true, terrain: true, vegetation: "vegetation" }
   - id: "aot"
     label: "Aerosol optical thickness"
     verified: false
+    masks: { cloud: false, shadow: false, terrain: false }
   - id: "scl"
     label: "Scene classification map"
     verified: true
@@ -56,6 +75,7 @@ layers:
   - id: "terrain"
     label: "Terrain / solar incidence"
     verified: true
+    masks: { cloud: true, shadow: true }
   - id: "vhi"
     label: "swissEO VHI forest"
     verified: true
@@ -65,18 +85,23 @@ layers:
   - id: "evi"
     label: "EVI"
     verified: false
+    masks: { cloud: true, shadow: true, terrain: true, vegetation: "vegetation" }
   - id: "savi"
     label: "SAVI"
     verified: false
+    masks: { cloud: true, shadow: true, terrain: true, vegetation: "vegetation" }
   - id: "barren"
     label: "Barren Soil"
     verified: false
+    masks: { cloud: true, shadow: true, terrain: true }
   - id: "mstress"
     label: "Moisture Stress"
     verified: false
+    masks: { cloud: true, shadow: true, terrain: true, vegetation: "vegetation" }
   - id: "hon"
     label: "Highlight Optimized Natural Color"
     verified: false
+    masks: { cloud: true, shadow: true, terrain: true }
   - id: "ndvidiff"
     label: "swissEO NDVIdiff"
     verified: true
@@ -97,12 +122,16 @@ layers:
   - id: "fdc"
     label: "Forest Disturbance Classification"
     verified: false
+    masks: { cloud: true, shadow: true, terrain: true, vegetation: "forest" }
   - id: "nddi"
     label: "NDDI"
     verified: false
+    masks: { cloud: true, shadow: true, terrain: true, vegetation: "vegetation" }
   - id: "nddichg"
     label: "NDDI change vs. previous year"
     verified: false
+    masks: { cloud: true, shadow: true, terrain: true, vegetation: "vegetation" }
   - id: "analyst"
     label: "NDVI difference to a reference date"
     verified: false
+    masks: { cloud: true, shadow: true, terrain: true, vegetation: "forest" }

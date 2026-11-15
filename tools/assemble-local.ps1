@@ -71,6 +71,14 @@ if ($Env -eq "int") {
   }
 }
 
+# the version in the Info tab: a local build names the commit it was built from (the deploys write the
+# release or "int", see README, Releases)
+$sha = (& git rev-parse HEAD).Trim(); $day = (& git log -1 --format=%cs HEAD).Trim()
+foreach ($f in $pages) {
+  Edit-Utf8 $f { param($t) $t.Replace("const APP_VERSION = null; // replaced on deploy",
+    "const APP_VERSION = {`"v`":`"local`",`"sha`":`"$sha`",`"date`":`"$day`"}; // written by assemble-local") }
+}
+
 # check-dist.sh is a shell script: run it with Git's bash when it is not on PATH
 $bash = (Get-Command bash -ErrorAction SilentlyContinue).Source
 if (-not $bash) { $bash = "C:\Program Files\Git\bin\bash.exe" }

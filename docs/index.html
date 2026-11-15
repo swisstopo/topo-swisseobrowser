@@ -202,9 +202,9 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
     <li data-i18n="[html]t1.li1"><span class="n">1</span><span><b>Date</b>: the selected day, the arrows for the previous / next day with data, and the calendar</span></li>
     <li data-i18n="[html]t1.li2"><span class="n">2</span><span><b>Configuration</b>: groups of layers for a topic, and the Compare and WMS / WMTS views</span></li>
     <li data-i18n="[html]t1.li3"><span class="n">3</span><span><b>Layers</b>: click one to show it on the map</span></li>
-    <li data-i18n="[html]t1.li4"><span class="n">4</span><span><b>Date on the map</b>, <i>Copy link</i> (chain icon) and the <i>Pixel inspector</i> ((i) with a pointer)</span></li>
+    <li data-i18n="[html]t1.li4"><span class="n">4</span><span><b>Date on the map</b> and <i>Copy link</i> (chain icon)</span></li>
     <li data-i18n="[html]t1.li5"><span class="n">5</span><span><b>Go to Place</b>: search a town, address or mountain</span></li>
-    <li data-i18n="[html]t1.li6"><span class="n">6</span><span>The <b>basemap</b> button (layers icon) and <b>Help</b> (the <span class="key">i</span>, this page)</span></li>
+    <li data-i18n="[html]t1.li6"><span class="n">6</span><span>The <b>basemap</b> button (layers icon), <b>Help</b> (the <span class="key">i</span>, this page) and below it the <i>Pixel inspector</i> ((i) with a pointer)</span></li>
     <li data-i18n="[html]t1.li7"><span class="n">7</span><span><b>Tools</b>: area of interest, image download, timelapse and <span class="key">3D</span></span></li>
     <li data-i18n="[html]t1.li8"><span class="n">8</span><span><b>Zoom</b>, mouse position in Swiss coordinates (LV95) and scale bar</span></li>
   </ul>
@@ -261,7 +261,7 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
   </ol>
   <figure><img data-i18n="[alt]t5.img1" src="img/mask-lnf.jpg" alt="NDVI restricted to arable land, meadows and pastures, with the category check boxes" width="1400" height="900">
     <figcaption data-i18n="[html]t5.cap1"><b>Fig. 5</b> NDVI near Kerzers, 13 August 2026, restricted by the Nutzungsflächen mask to arable land,
-    permanent meadows and permanent pastures. Each category has the colour of the federal map service.</figcaption></figure>
+    permanent meadows and permanent pastures.</figcaption></figure>
   <p data-i18n="[html]t5.p2">The other masks keep forest (the habitat map of swissEO VHI or the swissTLM3D forest), conifer, mixed or broadleaf
     forest (Forest Type NFI 2023, ETH tree species), single tree species (ETH) or all vegetation. They are described, with their sources, in
     <a href="#vis-veg">Vegetation masks</a>. Masks also apply to statistics, downloads and the timelapse.</p>
@@ -270,7 +270,7 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
     single tree species of the ETH map, tick the species you want, or use <i>All conifers</i> / <i>All broadleaves</i>.</div>
 
   <h2 data-i18n="[html]t6.title" id="t6"><span class="n">6</span>Read the value of a pixel</h2>
-  <p data-i18n="[html]t6.p1">Click the <b>Pixel inspector</b> button (the (i) with a mouse pointer, at the top of the map) to switch it on: it turns
+  <p data-i18n="[html]t6.p1">Click the <b>Pixel inspector</b> button (the (i) with a mouse pointer, at the top right of the map, below the help button) to switch it on: it turns
     blue. Then click on the map. A box shows the
     values at that spot: the position, the reflectance of every band, the index value of the layer, the cloud and
     terrain information, the forest / vegetation mask, the swissTLM3D forest class, the broadleaf probability of Forest
@@ -297,8 +297,9 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
   <h2 data-i18n="[html]t8.title" id="t8"><span class="n">8</span>Look at it in 3D</h2>
   <p data-i18n="[html]t8.p1">The <span class="key">3D</span> button, the last of the tools, lays the map and the satellite layer on the terrain.</p>
   <ol class="steps">
-    <li data-i18n="[html]t8.li1">Click <span class="key">3D</span>: the map tilts and the place names (labels) appear. The button now says
-      <span class="key">2D</span>, which brings back the flat map; the labels stay until you switch them off in the layers button.</li>
+    <li data-i18n="[html]t8.li1">Click <span class="key">3D</span>: the map tilts, the place names (labels) appear and the background becomes the
+      <i>swissTLM map for 3D</i>. The button now says
+      <span class="key">2D</span>, which brings back the flat map and its basemap; the labels stay until you switch them off in the layers button.</li>
     <li data-i18n="[html]t8.li2">Drag with the <b>right mouse button</b> (or hold <span class="key">Ctrl</span> and drag) to tilt and turn the
       view; on a touch screen use two fingers. Without a right mouse button, use the <b>3D navigation</b> above the zoom
       buttons: the upper disc moves the map, the lower one turns and tilts it; its red tab points north.</li>
@@ -369,7 +370,8 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
 
   <h3 data-i18n="vis-masks.title" id="vis-masks">Masks</h3>
   <p data-i18n="vis-masks.p1">Every Sentinel-2 layer has these masks in its menu; they hide pixels on the map and leave them out of statistics,
-    downloads and the timelapse:</p>
+    downloads and the timelapse. Most layers hide clouds, cloud shadows and terrain shadows as soon as they are opened
+    (True color, False color, SWIR and the aerosol layer start without masks); switch a mask on or off in the layer's menu:</p>
   <ul>
     <li data-i18n="[html]vis-masks.li1"><b>Clouds</b> and <b>Cloud shadows</b>: the cloud mask delivered with each swissEO mosaic (thick and thin cloud,
       cloud shadow);</li>
@@ -380,7 +382,9 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
   </ul>
 
   <h3 data-i18n="vis-veg.title" id="vis-veg">Vegetation masks</h3>
-  <p data-i18n="[html]vis-veg.p1">The pull-down <i>Vegetation mask</i> shows <i>Off</i> ("Choose one") by default. Its entries, in this order:</p>
+  <p data-i18n="[html]vis-veg.p1">The pull-down <i>Vegetation mask</i> starts with <i>All vegetation</i> for the vegetation indices (NDVI, EVI,
+    SAVI, moisture indices, NDDI) and NBR, with <i>Forest</i> for the forest layers and for every vegetation index in the <i>Forest</i>
+    configuration, and with <i>Off</i> ("Choose one") for the composites and the other indices. Its entries, in this order:</p>
   <table>
     <tr><th data-i18n="vis-veg.th1">Entry</th><th data-i18n="vis-veg.th2">What it keeps</th><th data-i18n="vis-veg.th3">Source</th></tr>
     <tr><td data-i18n="vis-veg.td1">Habitat Map: Forest, All vegetation</td>
@@ -484,9 +488,10 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
   <h3 data-i18n="vis-base.title" id="vis-base">Basemaps and labels</h3>
   <p data-i18n="[html]vis-base.p1">Hover the layers button at the top right of the map (left of the <span class="key">i</span>), as in the Copernicus
     Browser, to choose the <b>basemap</b>: <i>Map</i> (swisstopo national map), <i>SWISSIMAGE</i> (aerial photo),
-    <i>Map Grey</i> or <i>None</i>. Under <i>Map overlays</i>, <b>Labels</b> writes the names of places, roads, peaks and
+    <i>Map Grey</i> or <i>None</i>; in 3D also the <i>swissTLM map for 3D</i>, the background of the 3D view of
+    map.geo.admin.ch, which 3D starts with. Under <i>Map overlays</i>, <b>Labels</b> writes the names of places, roads, peaks and
     lakes from swisstopo's base map above the satellite data, as sharp text at every scale (in 3D upright and facing you).
-    The names stop at the border of Switzerland and Liechtenstein.</p>
+    Choosing SWISSIMAGE switches the labels on. The names stop at the border of Switzerland and Liechtenstein.</p>
 
   <h3 data-i18n="vis-3d.title" id="vis-3d">3D visualization</h3>
   <p data-i18n="vis-3d.p1">The 3D view lays the map, the satellite layer, the labels and the area of interest on the terrain, as the 3D view
@@ -507,9 +512,10 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
   <p data-i18n="vis-3d.p2">In 3D three buttons appear above the image download, as in the Copernicus Browser:</p>
   <h3 data-i18n="vis-3d.title3" style="font-size:15px">3D settings (gear)</h3>
   <ul>
-    <li data-i18n="[html]vis-3d.li4"><b>Height model</b>: <i>swissALTIRegio</i>, swisstopo's 10 m model of the bare terrain of Switzerland and its
-      border regions (the default), or <i>swissSURFACE3D 10 m</i>, the surface with buildings and trees, resampled to
-      10 m by swissEO (beyond Switzerland and in its gaps the heights of swissALTIRegio).</li>
+    <li data-i18n="[html]vis-3d.li4"><b>Height model</b>: <i>swissALTI3D</i>, swisstopo's 0.5 m model of the bare terrain, near you, and
+      <i>swissALTIRegio</i>, the 10 m model, further away and beyond Switzerland (the default); <i>swissALTIRegio</i> alone;
+      or <i>swissSURFACE3D 10 m</i>, the surface with buildings and trees, resampled to 10 m by swissEO (beyond
+      Switzerland and in its gaps the heights of swissALTIRegio).</li>
     <li data-i18n="[html]vis-3d.li5"><b>Sun shading of the terrain</b> and its parameters: the <i>shading method</i> (combined, standard, basic,
       Igor, multidirectional), the <i>shading strength</i> and the <i>shadow</i>, <i>highlight</i> and <i>accent
       colours</i>. The colours are partly transparent, so the satellite image stays visible.</li>
@@ -606,7 +612,7 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
     vegetation mask can be chosen here too.</p>
 
   <h3 data-i18n="tools-insp.title" id="tools-insp">Pixel inspector</h3>
-  <p data-i18n="[html]tools-insp.p1">Switch it on at the top of the map and click a spot. For the satellite layers it shows the band values (stored
+  <p data-i18n="[html]tools-insp.p1">Switch it on with its button below the help button at the top right of the map and click a spot. For the satellite layers it shows the band values (stored
     number and reflectance), the index value, the scene classification, cloud and terrain mask, the habitat map of the
     date (forest, vegetation), the swissTLM3D forest class, the broadleaf probability of Forest Type NFI, the broadleaf
     share and dominant tree species of the ETH map and the Nutzungsflächen category; for the swissEO products the product
@@ -678,7 +684,9 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
       forest, at the end of July, August and September</td>
       <td data-i18n="[html]data.td9"><a href="https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-ndvidiff" target="_blank" rel="noopener">NDVIdiff</a>,
       <a href="https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-ndviz" target="_blank" rel="noopener">NDVIz</a>, swisstopo</td></tr>
-    <tr><td data-i18n="data.td10">swissALTIRegio</td><td data-i18n="data.td11">Height model of the 3D view (default), 10 m</td>
+    <tr><td data-i18n="data.td10a">swissALTI3D</td><td data-i18n="data.td11a">Height model of the 3D view near you (default), 0.5 m</td>
+      <td data-i18n="[html]data.td12a"><a href="https://www.swisstopo.admin.ch/en/height-model-swissalti3d" target="_blank" rel="noopener">swisstopo</a></td></tr>
+    <tr><td data-i18n="data.td10">swissALTIRegio</td><td data-i18n="data.td11">Height model of the 3D view further away and beyond Switzerland, 10 m</td>
       <td data-i18n="[html]data.td12"><a href="https://www.geocat.ch/datahub/dataset/f7f058e9-288b-4c55-8f4e-6360880dbb59" target="_blank" rel="noopener">swisstopo, metadata on geocat.ch</a></td></tr>
     <tr><td data-i18n="data.td13">swissSURFACE3D, 10 m</td><td data-i18n="data.td14">Surface model of the 3D view (option), resampled to 10 m by swissEO</td>
       <td data-i18n="[html]data.td15"><a href="https://www.swisstopo.admin.ch/en/height-model-swisssurface3d" target="_blank" rel="noopener">swisstopo</a></td></tr>
@@ -695,7 +703,8 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
     <tr><td data-i18n="data.td31">Basemaps, labels, place search</td><td data-i18n="data.td32">Background maps, names on the map, Go to Place</td>
       <td data-i18n="data.td33">swisstopo, map.geo.admin.ch</td></tr>
   </table>
-  <p data-i18n="data.p1">The Info tab lists the acquisitions of the selected date with their metadata and the scaling of all products.</p>
+  <p data-i18n="data.p1">The Info tab lists the acquisitions of the selected date with their metadata and the scaling of all products.
+    Under the terms it shows the version of the browser, linked to the notes of that release.</p>
   <h3 data-i18n="data.title3">Coordinates</h3>
   <p data-i18n="[html]data.p2">All positions you see are Swiss coordinates <b>LV95</b> (EPSG:2056): the mouse position, the pixel inspector, the
     links and the import defaults. Only GeoJSON downloads use WGS84, as the GeoJSON standard requires.</p>
@@ -752,7 +761,7 @@ const I18N = window.swisseoI18n;
 /* the links back to the browser open it in the language of this page */
 const home = () => {
   const l = I18N ? I18N.lang() : "en";
-  document.querySelectorAll("a[data-home]").forEach(a => { a.href = homeUrl + (l === "en" ? "" : "?lang=" + l); });
+  document.querySelectorAll("a[data-home]").forEach(a => { a.href = homeUrl + (l === "en" ? "" : "?lang=" + encodeURIComponent(l)); });
 };
 if (location.protocol === "file:") { homeUrl = "../swisseo-browser.html"; home(); }
 else fetch("../swisseo-browser.html", { method: "HEAD" }).then(r => { if (r.ok) { homeUrl = "../swisseo-browser.html"; home(); } }).catch(() => {});

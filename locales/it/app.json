@@ -272,7 +272,7 @@
       "shadowColour": "Colore delle ombre",
       "standard": "Standard",
       "sunShadingOfThe": "Ombreggiatura solare del terreno (pulsante lampadina)",
-      "theShadingLightsThe": "L'ombreggiatura illumina il modello altimetrico dalla direzione e dall'altezza del sole al centro della mappa (vedi <i>Ora solare</i>). Cielo, ombre proiettate dalle montagne, riflessi dell'obiettivo e stereo anaglifo non sono disponibili in questa libreria cartografica.<br>Fonti: <a href=\"https://www.geocat.ch/datahub/dataset/f7f058e9-288b-4c55-8f4e-6360880dbb59\" target=\"_blank\" rel=\"noopener\">swissALTIRegio</a> (metadati su geocat.ch), <a href=\"https://www.swisstopo.admin.ch/it/modello-altimetrico-swisssurface3d\" target=\"_blank\" rel=\"noopener\">swissSURFACE3D</a> (ricampionato a 10 m da swissEO).",
+      "theShadingLightsThe": "L'ombreggiatura illumina il modello altimetrico dalla direzione e dall'altezza del sole al centro della mappa (vedi <i>Ora solare</i>). Cielo, ombre proiettate dalle montagne, riflessi dell'obiettivo e stereo anaglifo non sono disponibili in questa libreria cartografica.<br>Fonti: <a href=\"https://www.swisstopo.admin.ch/it/modello-altimetrico-swissalti3d\" target=\"_blank\" rel=\"noopener\">swissALTI3D</a> (0,5 m, vicino; più lontano e fuori dalla Svizzera swissALTIRegio), <a href=\"https://www.geocat.ch/datahub/dataset/f7f058e9-288b-4c55-8f4e-6360880dbb59\" target=\"_blank\" rel=\"noopener\">swissALTIRegio</a> (metadati su geocat.ch), <a href=\"https://www.swisstopo.admin.ch/it/modello-altimetrico-swisssurface3d\" target=\"_blank\" rel=\"noopener\">swissSURFACE3D</a> (ricampionato a 10 m da swissEO).",
       "verticalTerrainScaling": "Esagerazione verticale del terreno"
     },
     "timelapse": {
@@ -502,10 +502,15 @@
     "openAGithubIssue": "Aprire un issue su GitHub con il link alla vista attuale",
     "reportAnIssueImprovement": "Segnalare un problema o un miglioramento",
     "selectedDate": "Data selezionata",
-    "swisstopoOpenGovernmentData": "© swisstopo, <a href=\"https://www.swisstopo.admin.ch/ogd-conditions\" target=\"_blank\">open government data</a>. I prodotti swissEO contengono dati Copernicus Sentinel modificati. Terreno 3D: <a href=\"https://www.geocat.ch/datahub/dataset/f7f058e9-288b-4c55-8f4e-6360880dbb59\" target=\"_blank\" rel=\"noopener\">swissALTIRegio</a>, swissSURFACE3D © swisstopo. Etichette © swisstopo. <a href=\"https://doi.org/10.16904/1000001.7\" target=\"_blank\" rel=\"noopener\">Tipo di bosco IFN</a> © WSL (Waser et al. 2025, finanziato dall'UFAM). <a href=\"https://arxiv.org/abs/2611.08095\" target=\"_blank\" rel=\"noopener\">Specie arboree ETH</a> © Zhou et al. 2026 (ETH Zurigo), con licenza CC BY-NC 4.0: solo per uso non commerciale. <a href=\"https://www.geocat.ch/datahub/dataset/ae183bc4-5c91-467e-89bc-85f390340efb\" target=\"_blank\" rel=\"noopener\">Superfici di utilizzo</a> © UFAG e i Cantoni. Livelli di altri servizi WMS / WMTS: © i rispettivi fornitori. Non per uso operativo. Codice sorgente, documentazione e issue: <a href=\"https://github.com/swisstopo/topo-swisseobrowser\" target=\"_blank\" rel=\"noopener\">github.com/swisstopo/topo-swisseobrowser</a>.",
+    "swisstopoOpenGovernmentData": "© swisstopo, <a href=\"https://www.swisstopo.admin.ch/ogd-conditions\" target=\"_blank\">open government data</a>. I prodotti swissEO contengono dati Copernicus Sentinel modificati. Terreno 3D: <a href=\"https://www.swisstopo.admin.ch/it/modello-altimetrico-swissalti3d\" target=\"_blank\" rel=\"noopener\">swissALTI3D</a>, <a href=\"https://www.geocat.ch/datahub/dataset/f7f058e9-288b-4c55-8f4e-6360880dbb59\" target=\"_blank\" rel=\"noopener\">swissALTIRegio</a>, swissSURFACE3D © swisstopo. Etichette © swisstopo. <a href=\"https://doi.org/10.16904/1000001.7\" target=\"_blank\" rel=\"noopener\">Tipo di bosco IFN</a> © WSL (Waser et al. 2025, finanziato dall'UFAM). <a href=\"https://arxiv.org/abs/2611.08095\" target=\"_blank\" rel=\"noopener\">Specie arboree ETH</a> © Zhou et al. 2026 (ETH Zurigo), con licenza CC BY-NC 4.0: solo per uso non commerciale. <a href=\"https://www.geocat.ch/datahub/dataset/ae183bc4-5c91-467e-89bc-85f390340efb\" target=\"_blank\" rel=\"noopener\">Superfici di utilizzo</a> © UFAG e i Cantoni. Livelli di altri servizi WMS / WMTS: © i rispettivi fornitori. Non per uso operativo. Codice sorgente, documentazione e issue: <a href=\"https://github.com/swisstopo/topo-swisseobrowser\" target=\"_blank\" rel=\"noopener\">github.com/swisstopo/topo-swisseobrowser</a>.",
     "terms": "Note legali",
     "theHelpPageExplains": "La <a href=\"docs/index.html\" target=\"_blank\" rel=\"noopener\">pagina di aiuto</a> spiega ogni funzione con schermate e contiene un tutorial per la prima visita. Il <a href=\"https://github.com/swisstopo/topo-swisseobrowser#readme\" target=\"_blank\" rel=\"noopener\">README</a> descrive i prodotti e i servizi dietro i livelli, la scalatura e i valori no-data di ogni asset, le formule, i limiti del browser e la <a href=\"https://github.com/swisstopo/topo-swisseobrowser#layer-verification\" target=\"_blank\" rel=\"noopener\">verifica dei livelli</a> che determina quali livelli portano l'etichetta <span class=\"ver\">BETA</span>.",
-    "writeAnEMail": "Scrivere un'e-mail con il link alla vista attuale (apre il programma di posta)"
+    "writeAnEMail": "Scrivere un'e-mail con il link alla vista attuale (apre il programma di posta)",
+    "version": "Versione",
+    "versionLocal": "copia locale, non pubblicata",
+    "versionInt": "integrazione, commit",
+    "versionLocalBuild": "build locale, commit",
+    "versionCommit": "commit"
   },
   "inspect": {
     "belowThr": "sotto la soglia",
@@ -1077,7 +1082,8 @@
     "back": "Torna alla mappa piana (2D)",
     "dem": {
       "alti": "swissALTIRegio: terreno (10 m)",
-      "dsm": "swissSURFACE3D 10 m: superficie con edifici e alberi"
+      "dsm": "swissSURFACE3D 10 m: superficie con edifici e alberi",
+      "alti3d": "swissALTI3D: terreno (0,5 m vicino, swissALTIRegio lontano e fuori dalla Svizzera)"
     },
     "on": "Terreno 3D"
   },
@@ -1114,7 +1120,8 @@
       "grey": "Carta grigia",
       "none": "Nessuna",
       "pixelkarte": "Carta",
-      "swissimage": "SWISSIMAGE"
+      "swissimage": "SWISSIMAGE",
+      "tlm3d": "Carta swissTLM per il 3D"
     },
     "eth": {
       "1": "Abete rosso (Fichte)",

@@ -15,12 +15,12 @@
     "li4": "Les cartes des essences ETH ont des pixels de 30 m (chaque cellule de 10 m prend le pixel sous son centre) et sont sous licence CC BY-NC 4.0 : usage non commercial uniquement, avec mention de la source. Leur part de feuillus est une part de la surface terrière, la valeur du Degré de mélange LFI une probabilité : les mêmes limites ne signifient pas la même chose.",
     "li5": "Les zones d'intérêt peuvent avoir jusqu'à 100 000 sommets et les fichiers jusqu'à 50 MB ; les zones issues de fichiers ne font partie d'un lien que si elles sont petites.",
     "li6": "Les couches marquées <span class=\"beta\" style=\"margin:0\">BETA</span> ne sont pas encore vérifiées ; les couches de saison VHI ne comptent que les jours avec une valeur VHI.",
-    "p1": "L'onglet Info liste les acquisitions de la date choisie avec leurs métadonnées et la mise à l'échelle de tous les produits.",
+    "p1": "L'onglet Info liste les acquisitions de la date choisie avec leurs métadonnées et la mise à l'échelle de tous les produits. Sous les conditions, il indique la version du navigateur, avec un lien vers les notes de cette version.",
     "p2": "Toutes les positions que vous voyez sont des coordonnées suisses <b>LV95</b> (EPSG:2056) : la position de la souris, l'inspecteur de pixels, les liens et les valeurs par défaut de l'import. Seuls les téléchargements GeoJSON utilisent WGS84, comme l'exige la norme GeoJSON.",
     "p3": "La recherche et le téléchargement des produits d'origine, les épingles, l'outil de mesure, les scripts personnalisés et les comptes d'utilisateur ne sont pas disponibles. La vue 3D n'a ni ciel ni atmosphère, ni ombres portées des montagnes, ni effet de lentille, ni stéréo anaglyphe, ni timelapse 3D. Les autres missions satellitaires ne sont pas incluses ; le swissEO Browser ne montre que les produits swissEO.",
     "td1": "swissEO S2-SR",
     "td10": "swissALTIRegio",
-    "td11": "Modèle altimétrique de la vue 3D (par défaut), 10 m",
+    "td11": "Modèle altimétrique de la vue 3D plus loin et hors de Suisse, 10 m",
     "td12": "<a href=\"https://www.geocat.ch/datahub/dataset/f7f058e9-288b-4c55-8f4e-6360880dbb59\" target=\"_blank\" rel=\"noopener\">swisstopo, métadonnées sur geocat.ch</a>",
     "td13": "swissSURFACE3D, 10 m",
     "td14": "Modèle de surface de la vue 3D (option), rééchantillonné à 10 m par swissEO",
@@ -58,7 +58,10 @@
     "title2": "Données et sources",
     "title3": "Coordonnées",
     "title4": "Non inclus par rapport au Copernicus Browser",
-    "title5": "Limites"
+    "title5": "Limites",
+    "td10a": "swissALTI3D",
+    "td11a": "Modèle altimétrique de la vue 3D près de vous (par défaut), 0,5 m",
+    "td12a": "<a href=\"https://www.swisstopo.admin.ch/fr/modele-altimetrique-swissalti3d\" target=\"_blank\" rel=\"noopener\">swisstopo</a>"
   },
   "envbar": "<b>Version d'intégration pour les tests.</b> Pas pour un usage opérationnel : les couches et valeurs affichées ici ne sont pas validées et peuvent être fausses. La version officielle n'est pas encore publiée.",
   "footer": {
@@ -132,9 +135,9 @@
     "li1": "<span class=\"n\">1</span><span><b>Date</b> : le jour choisi, les flèches vers le jour précédent / suivant avec des données, et le calendrier</span>",
     "li2": "<span class=\"n\">2</span><span><b>Configuration</b> : des groupes de couches pour un thème, ainsi que les vues Comparer et WMS / WMTS</span>",
     "li3": "<span class=\"n\">3</span><span><b>Couches</b> : cliquez sur l'une d'elles pour l'afficher sur la carte</span>",
-    "li4": "<span class=\"n\">4</span><span><b>Date sur la carte</b>, <i>Copier le lien</i> (icône de chaîne) et l'<i>Inspecteur de pixels</i> ((i) avec un pointeur)</span>",
+    "li4": "<span class=\"n\">4</span><span><b>Date sur la carte</b> et <i>Copier le lien</i> (icône de chaîne)</span>",
     "li5": "<span class=\"n\">5</span><span><b>Aller à un lieu</b> : chercher une localité, une adresse ou une montagne</span>",
-    "li6": "<span class=\"n\">6</span><span>Le bouton <b>carte de fond</b> (icône des couches) et l'<b>aide</b> (le <span class=\"key\">i</span>, cette page)</span>",
+    "li6": "<span class=\"n\">6</span><span>Le bouton <b>carte de fond</b> (icône des couches), l'<b>aide</b> (le <span class=\"key\">i</span>, cette page) et, en dessous, l'<i>Inspecteur de pixels</i> ((i) avec un pointeur)</span>",
     "li7": "<span class=\"n\">7</span><span><b>Outils</b> : zone d'intérêt, téléchargement d'image, timelapse et <span class=\"key\">3D</span></span>",
     "li8": "<span class=\"n\">8</span><span><b>Zoom</b>, position de la souris en coordonnées suisses (LV95) et barre d'échelle</span>",
     "p1": "La fenêtre a deux parties : le <b>menu</b> à gauche et la <b>carte</b> à droite. Le menu a deux onglets, <i>Visualiser</i> (choisir la date et la couche) et <i>Info</i> (sur les données, retours). La carte montre la couche choisie sur une carte de fond ; les boutons sur la carte sont les outils.",
@@ -176,7 +179,7 @@
   },
   "t5": {
     "box1": "<b>Astuce :</b> pour la forêt de résineux, mixte ou de feuillus, un curseur à deux poignées fixe où une classe s'arrête et où la suivante commence (30 % et 85 % de feuillus par défaut). Déplacez une poignée et relâchez : la carte suit. Pour les essences de la carte ETH, cochez les essences voulues, ou utilisez <i>Tous les résineux</i> / <i>Tous les feuillus</i>.",
-    "cap1": "<b>Fig. 5</b> NDVI près de Chiètres, 13 août 2026, limité par le masque Nutzungsflächen aux terres assolées, prairies permanentes et pâturages permanents. Chaque catégorie a la couleur du service cartographique fédéral.",
+    "cap1": "<b>Fig. 5</b> NDVI près de Chiètres, 13 août 2026, limité par le masque Nutzungsflächen aux terres assolées, prairies permanentes et pâturages permanents.",
     "img1": "NDVI limité aux terres assolées, prairies et pâturages, avec les cases à cocher des catégories",
     "li1": "Dans le menu de la couche, descendez jusqu'à <b>Masques</b>. La liste déroulante <i>Masque de végétation</i> indique <i>Désactivé</i>.",
     "li2": "Choisissez un masque, par exemple <i>Utilisation du sol (catégories ci-dessous)</i> sous <i>Nutzungsflächen</i> : l'utilisation agricole du sol des cantons.",
@@ -188,7 +191,7 @@
   "t6": {
     "cap1": "<b>Fig. 6</b> L'inspecteur de pixels sur un champ : valeurs des bandes (nombre stocké et réflectance), le NDVI, les masques à cet endroit et la parcelle des Nutzungsflächen (terres assolées, pois, code 537).",
     "img1": "Inspecteur de pixels avec les valeurs des bandes et du NDVI",
-    "p1": "Cliquez sur le bouton <b>Inspecteur de pixels</b> (le (i) avec un pointeur de souris, en haut de la carte) pour l'activer : il devient bleu. Cliquez ensuite sur la carte. Une fenêtre affiche les valeurs à cet endroit : la position, la réflectance de chaque bande, la valeur d'indice de la couche, les informations de nuages et de relief, le masque forêt / végétation, la classe forestière swissTLM3D, la probabilité de feuillus du Degré de mélange LFI, la part de feuillus et l'essence dominante de la carte ETH ainsi que la catégorie des Nutzungsflächen. Cliquez à nouveau sur le bouton pour le désactiver.",
+    "p1": "Cliquez sur le bouton <b>Inspecteur de pixels</b> (le (i) avec un pointeur de souris, en haut à droite de la carte, sous le bouton d'aide) pour l'activer : il devient bleu. Cliquez ensuite sur la carte. Une fenêtre affiche les valeurs à cet endroit : la position, la réflectance de chaque bande, la valeur d'indice de la couche, les informations de nuages et de relief, le masque forêt / végétation, la classe forestière swissTLM3D, la probabilité de feuillus du Degré de mélange LFI, la part de feuillus et l'essence dominante de la carte ETH ainsi que la catégorie des Nutzungsflächen. Cliquez à nouveau sur le bouton pour le désactiver.",
     "title": "<span class=\"n\">6</span>Lire la valeur d'un pixel"
   },
   "t7": {
@@ -203,7 +206,7 @@
   "t8": {
     "cap1": "<b>Fig. 8</b> Le Grand glacier d'Aletsch en 3D : couleurs naturelles du 13 août 2026 sur swissALTIRegio, vue vers le nord par-dessus la Bettmeralp vers la Jungfrau et le lac de Brienz, avec les étiquettes activées.",
     "img1": "Le Grand glacier d'Aletsch en 3D avec l'image en couleurs naturelles et les étiquettes",
-    "li1": "Cliquez sur <span class=\"key\">3D</span> : la carte s'incline et les noms de lieux (étiquettes) apparaissent. Le bouton indique maintenant <span class=\"key\">2D</span>, qui ramène la carte plane ; les étiquettes restent jusqu'à ce que vous les désactiviez avec le bouton des couches.",
+    "li1": "Cliquez sur <span class=\"key\">3D</span> : la carte s'incline, les noms de lieux (étiquettes) apparaissent et le fond devient la <i>Carte swissTLM pour la 3D</i>. Le bouton indique maintenant <span class=\"key\">2D</span>, qui ramène la carte plane et sa carte de fond ; les étiquettes restent jusqu'à ce que vous les désactiviez avec le bouton des couches.",
     "li2": "Faites glisser avec le <b>bouton droit de la souris</b> (ou maintenez <span class=\"key\">Ctrl</span> et faites glisser) pour incliner et tourner la vue ; sur un écran tactile, avec deux doigts. Sans bouton droit, utilisez la <b>navigation 3D</b> au-dessus des boutons de zoom : le disque du haut déplace la carte, celui du bas la tourne et l'incline ; son repère rouge indique le nord.",
     "li3": "Trois boutons de plus apparaissent au-dessus des outils : les <b>réglages 3D</b> (roue dentée), l'<b>ombrage solaire</b> (ampoule) et l'<b>heure solaire</b> (soleil). Le relief est éclairé par le soleil à l'heure de l'image satellite ; avec l'heure solaire, vous pouvez éclairer les montagnes comme le matin ou le soir.",
     "p1": "Le bouton <span class=\"key\">3D</span>, le dernier des outils, pose la carte et la couche satellite sur le relief.",
@@ -236,7 +239,7 @@
     "title": "Téléchargement d'image"
   },
   "tools-insp": {
-    "p1": "Activez-le en haut de la carte et cliquez sur un endroit. Pour les couches satellite, il montre les valeurs des bandes (nombre stocké et réflectance), la valeur d'indice, la classification de la scène, le masque des nuages et du relief, la carte des habitats de la date (forêt, végétation), la classe forestière swissTLM3D, la probabilité de feuillus du Degré de mélange LFI, la part de feuillus et l'essence dominante de la carte ETH et la catégorie des Nutzungsflächen ; pour les produits swissEO, la valeur du produit. Voir <a href=\"#t6\">fig. 6</a>.",
+    "p1": "Activez-le avec son bouton sous le bouton d'aide, en haut à droite de la carte, et cliquez sur un endroit. Pour les couches satellite, il montre les valeurs des bandes (nombre stocké et réflectance), la valeur d'indice, la classification de la scène, le masque des nuages et du relief, la carte des habitats de la date (forêt, végétation), la classe forestière swissTLM3D, la probabilité de feuillus du Degré de mélange LFI, la part de feuillus et l'essence dominante de la carte ETH et la catégorie des Nutzungsflächen ; pour les produits swissEO, la valeur du produit. Voir <a href=\"#t6\">fig. 6</a>.",
     "title": "Inspecteur de pixels"
   },
   "tools-search": {
@@ -285,7 +288,7 @@
     "li13": "Les liens conservent la vue 3D avec son inclinaison et sa direction, le modèle altimétrique et l'exagération verticale.",
     "li2": "Faites glisser avec le <b>bouton droit de la souris</b>, ou maintenez <span class=\"key\">Ctrl</span> et faites glisser, pour incliner et tourner la vue ; sur un écran tactile, avec deux doigts. Déplacez et zoomez comme d'habitude. La <b>navigation 3D</b> au-dessus des boutons de zoom fait de même avec la souris seule : le disque du haut déplace la carte, celui du bas la tourne (gauche, droite) et l'incline (haut, bas). Cliquez sur une flèche pour un pas ou maintenez-la enfoncée ; faites glisser le bouton central, plus loin, plus vite. Le repère rouge indique toujours le nord : un clic dessus remet la carte vers le nord, un double-clic sur le bouton central du bas la remet aussi à plat (vue verticale d'en haut). Les boutons de zoom se trouvent sous les disques.",
     "li3": "Une première vue 3D prend quelques secondes : les altitudes sont lues dans le modèle altimétrique et transformées en relief dans votre navigateur.",
-    "li4": "<b>Modèle altimétrique</b> : <i>swissALTIRegio</i>, le modèle à 10 m de swisstopo du terrain nu de la Suisse et de ses régions frontalières (par défaut), ou <i>swissSURFACE3D 10 m</i>, la surface avec bâtiments et arbres, rééchantillonnée à 10 m par swissEO (hors de Suisse et dans ses lacunes, les altitudes de swissALTIRegio).",
+    "li4": "<b>Modèle altimétrique</b> : <i>swissALTI3D</i>, le modèle à 0,5 m de swisstopo du terrain nu, près de vous, et <i>swissALTIRegio</i>, le modèle à 10 m, plus loin et hors de Suisse (par défaut) ; <i>swissALTIRegio</i> seul ; ou <i>swissSURFACE3D 10 m</i>, la surface avec bâtiments et arbres, rééchantillonnée à 10 m par swissEO (hors de Suisse et dans ses lacunes, les altitudes de swissALTIRegio).",
     "li5": "<b>Ombrage solaire du relief</b> et ses paramètres : la <i>méthode d'ombrage</i> (combinée, standard, simple, Igor, multidirectionnelle), l'<i>intensité de l'ombrage</i> et les couleurs d'<i>ombre</i>, de <i>lumière</i> et d'<i>accent</i>. Les couleurs sont partiellement transparentes pour que l'image satellite reste visible.",
     "li6": "<b>Exagération verticale du relief</b> de 50 à 300 % : les valeurs au-dessus de 100 % rendent le relief plus raide.",
     "li7": "<b>Réinitialiser les valeurs</b> remet tous les réglages, sauf le modèle altimétrique, à leurs valeurs par défaut.",
@@ -301,7 +304,7 @@
     "title5": "Ce qui fonctionne en 3D"
   },
   "vis-base": {
-    "p1": "Survolez le bouton des couches en haut à droite de la carte (à gauche du <span class=\"key\">i</span>), comme dans le Copernicus Browser, pour choisir la <b>carte de fond</b> : <i>Carte</i> (carte nationale de swisstopo), <i>SWISSIMAGE</i> (photo aérienne), <i>Carte grise</i> ou <i>Aucune</i>. Sous <i>Superpositions</i>, <b>Étiquettes</b> écrit les noms des lieux, routes, sommets et lacs de la carte de base de swisstopo au-dessus des données satellite, en texte net à toutes les échelles (en 3D droit et tourné vers vous). Les noms s'arrêtent à la frontière de la Suisse et du Liechtenstein.",
+    "p1": "Survolez le bouton des couches en haut à droite de la carte (à gauche du <span class=\"key\">i</span>), comme dans le Copernicus Browser, pour choisir la <b>carte de fond</b> : <i>Carte</i> (carte nationale de swisstopo), <i>SWISSIMAGE</i> (photo aérienne), <i>Carte grise</i> ou <i>Aucune</i> ; en 3D aussi la <i>Carte swissTLM pour la 3D</i>, le fond de la vue 3D de map.geo.admin.ch, par laquelle la 3D commence. Sous <i>Superpositions</i>, <b>Étiquettes</b> écrit les noms des lieux, routes, sommets et lacs de la carte de base de swisstopo au-dessus des données satellite, en texte net à toutes les échelles (en 3D droit et tourné vers vous). Choisir SWISSIMAGE active les étiquettes. Les noms s'arrêtent à la frontière de la Suisse et du Liechtenstein.",
     "title": "Cartes de fond et étiquettes"
   },
   "vis-compare": {
@@ -350,7 +353,7 @@
     "li2": "<b>Ombre du relief</b> : les pentes à l'ombre du relief au moment de l'acquisition ;",
     "li3": "<b>Masque de végétation</b> : garde la forêt, toute la végétation, la forêt de résineux, mixte ou de feuillus, des essences choisies ou des catégories choisies de l'utilisation agricole du sol (section suivante) ;",
     "li4": "<b>Masque personnalisé</b> : vos propres polygones (voir <a href=\"#vis-mask\">Masques personnalisés</a>).",
-    "p1": "Chaque couche Sentinel-2 a ces masques dans son menu ; ils masquent des pixels sur la carte et les excluent des statistiques, des téléchargements et du timelapse :",
+    "p1": "Chaque couche Sentinel-2 a ces masques dans son menu ; ils masquent des pixels sur la carte et les excluent des statistiques, des téléchargements et du timelapse. La plupart des couches masquent les nuages, les ombres de nuages et les ombres du relief dès leur ouverture (Couleurs naturelles, Fausses couleurs, SWIR et la couche des aérosols commencent sans masque) ; activez ou désactivez un masque dans le menu de la couche :",
     "title": "Masques"
   },
   "vis-menu": {
@@ -373,7 +376,7 @@
     "li3": "Les couches à deux dates (changement de NDDI, différence de NDVI par rapport à une date de référence) utilisent le masque de la date choisie pour les deux dates, si bien qu'une nouvelle version d'une carte des habitats n'apparaît jamais comme un changement.",
     "li4": "Le masque s'applique aussi aux <a href=\"#tools-stats\">statistiques</a> (où vous pouvez en choisir un autre), à l'<a href=\"#tools-spec\">explorateur spectral</a>, aux téléchargements et au timelapse ; le rapport de changement indique la surface masquée en hectares.",
     "li5": "L'<a href=\"#tools-insp\">inspecteur de pixels</a> montre à chaque endroit la carte des habitats, la classe forestière swissTLM3D, la probabilité de feuillus (Degré de mélange LFI), la part de feuillus et l'essence dominante (ETH) ainsi que la catégorie des Nutzungsflächen, quel que soit le masque choisi ; avec un masque par type de forêt aussi la classe aux limites actuelles.",
-    "p1": "La liste déroulante <i>Masque de végétation</i> indique <i>Désactivé</i> (« En choisir une ») par défaut. Ses entrées, dans cet ordre :",
+    "p1": "La liste déroulante <i>Masque de végétation</i> commence par <i>Toute la végétation</i> pour les indices de végétation (NDVI, EVI, SAVI, indices d'humidité, NDDI) et le NBR, par <i>Forêt</i> pour les couches forestières et pour chaque indice de végétation dans la configuration <i>Forêt</i>, et par <i>Désactivé</i> (« En choisir une ») pour les composites et les autres indices. Ses entrées, dans cet ordre :",
     "p2": "Bon à savoir :",
     "td1": "Carte des habitats : forêt, toute la végétation",
     "td10": "Essences ETH (30 m) : forêt de résineux, forêt mixte, forêt de feuillus",

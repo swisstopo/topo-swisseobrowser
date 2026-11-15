@@ -32,6 +32,7 @@ on:
 permissions:
   contents: read
   id-token: write
+  pull-requests: read     # tools/release.sh reads the labels of the merged pull request
 
 concurrency:
   group: deploy-prod
@@ -106,6 +107,22 @@ jobs:
             grep -qxF "const LANGS_OFFERED = $offered; // offered in production" "$f" ||
               { echo "::error::LANGS_OFFERED was not written in $f"; exit 1; }
           done
+
+      # The version in the Info tab (README, Releases): the release the job "release" creates after this
+      # deploy (tools/release.sh decides both), or the tag the commit already has on a manual redeploy.
+      - name: The version this deploy shows
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ver=$(bash tools/release.sh --print-version)
+          json=$(printf '{"v":"%s","sha":"%s","date":"%s"}' "$ver" "$GITHUB_SHA" "$(git log -1 --format=%cs "$GITHUB_SHA")")
+          marker='const APP_VERSION = null; // replaced on deploy'
+          f=_site/index.html
+          grep -qF "$marker" "$f" || { echo "::error::the APP_VERSION marker is missing in $f"; exit 1; }
+          sed -i "s|^$marker\$|const APP_VERSION = $json; // written by the deploy|" "$f"
+          grep -qxF "const APP_VERSION = $json; // written by the deploy" "$f" ||
+            { echo "::error::APP_VERSION was not written in $f"; exit 1; }
+          echo "this deploy shows version $ver"
 
       # The link preview (Open Graph) needs absolute addresses. They are committed with the integration
       # address, so a local copy and the integration site preview correctly; here they become this site's

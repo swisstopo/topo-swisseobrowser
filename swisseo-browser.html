@@ -332,15 +332,17 @@ body.is3d .maplibregl-ctrl-bottom-right .zoom-ctl{margin-right:34px}
 .mapbtn:hover{background:var(--hover)}
 .mapbtn.on{background:var(--blue);color:#fff;border-color:var(--blue)}
 .mapbtn svg{width:20px;height:20px}
-#mapTools{position:absolute;right:10px;top:102px;z-index:900;display:flex;flex-direction:column;gap:6px}
+#mapTools{position:absolute;right:10px;top:148px;z-index:900;display:flex;flex-direction:column;gap:6px}
 /* top right, as in the Copernicus Browser: place search, basemap switcher and help and tutorial (docs/index.html, the
-   "i"); below the "i" the area of interest and the tools */
+   "i"); below the "i" the pixel inspector (#17), the area of interest and the tools */
 #btnHelp{top:10px;text-decoration:none}
+#btnInspect{top:56px}
+#btnInspect svg{width:22px;height:22px}
 #btnHelp svg{width:22px;height:22px}
 .maplibregl-ctrl-top-right{top:0;right:46px}
 #mapTools .mapbtn{position:static}
 #btn3d{font-weight:800;font-size:13px;letter-spacing:.02em}
-/* top left of the map: open-menu button, date and acquisitions, copy link and pixel inspector icons */
+/* top left of the map: open-menu button, date and acquisitions, copy link */
 #mapTL{position:absolute;left:10px;top:10px;z-index:905;display:flex;align-items:center;gap:8px;flex-wrap:wrap;
   max-width:calc(100% - 406px)}
 #mapTL .mapbtn{position:static;flex:0 0 36px}
@@ -399,7 +401,7 @@ body.is3d .maplibregl-ctrl-bottom-right .zoom-ctl{margin-right:34px}
 .tl-opts .chk{margin-top:6px}
 
 /* ---------- area of interest tool (expands to the left, as in Copernicus) ---------- */
-#aoiTool{position:absolute;right:10px;top:56px;z-index:910;display:flex;flex-direction:row-reverse;gap:6px;align-items:center}
+#aoiTool{position:absolute;right:10px;top:102px;z-index:910;display:flex;flex-direction:row-reverse;gap:6px;align-items:center}
 #aoiTool .mapbtn{position:static}
 .tgroup{display:flex;align-items:center;gap:2px;background:#fff;border:1px solid var(--border);border-radius:4px;
   box-shadow:var(--shadow);height:36px;padding:0 3px}
@@ -746,6 +748,7 @@ table.kv td:first-child{color:var(--muted)}
           <div data-i18n="[html]info.swisstopoOpenGovernmentData" style="color:var(--muted);font-size:11.5px">© swisstopo,
             <a href="https://www.swisstopo.admin.ch/ogd-conditions" target="_blank">open government data</a>.
             The swissEO products contain modified Copernicus Sentinel data. 3D terrain:
+            <a href="https://www.swisstopo.admin.ch/en/height-model-swissalti3d" target="_blank" rel="noopener">swissALTI3D</a>,
             <a href="https://www.geocat.ch/datahub/dataset/f7f058e9-288b-4c55-8f4e-6360880dbb59" target="_blank" rel="noopener">swissALTIRegio</a>,
             swissSURFACE3D © swisstopo. Labels © swisstopo.
             <a href="https://doi.org/10.16904/1000001.7" target="_blank" rel="noopener">Forest Type NFI</a>
@@ -755,6 +758,7 @@ table.kv td:first-child{color:var(--muted)}
             Layers of other WMS / WMTS services: © their providers. Not for operational use.
             Source code, documentation and issues:
             <a href="https://github.com/swisstopo/topo-swisseobrowser" target="_blank" rel="noopener">github.com/swisstopo/topo-swisseobrowser</a>.</div>
+          <div id="appVersion" style="color:var(--muted);font-size:11.5px;margin-top:4px"></div>
           <div data-i18n="[html]legal.links" class="legal">
             <a href="https://www.swisstopo.admin.ch/en/impressum-federal-office-of-topography" target="_blank" rel="noopener">Impressum</a>
             <a href="https://www.swisstopo.admin.ch/en/legal-framework" target="_blank" rel="noopener">Legal framework</a>
@@ -773,13 +777,13 @@ table.kv td:first-child{color:var(--muted)}
         <button data-i18n="[title]map.openTheMenu" id="btnOpenSide" title="Open the menu"></button>
         <div id="scenebadge"><span data-i18n="map.date">Date</span><b id="badgeTxt">…</b></div>
         <button data-i18n="[title]map.copyLinkALink;[aria-label]map.copyLink" class="mapbtn" id="btnLink" title="Copy link: a link to exactly this view" aria-label="Copy link"></button>
-        <button data-i18n="[title]map.pixelInspectorOffClick;[aria-label]map.pixelInspector" class="mapbtn" id="btnInspect" title="Pixel inspector (off): click it, then click the map to read the values of a pixel"
-          aria-label="Pixel inspector" aria-pressed="false"></button>
       </div>
       <a data-i18n="[title]map.helpAndTutorialAbout;[aria-label]map.helpAndTutorial" class="mapbtn" id="btnHelp" href="docs/index.html" target="_blank" rel="noopener"
         title="Help and tutorial: about the swissEO Browser" aria-label="Help and tutorial"><svg viewBox="0 0 24 24" aria-hidden="true">
         <circle cx="12.4" cy="4.6" r="2.4" fill="currentColor"/>
         <path d="M8.6 9h5.8v10h2.2v2.6H8.4V19h2.2v-7.4h-2z" fill="currentColor"/></svg></a>
+      <button data-i18n="[title]map.pixelInspectorOffClick;[aria-label]map.pixelInspector" class="mapbtn" id="btnInspect" title="Pixel inspector (off): click it, then click the map to read the values of a pixel"
+        aria-label="Pixel inspector" aria-pressed="false"></button>
       <div id="placeSearch">
         <button data-i18n="[title]map.searchAPlace" class="ps-ico" id="psIco" title="Search a place"></button>
         <input data-i18n="[title]map.searchPlacesAddressesMunicipalities;[placeholder]map.goToPlace" id="psIn" type="text" spellcheck="false" autocomplete="off" placeholder="Go to Place"
@@ -836,7 +840,9 @@ table.kv td:first-child{color:var(--muted)}
         </div>
         <div data-i18n="[html]dialogs.terrain3d.theShadingLightsThe" class="hint" style="margin-top:8px">The shading lights the height model from the sun's direction and height at the
           map centre (see <i>Sun time</i>). A sky, shadows cast by mountains, a lens flare and anaglyph stereo are not
-          available in this map library.<br>Sources: <a href="https://www.geocat.ch/datahub/dataset/f7f058e9-288b-4c55-8f4e-6360880dbb59"
+          available in this map library.<br>Sources: <a href="https://www.swisstopo.admin.ch/en/height-model-swissalti3d" target="_blank"
+          rel="noopener">swissALTI3D</a> (0.5 m, near; further away and beyond Switzerland swissALTIRegio),
+          <a href="https://www.geocat.ch/datahub/dataset/f7f058e9-288b-4c55-8f4e-6360880dbb59"
           target="_blank" rel="noopener">swissALTIRegio</a> (metadata on geocat.ch),
           <a href="https://www.swisstopo.admin.ch/en/height-model-swisssurface3d" target="_blank" rel="noopener">swissSURFACE3D</a>
           (resampled to 10 m by swissEO).</div>
@@ -1200,6 +1206,7 @@ const layerText = (rec, field) => rec.ext ? rec[field] :
 /* The languages this build offers: null means all four (the repository and the integration site);
    the production deploy writes only those that a native speaker has reviewed. */
 const LANGS_OFFERED = null; // replaced on deploy
+const APP_VERSION = null; // replaced on deploy
 await I18N.init({ namespace: "app", base: "./locales/", offered: LANGS_OFFERED });
 
 const $ = s => document.querySelector(s);
@@ -1485,14 +1492,14 @@ const ATTR = '&copy; <a href="https://www.swisstopo.admin.ch">swisstopo</a>';
 /* Every raster tile of the map is drawn by this page, through the swisseo:// protocol: the swisstopo WMTS tiles are
    composed into the tiles of the quad tree, the swissEO layers are rendered from the COGs, WMS and WMTS layers are
    read and placed on the LV95 grid. A layer's draw(bbox, N, signal) returns a canvas, ImageData or null (nothing)
-   for the LV95 box of an N × N px tile (N = lyr.size, 512 by default); tiles outside its LV95 bounds are not drawn
+   for the LV95 box of an N × N px tile (N = lyr.size, or lyr.size(z) per zoom, 512 by default); tiles outside its LV95 bounds are not drawn
    at all, and lyr.empty(N), if given, is returned instead of nothing. */
 const RASTERS = new Map();
 let rasterSeq = 0;
 maplibregl.addProtocol("swisseo", async (params, ctrl) => {
   const m = /^swisseo:\/\/(\w+)\/(\d+)\/(\d+)\/(\d+)/.exec(params.url), lyr = m && RASTERS.get(m[1]);
   if (!lyr) return { data: null };
-  const z = +m[2], x = +m[3], y = +m[4], span = TILE * RES0 / 2 ** z, N = lyr.size || TILE;
+  const z = +m[2], x = +m[3], y = +m[4], span = TILE * RES0 / 2 ** z, N = typeof lyr.size === "function" ? lyr.size(z) : lyr.size || TILE;
   const bbox = [ORIGIN[0] + x * span, ORIGIN[1] - (y + 1) * span, ORIGIN[0] + (x + 1) * span, ORIGIN[1] - y * span];
   const none = async () => ({ data: lyr.empty ? await createImageBitmap(lyr.empty(N)) : null });   // nothing to draw
   if (lyr.bounds && !boxesMeet(bbox, lyr.bounds)) return none();
@@ -1541,10 +1548,17 @@ const BASEMAPS = {
   pixelkarte: wmts("ch.swisstopo.pixelkarte-farbe", "jpeg"),
   swissimage: wmts("ch.swisstopo.swissimage", "jpeg"),
   grey:       wmts("ch.swisstopo.pixelkarte-grau", "jpeg"),
+  // only in 3D, and its default there (#18): the swissTLM map made for 3D views (map.geo.admin.ch's 3D background)
+  tlm3d:      wmts("ch.swisstopo.swisstlm3d-karte-farbe.3d", "jpeg"),
   none:       null
 };
-const BASE_NAMES = { pixelkarte: "Map", swissimage: "SWISSIMAGE", grey: "Map Grey", none: "None" };
-let baseLayer = null, basemap = "pixelkarte", baseMapLayer = null;
+const BASE_NAMES = { pixelkarte: "Map", swissimage: "SWISSIMAGE", grey: "Map Grey", tlm3d: "swissTLM map for 3D", none: "None" };
+const BASE_3D = new Set(["tlm3d"]);                              // basemaps offered only in 3D
+let baseLayer = null, basemap = "pixelkarte", baseMapLayer = null, base2d = null;   // base2d: the 2D basemap left for 3D
+/* The defaults (#18): the Map in 2D, the swissTLM map in 3D; the labels on over SWISSIMAGE. A link carries only what
+   differs from them. */
+const baseDefault = () => terrainOn ? "tlm3d" : "pixelkarte";
+const labelsDefault = () => basemap === "swissimage";
 
 let labelIds = [], labelsWanted = false;                           // the vector label layers on the map
 const labelsOn = () => labelsWanted;
@@ -1586,7 +1600,7 @@ const basemapCtl = (() => {
   tset(over, "map.overlaysTitle", "Map overlays", "data-title");
   Object.keys(BASEMAPS).forEach(k => {
     const lb = el("label"), r = el("input");
-    r.type = "radio"; r.name = "bm-base"; r.onchange = () => setBasemap(k);
+    r.type = "radio"; r.name = "bm-base"; r.onchange = () => setBasemap(k, true);
     radios[k] = r;
     const nm = el("span"); nm.dataset.i18n = "vocab.basemap." + k; nm.textContent = BASE_NAMES[k];
     lb.append(r, " ", nm); I18N.apply(nm);
@@ -1606,19 +1620,25 @@ const basemapCtl = (() => {
   tg.onclick = e => { e.preventDefault(); open(!d.classList.contains("open")); };
   map.on("click", () => open(false));
   return { onAdd: () => d, onRemove() {},
-           sync() { Object.keys(radios).forEach(k => { radios[k].checked = k === basemap; }); cb.checked = labelsOn(); } };
+           sync() {
+             Object.keys(radios).forEach(k => { radios[k].checked = k === basemap; radios[k].parentElement.hidden = BASE_3D.has(k) && !terrainOn; });
+             cb.checked = labelsOn();
+           } };
 })();
 map.addControl(basemapCtl, "top-right");
 const mapCanvas = map.getCanvas();
 tset(mapCanvas, "map.canvas", "Map", "aria-label");
-function setBasemap(name) {
-  if (!(name in BASEMAPS)) name = "pixelkarte";
+/* user: chosen in the switcher, so the labels follow the new basemap's default unless they were changed by hand */
+function setBasemap(name, user) {
+  if (!(name in BASEMAPS) || (BASE_3D.has(name) && !terrainOn)) name = baseDefault();
+  const labelsWere = labelsDefault();
   if (BASEMAPS[name] !== baseLayer || (BASEMAPS[name] && !baseMapLayer)) {
     removeRaster(baseMapLayer);
     baseMapLayer = BASEMAPS[name] ? wmtsRaster(BASEMAPS[name], "z-base") : null;
   }
   basemap = name;
   baseLayer = BASEMAPS[name];
+  if (user && labelsOn() === labelsWere && labelsDefault() !== labelsWere) setLabels(labelsDefault());
   basemapCtl.sync();
   writeUrlSoon();
 }
@@ -1644,11 +1664,12 @@ async function setLabels(on) {
 }
 
 /* ============================================================
-   2b. 3D terrain: swissALTIRegio or the swissSURFACE3D surface model
+   2b. 3D terrain: swissALTI3D (near) and swissALTIRegio (far), or the swissSURFACE3D surface model
    ============================================================ */
-/* The 3D mode drapes the map over swissALTIRegio, swisstopo's 10 m terrain model of Switzerland and its border
-   regions. It is one COG in LV95 on the 10 m pixel grid of the map, so its heights become terrain tiles of the map
-   grid without reprojection: Terrarium-encoded, 256 px, at most 20 m per pixel (MapLibre interpolates beyond). */
+/* swissALTIRegio, swisstopo's 10 m terrain model of Switzerland and its border regions (the coarse levels and the area
+   beyond swissALTI3D, below). It is one COG in LV95 on the 10 m pixel grid of the map, so its heights become terrain
+   tiles of the map grid without reprojection: Terrarium-encoded, 256 px, at most 20 m per pixel (MapLibre interpolates
+   beyond). */
 const ALTI = "https://data.geo.admin.ch/ch.swisstopo.swissaltiregio/swissaltiregio/swissaltiregio_2056_5728.tif";
 const ALTI_BOX = [2385000, 974000, 2935000, 1404000];
 const ATTR_ALTI = '&copy; <a href="https://www.swisstopo.admin.ch/en/height-model-swissaltiregio">swisstopo swissALTIRegio</a>';
@@ -1664,7 +1685,85 @@ function terrarium(h, N) {                                     // heights in m -
    swissEO bucket (Switzerland plus 10 km, no data −9999); beyond it and in its gaps the heights of swissALTIRegio. */
 const DSM = "https://s3-topo-satromo-prod.s3.eu-central-1.amazonaws.com/data/DSM/DSM_10m_EPSG2056_CH_clipped_10km_extended_9999_cog.tif";
 const ATTR_DSM = '&copy; <a href="https://www.swisstopo.admin.ch/en/height-model-swisssurface3d">swisstopo swissSURFACE3D</a> (10 m)';
+/* swissALTI3D, swisstopo's terrain model of Switzerland and Liechtenstein at 0.5 m (the default in 3D, #18, as in the
+   former repository davidoesch/swisseobrowser): one COG per km² and release in the STAC collection
+   ch.swisstopo.swissalti3d, LV95 with LN02 heights (as swissALTIRegio), each as 0.5 m and 2 m asset; the 0.5 m COGs
+   have overviews at 1, 2 and 4 m. The terrain tiles reach zoom 13 (0.5 m per pixel): from zoom 10 (4 m per pixel) on,
+   near the camera, a tile is read from the 0.5 m assets (the 2 m asset where a km² has none) of the latest release of
+   every km² it touches, at the overview that fits; up to zoom 9 (10 m per pixel and coarser, far from the camera) and
+   beyond Switzerland or in gaps from swissALTIRegio. The items are looked up in the STAC API once per block of
+   4 × 4 km; at most ALTI3D_OPEN COGs are kept open (their header and cached blocks). */
+const ALTI3D_ITEMS = "https://data.geo.admin.ch/api/stac/v0.9/collections/ch.swisstopo.swissalti3d/items";
+const ATTR_ALTI3D = '&copy; <a href="https://www.swisstopo.admin.ch/en/height-model-swissalti3d">swisstopo swissALTI3D</a>';
+const alti3dKm = new Map(), alti3dBlocks = new Map(), alti3dOpen = [], ALTI3D_OPEN = 48;
+function alti3dBlock(bx, by) {                 // the latest release of each km² in the block, by "E-N" (km, lower left)
+  const key = bx + "-" + by;
+  if (!alti3dBlocks.has(key)) {
+    const pr = (async () => {
+      const c = [[0, 0], [1, 0], [0, 1], [1, 1]].map(([i, j]) => lv95(bx * 4000 + 1 + i * 3998, by * 4000 + 1 + j * 3998));
+      const lo = c.map(q => q[0]), la = c.map(q => q[1]);
+      let url = ALTI3D_ITEMS + "?limit=100&bbox=" + [Math.min(...lo), Math.min(...la), Math.max(...lo), Math.max(...la)].join(",");
+      while (url) {
+        const r = await fetch(url);
+        if (!r.ok) throw new Error("swissALTI3D STAC " + r.status);
+        const j = await r.json();
+        (j.features || []).forEach(f => {
+          const m = /_(\d{4})_(\d{4})-(\d{4})$/.exec(f.id);
+          if (!m) return;
+          const k = m[2] + "-" + m[3], prev = alti3dKm.get(k);
+          if (prev && prev.year >= +m[1]) return;
+          const tifs = Object.values(f.assets || {}).map(a => a.href).filter(h => /\.tif$/.test(h));
+          const href = tifs.find(h => /_0\.5_/.test(h)) || tifs.find(h => /_2_/.test(h));
+          if (href) alti3dKm.set(k, { year: +m[1], href });
+        });
+        const next = (j.links || []).find(l => l.rel === "next");
+        url = next && next.href !== url ? next.href : null;
+      }
+    })();
+    pr.catch(() => alti3dBlocks.delete(key));                // asked again with the next tile
+    alti3dBlocks.set(key, pr);
+  }
+  return alti3dBlocks.get(key);
+}
+/* the COGs used last stay open; the oldest beyond ALTI3D_OPEN are closed (header and decoded tiles released) */
+function alti3dUsed(urls) {
+  urls.forEach(u => { const i = alti3dOpen.indexOf(u); if (i >= 0) alti3dOpen.splice(i, 1); alti3dOpen.push(u); });
+  while (alti3dOpen.length > ALTI3D_OPEN) {
+    const u = alti3dOpen.shift(), pr = pyrCache.get(u);
+    pyrCache.delete(u);
+    if (pr) pr.then(py => py.levels.forEach(l => [l.im, l.mask].forEach(im => {
+      const i = cachedImages.indexOf(im);
+      if (i >= 0) cachedImages.splice(i, 1);
+    }))).catch(() => {});
+  }
+}
+async function drawAlti3d(bbox, N, signal) {
+  if ((bbox[2] - bbox[0]) / N > 6) return DEMS.alti.draw(bbox, N, signal);            // far: swissALTIRegio
+  const kx0 = Math.floor(bbox[0] / 1000), kx1 = Math.ceil(bbox[2] / 1000) - 1;
+  const ky0 = Math.floor(bbox[1] / 1000), ky1 = Math.ceil(bbox[3] / 1000) - 1, blocks = new Map();
+  for (let x = kx0; x <= kx1; x++) for (let y = ky0; y <= ky1; y++) blocks.set(Math.floor(x / 4) + "," + Math.floor(y / 4), [Math.floor(x / 4), Math.floor(y / 4)]);
+  await Promise.all([...blocks.values()].map(([bx, by]) => alti3dBlock(bx, by)));
+  const urls = [];
+  for (let x = kx0; x <= kx1; x++) for (let y = ky0; y <= ky1; y++) { const t = alti3dKm.get(x + "-" + y); if (t) urls.push(t.href); }
+  const out = new Float32Array(N * N).fill(-9999);
+  (await Promise.all(urls.map(u => readGrid(u, bbox, N, N, signal, -9999)))).forEach(g => {
+    if (g) for (let k = 0; k < g.length; k++) if (g[k] > -500) out[k] = g[k];
+  });
+  alti3dUsed(urls);
+  let gap = false;
+  for (let k = 0; k < out.length && !gap; k++) gap = !(out[k] > -500);
+  if (gap) {                                                 // beyond Switzerland and in gaps: swissALTIRegio
+    const a = await readGrid(ALTI, bbox, N, N, signal, 0);
+    for (let k = 0; k < out.length; k++) if (!(out[k] > -500)) out[k] = a ? a[k] : 0;
+  }
+  return terrarium(out, N);
+}
 const DEMS = {
+  /* From zoom 10 on, the terrain tiles have 320 px: 4, 2, 1 and 0.5 m per pixel, the pixels of swissALTI3D's levels
+     (256 px would give 5, 2.5, 1.25 and 0.625 m: reading the nearest pixel then doubles every fourth row and column, and
+     the sun shading shows the steps as ripples). Up to zoom 9, 256 px: 20 and 10 m, on swissALTIRegio's 10 m grid. */
+  alti3d: { name: "swissALTI3D: terrain (0.5 m near, swissALTIRegio far and beyond Switzerland)", attribution: ATTR_ALTI3D + ", " + ATTR_ALTI,
+            maxzoom: 13, size: z => z >= 10 ? 320 : 256, draw: drawAlti3d },
   alti: { name: "swissALTIRegio: terrain (10 m)", attribution: ATTR_ALTI,
           draw: async (bbox, N, signal) => terrarium(await readGrid(ALTI, bbox, N, N, signal, 0), N) },
   dsm:  { name: "swissSURFACE3D 10 m: surface with buildings and trees", attribution: ATTR_DSM,
@@ -1684,7 +1783,7 @@ let demLayer = null, terrainOn = false, navCtl = null;
    The sun shading is a hillshade of the height model lit from the sun's direction and height at the map centre.
    A sky / atmosphere (not drawn by MapLibre here), cast shadows, a lens flare and anaglyph stereo, as in the
    Copernicus Browser's 3D view, are not available. */
-const T3D_DEFAULT = { dem: "alti", shade: true, method: "combined", hsExag: 0.4, shadow: "#000000",
+const T3D_DEFAULT = { dem: "alti3d", shade: true, method: "combined", hsExag: 0.4, shadow: "#000000",
                       highlight: "#ffffff", accent: "#000000", exag: 1 };
 /* the shading lies over the satellite image, so its colours are partly transparent */
 const rgba = (hex, a) => "rgba(" + [1, 3, 5].map(i => parseInt(hex.substr(i, 2), 16)).join(",") + "," + a + ")";
@@ -1738,17 +1837,17 @@ function apply3D() {
 }
 function addDem(kind) {
   // an empty terrain tile would read as -32768 m, so tiles without data are flat at 0 m
-  const def = DEMS[kind] || DEMS.alti, id = "dem_" + kind;
+  const def = DEMS[kind] || DEMS[T3D_DEFAULT.dem], id = "dem_" + kind;
   if (!RASTERS.has(id)) {
-    RASTERS.set(id, { id, size: 256, bounds: ALTI_BOX, pending: 0, v: 0, dem: true, empty: N => terrarium(null, N), draw: def.draw });
+    RASTERS.set(id, { id, size: def.size || 256, bounds: ALTI_BOX, pending: 0, v: 0, dem: true, empty: N => terrarium(null, N), draw: def.draw });
     map.addSource(id, { type: "raster-dem", tiles: ["swisseo://" + id + "/{z}/{x}/{y}"], tileSize: 256, encoding: "terrarium",
-                        maxzoom: 8, attribution: def.attribution });
+                        maxzoom: def.maxzoom || 8, attribution: def.attribution });
   }
   demLayer = RASTERS.get(id);
 }
 const setTerrain = () => map.setTerrain({ source: demLayer.id, exaggeration: t3d.exag });
 function setDem(kind) {
-  t3d.dem = kind in DEMS ? kind : "alti";
+  t3d.dem = kind in DEMS ? kind : T3D_DEFAULT.dem;
   if (!terrainOn) return;
   addDem(t3d.dem);
   setTerrain();
@@ -1758,9 +1857,12 @@ function setDem(kind) {
 /* 2D / 3D. In 3D the map can be tilted and turned (right-drag or Ctrl+drag, two fingers, the 3D navigation above the
    zoom buttons);
    the split comparison needs the flat map, so 3D compares with opacity. cam: { pitch, bearing } of a link. */
-function setTerrain3D(on, cam) {
+function setTerrain3D(on, cam, base) {
   if (on === terrainOn) return;
   terrainOn = on;
+  // the basemap of the mode (#18): 3D starts with the swissTLM map (or the link's basemap), 2D gets its own back
+  if (on) { base2d = basemap; setBasemap(base || baseDefault()); }
+  else setBasemap(BASE_3D.has(basemap) ? base2d || baseDefault() : basemap);
   if (on) {
     sunMode = "scene";                    // the sun of the scene shown (issue #10)
     addDem(t3d.dem);
@@ -1821,7 +1923,9 @@ function t3dForm() {
 }
 const demOptions = () => {
   const v = $("#t3dDem").value;
-  $("#t3dDem").innerHTML = Object.entries(DEMS).map(([k, d]) => '<option value="' + k + '">' + (k === "dsm" ? t("terrain3d.dem.dsm", "swissSURFACE3D 10 m: surface with buildings and trees") : t("terrain3d.dem.alti", "swissALTIRegio: terrain (10 m)")) + "</option>").join("");
+  $("#t3dDem").innerHTML = Object.entries(DEMS).map(([k, d]) => '<option value="' + k + '">' + (k === "dsm" ? t("terrain3d.dem.dsm", "swissSURFACE3D 10 m: surface with buildings and trees")
+    : k === "alti3d" ? t("terrain3d.dem.alti3d", "swissALTI3D: terrain (0.5 m near, swissALTIRegio far and beyond Switzerland)")
+    : t("terrain3d.dem.alti", "swissALTIRegio: terrain (10 m)")) + "</option>").join("");
   if (v) $("#t3dDem").value = v;
 };
 demOptions();
@@ -2122,7 +2226,8 @@ function trimTileCache() {
 function pyramid(url) {
   if (!pyrCache.has(url)) {
     pyrCache.set(url, (async () => {
-      const tiff = await GeoTIFF.fromUrl(url, { cache: true, blockSize: url.includes("swisseo_vhi") ? 65536 : 131072, cacheSize: 300 });
+      const tiff = await GeoTIFF.fromUrl(url, { cache: true, blockSize: /swisseo_vhi|swissalti3d/.test(url) ? 65536 : 131072,
+                                                cacheSize: url.includes("swissalti3d") ? 60 : 300 });
       const n = await tiff.getImageCount();
       const full = await tiff.getImage(0);
       const o = full.getOrigin(), r = full.getResolution();
@@ -2631,7 +2736,7 @@ const LAYERS = [
       "number of days with VHI < 10 (days without a VHI value do not count)" },
 
   { id:"fdc", group:"Indices", name:"Forest Disturbance Classification", type:"fnclass", source:"s2",
-    bands:["b02","b05","b06","b8a","b11","b12"], def:{ cloud:true, shadow:true, veg:"forest" }, palette:FDC_PALETTE,
+    bands:["b02","b05","b06","b8a","b11","b12"], palette:FDC_PALETTE,
     icon:"tree", sw:"linear-gradient(135deg,#ab6820,#b8b6b4,#7a2e01,#4c77ed)", fg:"#ffffff",
     sub:"Bark beetle, clear cut, wildfire, windthrow (Sentinel Hub custom script)",
     desc:"LightGBM classification of forest disturbances; healthy forest is not drawn.",
@@ -2647,7 +2752,7 @@ const LAYERS = [
     fn:nddi },
 
   { id:"nddichg", group:"Indices", name:"NDDI change vs. previous year", type:"diff2", source:"s2", bands:["b08","b04","b03","b11"], ndwiOpt:true,
-    ramp:R_NDDICHG, min:-1, max:1, lim:[-2, 2], def:{ cloud:true, shadow:true }, icon:"flame", unit:"ΔNDDI",
+    ramp:R_NDDICHG, min:-1, max:1, lim:[-2, 2], icon:"flame", unit:"ΔNDDI",
     sw:"linear-gradient(135deg,#2166ac,#f7f7f7,#b2182b)", fg:"#1a0a0a",
     sub:"NDDI of the date minus NDDI one year earlier",
     desc:"Change of the drought index between the selected date and the same time one year earlier.",
@@ -2656,13 +2761,14 @@ const LAYERS = [
 
   { id:"analyst", group:"Indices", name:"NDVI difference to a reference date", type:"diff2", source:"s2", bands:["b08","b04"], fn:nd,
     ramp:R_NDVIDIFF, min:-0.3, max:0.3, lim:[-1, 1], modal:true, unit:"ΔNDVI",
-    def:{ cloud:true, shadow:true, veg:"forest", thr:-0.08, mode:"diff" }, icon:"tree",
+    def:{ thr:-0.08, mode:"diff" }, icon:"tree",
     sw:"linear-gradient(135deg,#b71c1c,#f5f5f5,#004d40)", fg:"#1a1206",
     sub:"NDVI change between two dates in forest, with change detection",
     desc:"NDVI difference between the selected date and a reference date, masked to forest.",
     formula:"NDVI = (ρ(B08) − ρ(B04)) / (ρ(B08) + ρ(B04)), ρ < 0 → 0\nΔNDVI = NDVI(date) − NDVI(reference)\nchange = ΔNDVI < threshold (−0.08), then 3 × 3 majority filter (edge-effect removal)" }
 ];
-const LAYER = Object.fromEntries(LAYERS.map(r => [r.id, r]));
+// without a prototype: ids of external layers come from links and services (no "__proto__" pitfalls)
+const LAYER = Object.assign(Object.create(null), Object.fromEntries(LAYERS.map(r => [r.id, r])));
 /* Titles, descriptions and preview thumbnails as in the Copernicus Browser (in the upstream repository:
    src/assets/layers_metadata.js, src/assets/cache/configuration.json, public/previews). Layers without a Copernicus equivalent link to the
    swisstopo product page instead. */
@@ -2784,8 +2890,27 @@ const CONFIGS = {
     ["Layers", ["true", "ndvi", "evi", "ndmi", "vhi", "vhiveg", "ndvidiff", "ndvidiff2", "ndviz", "nddi", "nddichg", "analyst"]]] },
   DROUGHT2026: { name: "Drought 2026", beta: false, highlights: HIGHLIGHTS.drought2026, groups: [
     ["Layers", ["true", "ndmi", "ndwi", "mstress", "ndvi", "swir", "urban", "hon"]]] },
-  FOREST: { name: "Forest", beta: false, groups: [
+  FOREST: { name: "Forest", beta: false, veg: "forest", groups: [
     ["Layers", ["true", "ndvi", "evi", "vhi", "vhidef", "vhiext", "ndvidiff", "ndvidiff2", "ndviz", "analyst", "nbr", "ndmi", "fdc"]]] },
+};
+const MASK_DEFAULTS = {
+  "agri": { cloud: true, shadow: true, terrain: true },
+  "geo": { cloud: true, shadow: true, terrain: true },
+  "ndvi": { cloud: true, shadow: true, terrain: true, veg: "vegetation" },
+  "ndwi": { cloud: true, shadow: true, terrain: true },
+  "ndmi": { cloud: true, shadow: true, terrain: true, veg: "vegetation" },
+  "ndsi": { cloud: true, shadow: true, terrain: true },
+  "nbr": { cloud: true, shadow: true, terrain: true, veg: "vegetation" },
+  "terrain": { cloud: true, shadow: true },
+  "evi": { cloud: true, shadow: true, terrain: true, veg: "vegetation" },
+  "savi": { cloud: true, shadow: true, terrain: true, veg: "vegetation" },
+  "barren": { cloud: true, shadow: true, terrain: true },
+  "mstress": { cloud: true, shadow: true, terrain: true, veg: "vegetation" },
+  "hon": { cloud: true, shadow: true, terrain: true },
+  "fdc": { cloud: true, shadow: true, terrain: true, veg: "forest" },
+  "nddi": { cloud: true, shadow: true, terrain: true, veg: "vegetation" },
+  "nddichg": { cloud: true, shadow: true, terrain: true, veg: "vegetation" },
+  "analyst": { cloud: true, shadow: true, terrain: true, veg: "forest" },
 };
 /* catalog:configs:end */
 const cfgLayers = id => CONFIGS[id].groups.flatMap(g => g[1]);
@@ -3274,12 +3399,22 @@ function optLin(a) {
 }
 const sRGB = c => c <= 0.0031308 ? 12.92 * c : 1.055 * Math.pow(c, 1 / 2.4) - 0.055;
 
-function defaults(rec) {
-  return Object.assign({ gain: 1, gamma: 1, r: [0, 1], g: [0, 1], b: [0, 1], min: rec.min, max: rec.max, thr: rec.threshold,
-           opacity: 100, cloud: false, shadow: false, terrain: false, veg: "off", autoGain: false, look: "standard",
-           refDate: "", mode: "diff", ndwi: "swir", cmask: "off" }, rec.def || {});
+/* The masks a layer starts with come from the catalogue (MASK_DEFAULTS, catalog/layers.yaml). A configuration
+   with its own vegetation mask (CONFIGS[..].veg, e.g. the forest in Forest) replaces the layer's, unless the
+   layer has none. Links carry only what differs from these defaults, read with the configuration of the link. */
+const maskDefaults = rec => Object.hasOwn(MASK_DEFAULTS, rec.id) ? MASK_DEFAULTS[rec.id] : {};
+function vegDefault(rec, cfg) {
+  const own = maskDefaults(rec).veg || "off", c = Object.hasOwn(CONFIGS, cfg) ? CONFIGS[cfg] : null;
+  const v = own !== "off" && c && c.veg ? c.veg : own;
+  return vegOn(v) ? vegStr(vegParse(v)) : "off";
 }
-const settings = {};
+function defaults(rec, cfg = configId) {
+  const m = maskDefaults(rec);
+  return Object.assign({ gain: 1, gamma: 1, r: [0, 1], g: [0, 1], b: [0, 1], min: rec.min, max: rec.max, thr: rec.threshold,
+           opacity: 100, cloud: !!m.cloud, shadow: !!m.shadow, terrain: !!m.terrain, veg: vegDefault(rec, cfg),
+           autoGain: false, look: "standard", refDate: "", mode: "diff", ndwi: "swir", cmask: "off" }, rec.def || {});
+}
+const settings = Object.create(null);
 const S = rec => settings[rec.id] || (settings[rec.id] = defaults(rec));
 
 const RNG_KEYS = [["r", "redRange"], ["g", "greenRange"], ["b", "blueRange"]];
@@ -4563,7 +4698,8 @@ function vegSelect(value, on) {
     if (p.kind === "tlm") ex.append(...classes(TLM_KEYS, TLM_KEYS.map(k => voc("tlm", k, TLM_CLASSES[k])), p.classes, TLM_KEYS.map(k => TLM_RGB[k]),
                                                c => ({ kind: "tlm", classes: c })));
     else if (p.kind === "lnf") {
-      ex.append(...classes(LNF.map(q => q.k), LNF.map(q => voc("lnf", q.k, q.name)), p.groups, LNF_RGBS, c => ({ kind: "lnf", groups: c })));
+      // check boxes only, no colour squares: the mask keeps the chosen categories, it does not draw them in these colours (#19)
+      ex.append(...classes(LNF.map(q => q.k), LNF.map(q => voc("lnf", q.k, q.name)), p.groups, null, c => ({ kind: "lnf", groups: c })));
       ex.append(el("small", null, t("mask.lnfRead", "Read from the federal geoportal with 4 × 4 samples per cell (2.5 m for a 10 m cell).")),
                 source(META_LNF, t("mask.lnfSource", "Nutzungsflächen, BLW (data of the cantons)")));
     } else if (p.kind === "lfi" || p.kind === "eth") {
@@ -4596,7 +4732,7 @@ function vegSelect(value, on) {
       const quick = (t, keys) => { const a = el("button", "lnk", t); a.type = "button"; a.onclick = () => { set({ kind: "ethsp", classes: keys }); extras(); }; return a; };
       const q = el("div", "vrange");
       q.append(quick(t("mask.allConifers", "All conifers"), ETH_CONIF), quick(t("mask.allBroadleaves", "All broadleaves"), ETH_BROAD), quick(t("mask.all", "All"), ETH_KEYS));
-      ex.append(q, ...classes(ETH_KEYS, ETH_CLASSES.map(c => voc("eth", c[0], c[1])), p.classes, ETH_CLASSES.map(c => c[2]), c => ({ kind: "ethsp", classes: c })),
+      ex.append(q, ...classes(ETH_KEYS, ETH_CLASSES.map(c => voc("eth", c[0], c[1])), p.classes, null, c => ({ kind: "ethsp", classes: c })),   // no colours (#19)
                 el("small", null, t("mask.ethSpHelp", "The class with the largest predicted basal-area share per 30 m pixel; forest pixels of the ETH map only.")),
                 source(META_ETH, t("mask.ethSource", "ETH tree species, Zhou et al. 2026"), "arXiv:2611.08095, CC BY-NC 4.0"));
     }
@@ -5054,13 +5190,19 @@ const cfgBadge = () => { $("#cfgBeta").hidden = !CONFIGS[configId] || !CONFIGS[c
 const configOf = id => cfgLayers(configId).includes(id) ? configId : Object.keys(CONFIGS).find(k => cfgLayers(k).includes(id)) || "DEFAULT";
 function setConfig(id) {
   if (!CONFIGS[id]) return;
+  // a vegetation mask nobody changed follows the configuration (e.g. All vegetation → Forest); a chosen one stays
+  let vegChanged = false;
+  Object.keys(settings).forEach(k => {
+    const s = settings[k], rec = LAYER[k], was = rec && vegDefault(rec, configId), now = rec && vegDefault(rec, id);
+    if (rec && was !== now && s.veg === was) { s.veg = now; if (rec === currentRec) vegChanged = true; }
+  });
   configId = id;
   $("#cfgSel").value = id;
   cfgBadge();
   showView("layers");
   const ids = cfgLayers(id);
   const rec = ids.includes(currentRec.id) ? currentRec : LAYER[lastLayer[id]] || LAYER[ids[0]];
-  if (rec === currentRec) { renderLayerList(); writeUrlSoon(); }
+  if (rec === currentRec) { renderLayerList(); writeUrlSoon(); if (vegChanged) applyLayer(); }
   else selectLayer(rec);
 }
 $("#cfgSel").onchange = e => setConfig(e.target.value);
@@ -7552,7 +7694,7 @@ function writeUrl() {
   p.set("zoom", +mapZoom().toFixed(3));                                   // zoom of the swisstopo grid levels
   if (terrainOn) {
     p.set("3d", "true"); p.set("pitch", +map.getPitch().toFixed(1)); p.set("bearing", +map.getBearing().toFixed(1));
-    if (t3d.dem !== "alti") p.set("terrain", t3d.dem);
+    if (t3d.dem !== T3D_DEFAULT.dem) p.set("terrain", t3d.dem);
     if (t3d.exag !== 1) p.set("exaggeration", t3d.exag);
   }
   p.set("center", c.x.toFixed(2) + "," + c.y.toFixed(2));               // LV95 E,N as on map.geo.admin.ch
@@ -7566,8 +7708,8 @@ function writeUrl() {
   else if (expanded.has(currentRec.id)) p.set("layerMenu", "open");
   Object.entries(settingsToObj(currentRec, S(currentRec)))
     .forEach(([k, v]) => p.set(k, Array.isArray(v) ? JSON.stringify(v) : String(v)));
-  if (basemap !== "pixelkarte") p.set("basemap", basemap);
-  if (labelsOn()) p.set("labels", "true");
+  if (basemap !== baseDefault()) p.set("basemap", basemap);
+  if (labelsOn() !== labelsDefault()) p.set("labels", String(labelsOn()));
   if (compare.length) {
     p.set("compareLayers", b64e(compare.map(it => {
       const rec = LAYER[it.layerId], x = rec.ext;
@@ -7620,8 +7762,10 @@ function readUrl() {
   if (q.get("layerMenu") === "open") expanded.add(currentRec.id);      // the layer menu is closed unless the link opens it
   layerOff = q.get("showLayer") === "false";
 
-  setBasemap(q.get("basemap") || "pixelkarte");
-  setLabels(q.get("labels") === "true" || q.get("labels") === "1");
+  // the basemap: in 3D set below with the terrain (its default is the swissTLM map), the labels after it
+  const wantBase = q.get("basemap") || "", want3d = q.get("3d") === "true";
+  if (!want3d) setBasemap(wantBase || "pixelkarte");
+  const wantLabels = q.has("labels") ? q.get("labels") === "true" || q.get("labels") === "1" : null;
 
   if (q.has("compareLayers")) {
     try {
@@ -7664,8 +7808,9 @@ function readUrl() {
     const pt = parseFloat(q.get("pitch")), br = parseFloat(q.get("bearing")), ex = parseFloat(q.get("exaggeration"));
     if (q.get("terrain") in DEMS) t3d.dem = q.get("terrain");
     if (ex >= 0.5 && ex <= 3) t3d.exag = ex;
-    setTerrain3D(true, { pitch: isFinite(pt) ? clamp(pt, 0, 75) : 60, bearing: isFinite(br) ? br : 0 });
+    setTerrain3D(true, { pitch: isFinite(pt) ? clamp(pt, 0, 75) : 60, bearing: isFinite(br) ? br : 0 }, wantBase || null);
   }
+  setLabels(wantLabels === null ? labelsDefault() : wantLabels);
   return { hasView, hasDate: DATE_RE.test(ft), compareMode: cm !== "off" && compare.length >= 2 };
 }
 
@@ -7745,6 +7890,26 @@ function viewSummary() {
   return currentRec.name + " (" + currentRec.id + "), " + day + (layerOff ? ", layer hidden" : "") +
     (VERIFIED.has(currentRec.id) ? "" : ", BETA");
 }
+/* The version under the terms of the Info tab. The deploys write APP_VERSION (README, Releases): production its
+   release (v1.1.0, or v1.1.0+abc1234 for a merge without a release of its own), integration "int" and the commit;
+   a copy that was not deployed (localhost, a file) says so. */
+const REPO_URL = "https://github.com/swisstopo/topo-swisseobrowser";
+function showVersion() {
+  const e = $("#appVersion"), v = APP_VERSION;
+  if (!e) return;
+  e.textContent = t("info.version", "Version") + ": ";
+  const link = (href, text) => { const a = el("a", null, text); a.href = href; a.target = "_blank"; a.rel = "noopener"; return a; };
+  if (!v || !v.v) { e.append(t("info.versionLocal", "local copy, not deployed")); return; }
+  const sha = String(v.sha || "").slice(0, 7), commit = link(REPO_URL + "/commit/" + v.sha, sha);
+  if (v.v === "int") e.append(t("info.versionInt", "integration, commit") + " ", commit);
+  else if (v.v === "local") e.append(t("info.versionLocalBuild", "local build, commit") + " ", commit);
+  else if (/^v\d+\.\d+\.\d+$/.test(v.v)) e.append(link(REPO_URL + "/releases/tag/" + v.v, v.v));
+  else e.append(v.v.split("+")[0] + ", " + t("info.versionCommit", "commit") + " ", commit);
+  if (v.date) e.append(" (" + fmtDay(v.date) + ")");
+}
+showVersion();
+I18N.onChange(showVersion);
+
 /* Feedback: an e-mail in the mail app of the computer (no web-mail links, issue #13). The text stays English, like
    the issue texts: swisstopo reads it. */
 const FEEDBACK_SUBJ = "Feedback swissEO Browser";
@@ -9217,7 +9382,7 @@ $("#langSel").replaceChildren(...I18N.offered().map(l => {
 }));
 $("#langSel").value = I18N.lang();
 $("#langSel").onchange = e => I18N.setLanguage(e.target.value, true);
-const helpLink = () => { $("#btnHelp").href = "docs/index.html" + (I18N.lang() !== "en" ? "?lang=" + I18N.lang() : ""); };
+const helpLink = () => { $("#btnHelp").href = "docs/index.html" + (I18N.lang() !== "en" ? "?lang=" + encodeURIComponent(I18N.lang()) : ""); };
 helpLink();
 I18N.onChange(() => {
   $("#langSel").value = I18N.lang();
