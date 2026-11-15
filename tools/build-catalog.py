@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Writes the catalogue of catalog/ into the page and into the checklist of README.md.
 
-  catalog/layers.yaml          which layers exist and whether they are verified
-  catalog/configurations.yaml  what the pull-down offers, in which order, in which groups
+  catalog/layers.yaml          which layers exist, whether they are verified, and their default masks
+  catalog/configurations.yaml  what the pull-down offers, in which order, in which groups, and a
+                               configuration's own vegetation mask
 
 The layer definitions themselves (bands, formulas, colour ramps, JavaScript) stay in
 swisseo-browser.html; this script only decides what is offered where.
@@ -13,7 +14,7 @@ swisseo-browser.html; this script only decides what is offered where.
 
 What it writes:
   * the block between /* catalog:configs:start */ and /* catalog:configs:end */ in every page
-    given with --page,
+    given with --page: CONFIGS (the pull-down) and MASK_DEFAULTS (the masks a layer starts with),
   * the line "const VERIFIED_IDS = null; // replaced on deploy" in the same pages, which decides
     the BETA labels (it keeps the exact shape the production smoke test greps for),
   * with --write-readme, the checklist between <!-- verification:start --> and <!-- verification:end -->,
@@ -47,6 +48,10 @@ CFG_END = "/* catalog:configs:end */"
 VER_MARKER = "const VERIFIED_IDS = null; // replaced on deploy"
 VER_WRITTEN = 'const VERIFIED_IDS = {ids}; // from catalog/layers.yaml'
 RM_START = "<!-- verification:start -->"
+MASK_KEYS = ("cloud", "shadow", "terrain")
+# the values of the vegetationMask URL parameter (README, Vegetation masks); the page normalizes the details
+VEG_RE = re.compile(r"off|forest|vegetation|tlm(:[0-9.]+)?|(lfi|eth)-(conif|mixed|broad)(:[0-9.]+)*(:m3)?(\+(forest|tlm|none))?"
+                    r"|eth-sp(:[0-9.]+)?|lnf(:[a-z.]+)?")
 RM_END = "<!-- verification:end -->"
 
 errors = []
@@ -105,6 +110,7 @@ def load():
                 if lid not in listed:
                     fail("the configuration '{}' uses the layer '{}', which is not in "
                          "catalog/layers.yaml".format(c["key"], lid), "catalog/configurations.yaml")
+    check_masks(layers, configs, page)
     used = {lid for c in configs for g in c.get("groups", []) for lid in g.get("layers", [])}
     for lid in sorted(set(listed) - used):
         print("::warning file=catalog/configurations.yaml::the layer '{}' is in no configuration, "
@@ -113,6 +119,69 @@ def load():
     if errors:
         sys.exit(1)
     return layers, configs, page
+
+
+def check_masks(layers, configs, page):
+    """masks: { cloud, shadow, terrain: true/false, vegetation: a vegetationMask value }, only where the page
+    can apply them: cloud, shadow and terrain on the Sentinel-2 layers of a maskable type, the vegetation
+    mask on every Sentinel-2 layer."""
+    kind = {m.group(1): (m.group(2), m.group(3)) for m in
+            re.finditer(r'^\s*\{ id:"([a-z0-9_]+)"[^\n]*?type:"(\w+)"[^\n]*?source:"(\w+)"', page, re.M)}
+    m = re.search(r"^const MASKABLE = \{([^}]*)\}", page, re.M)
+    maskable = set(re.findall(r"(\w+):", m.group(1))) if m else set()
+    if not m:
+        fail("const MASKABLE is missing from " + PAGE, PAGE)
+    where = "catalog/layers.yaml"
+    for rec in layers:
+        masks = rec.get("masks")
+        if masks is None:
+            continue
+        lid = rec["id"]
+        typ, src = kind.get(lid, (None, None))
+        if not isinstance(masks, dict):
+            fail("{}: masks of '{}' must be a mapping, e.g. {{ cloud: true }}".format(where, lid), where)
+            continue
+        for k, v in masks.items():
+            if k in MASK_KEYS:
+                if not isinstance(v, bool):
+                    fail("{}: masks.{} of '{}' must be true or false".format(where, k, lid), where)
+                elif v and not (src == "s2" and typ in maskable):
+                    fail("{}: '{}' cannot have the {} mask: it is not a Sentinel-2 layer of a maskable "
+                         "type".format(where, lid, k), where)
+            elif k == "vegetation":
+                if not (isinstance(v, str) and VEG_RE.fullmatch(v)):
+                    fail("{}: masks.vegetation of '{}' is {!r}: use off, forest, vegetation or another value "
+                         "of the vegetationMask URL parameter".format(where, lid, v), where)
+                elif v != "off" and src != "s2":
+                    fail("{}: '{}' cannot have a vegetation mask: it is not a Sentinel-2 layer".format(where, lid),
+                         where)
+            else:
+                fail("{}: unknown key masks.{} of '{}' (cloud, shadow, terrain, vegetation)".format(where, k, lid),
+                     where)
+    for c in configs:
+        masks = c.get("masks")
+        if masks is None:
+            continue
+        cw = "catalog/configurations.yaml"
+        if not isinstance(masks, dict) or set(masks) - {"vegetation"}:
+            fail("{}: masks of the configuration '{}' may only set vegetation".format(cw, c["key"]), cw)
+        elif not (isinstance(masks.get("vegetation"), str) and VEG_RE.fullmatch(masks["vegetation"])):
+            fail("{}: masks.vegetation of the configuration '{}' is {!r}".format(cw, c["key"], masks.get("vegetation")),
+                 cw)
+
+
+def mask_defaults(layers):
+    """MASK_DEFAULTS of the page: the layers that start with a mask, in the page's setting names."""
+    out = []
+    for rec in layers:
+        masks = rec.get("masks") or {}
+        d = {k: True for k in MASK_KEYS if masks.get(k)}
+        if masks.get("vegetation", "off") != "off":
+            d["veg"] = masks["vegetation"]
+        if d:
+            out.append("  {}: {{ {} }},".format(json.dumps(rec["id"]),
+                                                ", ".join("{}: {}".format(k, json.dumps(v)) for k, v in d.items())))
+    return out
 
 
 def published(layers, configs, env):
@@ -144,7 +213,7 @@ def published(layers, configs, env):
     return out, verified
 
 
-def configs_block(configs):
+def configs_block(configs, layers):
     """The generated JavaScript between the two markers."""
     lines = [CFG_START, "const CONFIGS = {"]
     for c in configs:
@@ -152,6 +221,8 @@ def configs_block(configs):
                                                     "true" if c.get("beta") else "false")
         if c.get("highlights"):
             head += ", highlights: HIGHLIGHTS." + c["highlights"]
+        if (c.get("masks") or {}).get("vegetation"):
+            head += ", veg: " + json.dumps(c["masks"]["vegetation"])
         lines.append(head + ", groups: [")
         groups = c.get("groups", [])
         for i, g in enumerate(groups):
@@ -159,6 +230,11 @@ def configs_block(configs):
             # close the ids array, the [title, ids] pair and, on the last group, the groups array
             end = "]]] }," if i == len(groups) - 1 else "]],"
             lines.append("    [{}, [{}{}".format(json.dumps(g.get("title", "")), ids, end))
+    lines.append("};")
+    # the masks a layer starts with (cloud, shadow, terrain, veg); a configuration's veg replaces a layer's
+    # vegetation mask unless that is off
+    lines.append("const MASK_DEFAULTS = {")
+    lines.extend(mask_defaults(layers))
     lines.append("};")
     lines.append(CFG_END)
     return "\n".join(lines)
@@ -203,12 +279,12 @@ def main():
 
     layers, configs, page = load()
     offered, verified = published(layers, configs, args.env)
-    block = configs_block(offered)
+    block = configs_block(offered, layers)
     ids = sorted(verified)
 
     if args.check:
         # the repository files must be what this script would write for integration
-        want = configs_block(published(layers, configs, "int")[0])
+        want = configs_block(published(layers, configs, "int")[0], layers)
         a, b = page.find(CFG_START), page.find(CFG_END)
         if a < 0 or b < 0:
             fail("the catalogue markers are missing from " + PAGE, PAGE)
@@ -245,20 +321,20 @@ def main():
             fail("the VERIFIED_IDS marker is missing from " + f, f)
             sys.exit(1)
         s = s.replace(VER_MARKER, VER_WRITTEN.format(ids=json.dumps(ids)))
-        with open(f, "w", encoding="utf8") as fh:
+        with open(f, "w", encoding="utf8", newline="\n") as fh:
             fh.write(s)
 
     if args.write_readme:
         with open(README, encoding="utf8") as fh:
             readme = fh.read()
         readme = replace_block(readme, RM_START, RM_END, readme_block(layers, configs), README)
-        with open(README, "w", encoding="utf8") as fh:
+        with open(README, "w", encoding="utf8", newline="\n") as fh:
             fh.write(readme)
         # and the page in the repository, so what is committed matches the catalogue
         with open(PAGE, encoding="utf8") as fh:
             s = fh.read()
-        s = replace_block(s, CFG_START, CFG_END, configs_block(published(layers, configs, "int")[0]), PAGE)
-        with open(PAGE, "w", encoding="utf8") as fh:
+        s = replace_block(s, CFG_START, CFG_END, configs_block(published(layers, configs, "int")[0], layers), PAGE)
+        with open(PAGE, "w", encoding="utf8", newline="\n") as fh:
             fh.write(s)
 
     if args.previews:
@@ -268,7 +344,7 @@ def main():
             m = re.search(r'^\s*{}:\s*\{{[^\n]*thumb:\s*"([^"]+)"'.format(re.escape(lid)), page, re.M)
             if m:
                 thumbs.append(m.group(1))
-        with open(args.previews, "w", encoding="utf8") as fh:
+        with open(args.previews, "w", encoding="utf8", newline="\n") as fh:
             fh.write("\n".join(sorted(set(thumbs))) + "\n")
         print("previews: {} thumbnails for {} offered layers".format(len(set(thumbs)), len(offered_ids)))
 

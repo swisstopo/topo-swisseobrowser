@@ -86,6 +86,18 @@ jobs:
           done
           echo "noindex set on the integration version"
 
+      # The version in the Info tab (README, Releases): on integration the commit and its date.
+      - name: The version this deploy shows
+        run: |
+          json=$(printf '{"v":"int","sha":"%s","date":"%s"}' "$GITHUB_SHA" "$(git log -1 --format=%cs "$GITHUB_SHA")")
+          marker='const APP_VERSION = null; // replaced on deploy'
+          for f in _site/index.html _site/swisseo-browser.html; do
+            grep -qF "$marker" "$f" || { echo "::error::the APP_VERSION marker is missing in $f"; exit 1; }
+            sed -i "s|^$marker\$|const APP_VERSION = $json; // written by the deploy|" "$f"
+            grep -qxF "const APP_VERSION = $json; // written by the deploy" "$f" ||
+              { echo "::error::APP_VERSION was not written in $f"; exit 1; }
+          done
+
       - name: Check the site serves its libraries itself
         run: bash tools/check-dist.sh _site int
 

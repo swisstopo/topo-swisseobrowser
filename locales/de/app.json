@@ -269,7 +269,7 @@
       "shadowColour": "Schattenfarbe",
       "standard": "Standard",
       "sunShadingOfThe": "Sonnenschattierung des Geländes (Glühbirnen-Schaltfläche)",
-      "theShadingLightsThe": "Die Schattierung beleuchtet das Höhenmodell aus Richtung und Höhe der Sonne in der Kartenmitte (siehe <i>Sonnenzeit</i>). Himmel, von Bergen geworfene Schatten, Blendenflecke und Anaglyphen-Stereo sind in dieser Kartenbibliothek nicht verfügbar.<br>Quellen: <a href=\"https://www.geocat.ch/datahub/dataset/f7f058e9-288b-4c55-8f4e-6360880dbb59\" target=\"_blank\" rel=\"noopener\">swissALTIRegio</a> (Metadaten auf geocat.ch), <a href=\"https://www.swisstopo.admin.ch/de/hoehenmodell-swisssurface3d\" target=\"_blank\" rel=\"noopener\">swissSURFACE3D</a> (von swissEO auf 10 m umgerechnet).",
+      "theShadingLightsThe": "Die Schattierung beleuchtet das Höhenmodell aus Richtung und Höhe der Sonne in der Kartenmitte (siehe <i>Sonnenzeit</i>). Himmel, von Bergen geworfene Schatten, Blendenflecke und Anaglyphen-Stereo sind in dieser Kartenbibliothek nicht verfügbar.<br>Quellen: <a href=\"https://www.swisstopo.admin.ch/de/hoehenmodell-swissalti3d\" target=\"_blank\" rel=\"noopener\">swissALTI3D</a> (0,5 m, in der Nähe; weiter weg und ausserhalb der Schweiz swissALTIRegio), <a href=\"https://www.geocat.ch/datahub/dataset/f7f058e9-288b-4c55-8f4e-6360880dbb59\" target=\"_blank\" rel=\"noopener\">swissALTIRegio</a> (Metadaten auf geocat.ch), <a href=\"https://www.swisstopo.admin.ch/de/hoehenmodell-swisssurface3d\" target=\"_blank\" rel=\"noopener\">swissSURFACE3D</a> (von swissEO auf 10 m umgerechnet).",
       "verticalTerrainScaling": "Vertikale Überhöhung des Geländes"
     },
     "timelapse": {
@@ -415,13 +415,9 @@
       "text": "Im Berner Oberland ist die Trockenheit viel weniger sichtbar als im Mittelland, auch weil die starke Gletscherschmelze Bäche und Flüsse hoch hält und lokale Gewitter Feuchtigkeit brachten. An Südhängen zeigen sich dennoch trockenere Wiesen und lichtere Wälder. (Quelle: watson.ch, 10. August 2026)",
       "title": "Interlaken BE"
     },
-    "konstanz-and-untersee": {
-      "text": "Der Wasserstand des Untersees ist der tiefste der Referenzperiode 1991–2020. Breite, helle Uferstreifen liegen frei, wo normalerweise Wasser steht; Bootsstege lagen schon im April auf dem Trockenen. 8. August 2025 im Vergleich mit demselben Tag 2026. (Quelle: watson.ch, 10. August 2026)",
-      "title": "Konstanz und Untersee"
-    },
     "lake-constance-untersee": {
       "text": "Die anhaltende Trockenheit hat den Untersee auf einen historischen Tiefstand gebracht. Rund um die Insel Werd liegen breite Kiesbänke trocken. Mit 25 Zentimetern unter dem bisherigen Rekord ist der Wasserstand im August so tief wie seit mindestens 1930 nicht mehr. 8. August 2025 im Vergleich mit demselben Tag 2026. (Quelle: Blick, 12. August 2026)",
-      "title": "Bodensee – Untersee"
+      "title": "Bodensee: Untersee"
     },
     "lake-lucerne": {
       "text": "Weniger braun als andere Regionen: Lokale Gewitter brachten etwas Entlastung, und die bewaldeten Hänge von Rigi und Pilatus bleiben stellenweise grün. Viele Wiesen und Felder sind dennoch ausgetrocknet. (Quelle: watson.ch, 10. August 2026)",
@@ -499,10 +495,15 @@
     "openAGithubIssue": "Ein GitHub-Issue mit dem Link auf Ihre aktuelle Ansicht eröffnen",
     "reportAnIssueImprovement": "Problem oder Verbesserung melden",
     "selectedDate": "Gewähltes Datum",
-    "swisstopoOpenGovernmentData": "© swisstopo, <a href=\"https://www.swisstopo.admin.ch/ogd-conditions\" target=\"_blank\">Open Government Data</a>. Die swissEO-Produkte enthalten modifizierte Copernicus-Sentinel-Daten. 3D-Gelände: <a href=\"https://www.geocat.ch/datahub/dataset/f7f058e9-288b-4c55-8f4e-6360880dbb59\" target=\"_blank\" rel=\"noopener\">swissALTIRegio</a>, swissSURFACE3D © swisstopo. Beschriftungen © swisstopo. <a href=\"https://doi.org/10.16904/1000001.7\" target=\"_blank\" rel=\"noopener\">Waldmischungsgrad LFI</a> © WSL (Waser et al. 2025, finanziert vom BAFU). <a href=\"https://arxiv.org/abs/2611.08095\" target=\"_blank\" rel=\"noopener\">ETH-Baumarten</a> © Zhou et al. 2026 (ETH Zürich), lizenziert unter CC BY-NC 4.0: nur für nicht kommerzielle Nutzung. <a href=\"https://www.geocat.ch/datahub/dataset/ae183bc4-5c91-467e-89bc-85f390340efb\" target=\"_blank\" rel=\"noopener\">Nutzungsflächen</a> © BLW und die Kantone. Ebenen anderer WMS- / WMTS-Dienste: © die jeweiligen Anbieter. Nicht für den operationellen Einsatz. Quellcode, Dokumentation und Issues: <a href=\"https://github.com/swisstopo/topo-swisseobrowser\" target=\"_blank\" rel=\"noopener\">github.com/swisstopo/topo-swisseobrowser</a>.",
+    "swisstopoOpenGovernmentData": "© swisstopo, <a href=\"https://www.swisstopo.admin.ch/ogd-conditions\" target=\"_blank\">Open Government Data</a>. Die swissEO-Produkte enthalten modifizierte Copernicus-Sentinel-Daten. 3D-Gelände: <a href=\"https://www.swisstopo.admin.ch/de/hoehenmodell-swissalti3d\" target=\"_blank\" rel=\"noopener\">swissALTI3D</a>, <a href=\"https://www.geocat.ch/datahub/dataset/f7f058e9-288b-4c55-8f4e-6360880dbb59\" target=\"_blank\" rel=\"noopener\">swissALTIRegio</a>, swissSURFACE3D © swisstopo. Beschriftungen © swisstopo. <a href=\"https://doi.org/10.16904/1000001.7\" target=\"_blank\" rel=\"noopener\">Waldmischungsgrad LFI</a> © WSL (Waser et al. 2025, finanziert vom BAFU). <a href=\"https://arxiv.org/abs/2611.08095\" target=\"_blank\" rel=\"noopener\">ETH-Baumarten</a> © Zhou et al. 2026 (ETH Zürich), lizenziert unter CC BY-NC 4.0: nur für nicht kommerzielle Nutzung. <a href=\"https://www.geocat.ch/datahub/dataset/ae183bc4-5c91-467e-89bc-85f390340efb\" target=\"_blank\" rel=\"noopener\">Nutzungsflächen</a> © BLW und die Kantone. Ebenen anderer WMS- / WMTS-Dienste: © die jeweiligen Anbieter. Nicht für den operationellen Einsatz. Quellcode, Dokumentation und Issues: <a href=\"https://github.com/swisstopo/topo-swisseobrowser\" target=\"_blank\" rel=\"noopener\">github.com/swisstopo/topo-swisseobrowser</a>.",
     "terms": "Rechtliches",
     "theHelpPageExplains": "Die <a href=\"docs/index.html\" target=\"_blank\" rel=\"noopener\">Hilfeseite</a> erklärt jede Funktion mit Bildschirmfotos und enthält eine Anleitung für den ersten Besuch. Das <a href=\"https://github.com/swisstopo/topo-swisseobrowser#readme\" target=\"_blank\" rel=\"noopener\">README</a> beschreibt die Produkte und Dienste hinter den Ebenen, die Skalierung und die No-data-Werte jedes Assets, die Formeln, die Grenzen des Browsers und die <a href=\"https://github.com/swisstopo/topo-swisseobrowser#layer-verification\" target=\"_blank\" rel=\"noopener\">Ebenenprüfung</a>, die bestimmt, welche Ebenen die Marke <span class=\"ver\">BETA</span> tragen.",
-    "writeAnEMail": "E-Mail mit dem Link auf Ihre aktuelle Ansicht schreiben (öffnet Ihr Mailprogramm)"
+    "writeAnEMail": "E-Mail mit dem Link auf Ihre aktuelle Ansicht schreiben (öffnet Ihr Mailprogramm)",
+    "version": "Version",
+    "versionLocal": "lokale Kopie, nicht publiziert",
+    "versionInt": "Integration, Commit",
+    "versionLocalBuild": "lokaler Build, Commit",
+    "versionCommit": "Commit"
   },
   "inspect": {
     "belowThr": "unter dem Schwellenwert",
@@ -1069,7 +1070,8 @@
     "back": "Zurück zur flachen Karte (2D)",
     "dem": {
       "alti": "swissALTIRegio: Gelände (10 m)",
-      "dsm": "swissSURFACE3D 10 m: Oberfläche mit Gebäuden und Bäumen"
+      "dsm": "swissSURFACE3D 10 m: Oberfläche mit Gebäuden und Bäumen",
+      "alti3d": "swissALTI3D: Gelände (0,5 m in der Nähe, swissALTIRegio in der Ferne und ausserhalb der Schweiz)"
     },
     "on": "3D-Gelände"
   },
@@ -1106,7 +1108,8 @@
       "grey": "Karte grau",
       "none": "Keine",
       "pixelkarte": "Karte",
-      "swissimage": "SWISSIMAGE"
+      "swissimage": "SWISSIMAGE",
+      "tlm3d": "swissTLM-Karte für 3D"
     },
     "eth": {
       "1": "Fichte",

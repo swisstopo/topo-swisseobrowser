@@ -6,9 +6,16 @@
 #
 #   beta: true   the whole configuration is only offered on integration, with a BETA label
 #   highlights   the key of a story set in HIGHLIGHTS in the page (texts stay there)
+#   masks        { vegetation: forest }: the vegetation mask of every layer of this configuration that has
+#                one (masks.vegetation not off in catalog/layers.yaml), e.g. the forest in Forest
 #
 # The key is also the themeId of a permalink (upper case, no dashes). tools/build-catalog.py
 # writes this into the page; never edit the generated block there by hand.
+#
+# AFTER EDITING THIS FILE run, in the repository folder (Windows: python instead of python3):
+#   python3 tools/build-catalog.py --env int --write-readme
+# then reload localhost with Ctrl+F5 and commit this file, swisseo-browser.html and README.md together
+# (README, After editing the catalogue).
 
 configurations:
   - key: DEFAULT
@@ -43,6 +50,7 @@ configurations:
   - key: FOREST
     name: "Forest"
     beta: false
+    masks: { vegetation: "forest" }
     groups:
       - title: "Layers"
         layers: ["true", "ndvi", "evi", "vhi", "vhidef", "vhiext", "ndvidiff", "ndvidiff2", "ndviz", "analyst", "nbr", "ndmi", "fdc"]

@@ -15,12 +15,12 @@
     "li4": "Die ETH-Baumartenkarten haben 30-m-Pixel (jede 10-m-Zelle nimmt das Pixel unter ihrer Mitte) und sind unter CC BY-NC 4.0 lizenziert: nur nicht kommerzielle Nutzung, mit Quellenangabe. Ihr Laubholzanteil ist ein Anteil an der Basalfläche, der Wert des Waldmischungsgrads LFI eine Wahrscheinlichkeit: Dieselben Grenzen bedeuten nicht dasselbe.",
     "li5": "Interessengebiete können bis zu 100 000 Eckpunkte und Dateien bis zu 50 MB haben; Gebiete aus Dateien sind nur Teil eines Links, wenn sie klein sind.",
     "li6": "Mit <span class=\"beta\" style=\"margin:0\">BETA</span> markierte Ebenen sind noch nicht geprüft; die VHI-Saisonebenen zählen nur Tage mit einem VHI-Wert.",
-    "p1": "Das Register Info listet die Aufnahmen des gewählten Datums mit ihren Metadaten und die Skalierung aller Produkte.",
+    "p1": "Das Register Info listet die Aufnahmen des gewählten Datums mit ihren Metadaten und die Skalierung aller Produkte. Unter den rechtlichen Hinweisen zeigt es die Version des Browsers, verlinkt mit den Hinweisen zu dieser Version.",
     "p2": "Alle Positionen, die Sie sehen, sind Schweizer Koordinaten <b>LV95</b> (EPSG:2056): die Mausposition, die Pixelabfrage, die Links und die Vorgaben des Imports. Nur GeoJSON-Downloads verwenden WGS84, wie es der GeoJSON-Standard verlangt.",
     "p3": "Produktsuche und Download der Originalprodukte, Pins, das Messwerkzeug, eigene Skripte und Benutzerkonten sind nicht verfügbar. Die 3D-Ansicht hat keinen Himmel und keine Atmosphäre, keine von Bergen geworfenen Schatten, keine Blendenflecken, kein Anaglyphen-Stereo und keinen 3D-Zeitraffer. Andere Satellitenmissionen sind nicht enthalten; der swissEO Browser zeigt nur die swissEO-Produkte.",
     "td1": "swissEO S2-SR",
     "td10": "swissALTIRegio",
-    "td11": "Höhenmodell der 3D-Ansicht (Standard), 10 m",
+    "td11": "Höhenmodell der 3D-Ansicht weiter weg und ausserhalb der Schweiz, 10 m",
     "td12": "<a href=\"https://www.geocat.ch/datahub/dataset/f7f058e9-288b-4c55-8f4e-6360880dbb59\" target=\"_blank\" rel=\"noopener\">swisstopo, Metadaten auf geocat.ch</a>",
     "td13": "swissSURFACE3D, 10 m",
     "td14": "Oberflächenmodell der 3D-Ansicht (Option), von swissEO auf 10 m umgerechnet",
@@ -58,7 +58,10 @@
     "title2": "Daten und Quellen",
     "title3": "Koordinaten",
     "title4": "Im Vergleich zum Copernicus Browser nicht enthalten",
-    "title5": "Grenzen"
+    "title5": "Grenzen",
+    "td10a": "swissALTI3D",
+    "td11a": "Höhenmodell der 3D-Ansicht in Ihrer Nähe (Standard), 0,5 m",
+    "td12a": "<a href=\"https://www.swisstopo.admin.ch/de/hoehenmodell-swissalti3d\" target=\"_blank\" rel=\"noopener\">swisstopo</a>"
   },
   "envbar": "<b>Integrationsversion zum Testen.</b> Nicht für den operativen Einsatz: Die hier gezeigten Ebenen und Werte sind nicht validiert und können falsch sein. Die offizielle Version ist noch nicht veröffentlicht.",
   "footer": {
@@ -132,9 +135,9 @@
     "li1": "<span class=\"n\">1</span><span><b>Datum</b>: der gewählte Tag, die Pfeile für den vorherigen / nächsten Tag mit Daten und der Kalender</span>",
     "li2": "<span class=\"n\">2</span><span><b>Konfiguration</b>: Gruppen von Ebenen zu einem Thema sowie die Ansichten Vergleichen und WMS / WMTS</span>",
     "li3": "<span class=\"n\">3</span><span><b>Ebenen</b>: eine anklicken, um sie auf der Karte zu zeigen</span>",
-    "li4": "<span class=\"n\">4</span><span><b>Datum auf der Karte</b>, <i>Link kopieren</i> (Kettensymbol) und die <i>Pixelabfrage</i> ((i) mit Zeiger)</span>",
+    "li4": "<span class=\"n\">4</span><span><b>Datum auf der Karte</b> und <i>Link kopieren</i> (Kettensymbol)</span>",
     "li5": "<span class=\"n\">5</span><span><b>Ort suchen</b>: eine Ortschaft, Adresse oder einen Berg suchen</span>",
-    "li6": "<span class=\"n\">6</span><span>Die Schaltfläche <b>Hintergrundkarte</b> (Ebenensymbol) und die <b>Hilfe</b> (das <span class=\"key\">i</span>, diese Seite)</span>",
+    "li6": "<span class=\"n\">6</span><span>Die Schaltfläche <b>Hintergrundkarte</b> (Ebenensymbol), die <b>Hilfe</b> (das <span class=\"key\">i</span>, diese Seite) und darunter die <i>Pixelabfrage</i> ((i) mit Zeiger)</span>",
     "li7": "<span class=\"n\">7</span><span><b>Werkzeuge</b>: Interessengebiet, Bild herunterladen, Zeitraffer und <span class=\"key\">3D</span></span>",
     "li8": "<span class=\"n\">8</span><span><b>Zoom</b>, Mausposition in Schweizer Koordinaten (LV95) und Massstabsbalken</span>",
     "p1": "Das Fenster hat zwei Teile: das <b>Menü</b> links und die <b>Karte</b> rechts. Das Menü hat zwei Register, <i>Visualisieren</i> (Datum und Ebene wählen) und <i>Info</i> (zu den Daten, Rückmeldungen). Die Karte zeigt die gewählte Ebene über einer Hintergrundkarte; die Schaltflächen auf der Karte sind die Werkzeuge.",
@@ -176,7 +179,7 @@
   },
   "t5": {
     "box1": "<b>Tipp:</b> Für Nadel-, Misch- oder Laubwald legt ein Schieberegler mit zwei Griffen fest, wo eine Klasse endet und die nächste beginnt (standardmässig 30 % und 85 % Laubbäume). Bewegen Sie einen Griff und lassen Sie los: Die Karte folgt. Für einzelne Baumarten der ETH-Karte haken Sie die gewünschten Arten an oder verwenden <i>Alle Nadelbäume</i> / <i>Alle Laubbäume</i>.",
-    "cap1": "<b>Abb. 5</b> NDVI bei Kerzers, 13. August 2026, mit der Maske Nutzungsflächen auf Ackerfläche, Dauerwiesen und Dauerweiden beschränkt. Jede Kategorie hat die Farbe des Kartendienstes des Bundes.",
+    "cap1": "<b>Abb. 5</b> NDVI bei Kerzers, 13. August 2026, mit der Maske Nutzungsflächen auf Ackerfläche, Dauerwiesen und Dauerweiden beschränkt.",
     "img1": "NDVI beschränkt auf Ackerfläche, Wiesen und Weiden, mit den Kontrollkästchen der Kategorien",
     "li1": "Scrollen Sie im Ebenenmenü hinunter zu <b>Masken</b>. Das Ausklappmenü <i>Vegetationsmaske</i> steht auf <i>Aus</i>.",
     "li2": "Wählen Sie eine Maske, zum Beispiel <i>Landnutzung (Kategorien unten)</i> unter <i>Nutzungsflächen</i>: die landwirtschaftliche Nutzung der Kantone.",
@@ -188,7 +191,7 @@
   "t6": {
     "cap1": "<b>Abb. 6</b> Die Pixelabfrage auf einem Feld: Bandwerte (gespeicherte Zahl und Reflektanz), der NDVI, die Masken an dieser Stelle und die Parzelle der Nutzungsflächen (Ackerfläche, Erbsen, Code 537).",
     "img1": "Pixelabfrage mit Band- und NDVI-Werten",
-    "p1": "Klicken Sie auf die Schaltfläche <b>Pixelabfrage</b> (das (i) mit einem Mauszeiger, oben auf der Karte), um sie einzuschalten: Sie wird blau. Klicken Sie dann auf die Karte. Ein Feld zeigt die Werte an dieser Stelle: die Position, die Reflektanz jedes Bandes, den Indexwert der Ebene, die Wolken- und Geländeinformation, die Wald- / Vegetationsmaske, die swissTLM3D-Waldklasse, die Laubholzwahrscheinlichkeit des Waldmischungsgrads LFI, den Laubholzanteil und die dominante Baumart der ETH-Karte sowie die Kategorie der Nutzungsflächen. Ein erneuter Klick auf die Schaltfläche schaltet sie aus.",
+    "p1": "Klicken Sie auf die Schaltfläche <b>Pixelabfrage</b> (das (i) mit einem Mauszeiger, oben rechts auf der Karte, unter der Hilfe-Schaltfläche), um sie einzuschalten: Sie wird blau. Klicken Sie dann auf die Karte. Ein Feld zeigt die Werte an dieser Stelle: die Position, die Reflektanz jedes Bandes, den Indexwert der Ebene, die Wolken- und Geländeinformation, die Wald- / Vegetationsmaske, die swissTLM3D-Waldklasse, die Laubholzwahrscheinlichkeit des Waldmischungsgrads LFI, den Laubholzanteil und die dominante Baumart der ETH-Karte sowie die Kategorie der Nutzungsflächen. Ein erneuter Klick auf die Schaltfläche schaltet sie aus.",
     "title": "<span class=\"n\">6</span>Den Wert eines Pixels lesen"
   },
   "t7": {
@@ -203,7 +206,7 @@
   "t8": {
     "cap1": "<b>Abb. 8</b> Der Grosse Aletschgletscher in 3D: Echtfarben vom 13. August 2026 auf swissALTIRegio, mit Blick nach Norden über die Bettmeralp zur Jungfrau und zum Brienzersee, mit eingeschalteten Beschriftungen.",
     "img1": "Der Grosse Aletschgletscher in 3D mit dem Echtfarbenbild und Beschriftungen",
-    "li1": "Klicken Sie auf <span class=\"key\">3D</span>: Die Karte kippt und die Ortsnamen (Beschriftungen) erscheinen. Die Schaltfläche heisst jetzt <span class=\"key\">2D</span> und bringt die flache Karte zurück; die Beschriftungen bleiben, bis Sie sie über die Ebenen-Schaltfläche ausschalten.",
+    "li1": "Klicken Sie auf <span class=\"key\">3D</span>: Die Karte kippt, die Ortsnamen (Beschriftungen) erscheinen und der Hintergrund wird zur <i>swissTLM-Karte für 3D</i>. Die Schaltfläche heisst jetzt <span class=\"key\">2D</span> und bringt die flache Karte und ihre Hintergrundkarte zurück; die Beschriftungen bleiben, bis Sie sie über die Ebenen-Schaltfläche ausschalten.",
     "li2": "Ziehen Sie mit der <b>rechten Maustaste</b> (oder halten Sie <span class=\"key\">Ctrl</span> und ziehen Sie), um die Ansicht zu kippen und zu drehen; auf einem Touchscreen mit zwei Fingern. Ohne rechte Maustaste nutzen Sie die <b>3D-Navigation</b> über den Zoom-Schaltflächen: Die obere Scheibe verschiebt die Karte, die untere dreht und kippt sie; ihre rote Marke zeigt nach Norden.",
     "li3": "Über den Werkzeugen erscheinen drei weitere Schaltflächen: die <b>3D-Einstellungen</b> (Zahnrad), die <b>Sonnenschattierung</b> (Glühbirne) und die <b>Sonnenzeit</b> (Sonne). Das Gelände wird von der Sonne zur Zeit des Satellitenbilds beleuchtet; mit der Sonnenzeit können Sie die Berge wie am Morgen oder am Abend beleuchten.",
     "p1": "Die Schaltfläche <span class=\"key\">3D</span>, das letzte der Werkzeuge, legt die Karte und die Satellitenebene auf das Gelände.",
@@ -236,7 +239,7 @@
     "title": "Bild herunterladen"
   },
   "tools-insp": {
-    "p1": "Schalten Sie sie oben auf der Karte ein und klicken Sie auf eine Stelle. Für die Satellitenebenen zeigt sie die Bandwerte (gespeicherte Zahl und Reflektanz), den Indexwert, die Szenenklassifikation, Wolken- und Geländemaske, die Habitatkarte des Datums (Wald, Vegetation), die swissTLM3D-Waldklasse, die Laubholzwahrscheinlichkeit des Waldmischungsgrads LFI, den Laubholzanteil und die dominante Baumart der ETH-Karte und die Kategorie der Nutzungsflächen; für die swissEO-Produkte den Produktwert. Siehe <a href=\"#t6\">Abb. 6</a>.",
+    "p1": "Schalten Sie sie mit ihrer Schaltfläche unter der Hilfe-Schaltfläche oben rechts auf der Karte ein und klicken Sie auf eine Stelle. Für die Satellitenebenen zeigt sie die Bandwerte (gespeicherte Zahl und Reflektanz), den Indexwert, die Szenenklassifikation, Wolken- und Geländemaske, die Habitatkarte des Datums (Wald, Vegetation), die swissTLM3D-Waldklasse, die Laubholzwahrscheinlichkeit des Waldmischungsgrads LFI, den Laubholzanteil und die dominante Baumart der ETH-Karte und die Kategorie der Nutzungsflächen; für die swissEO-Produkte den Produktwert. Siehe <a href=\"#t6\">Abb. 6</a>.",
     "title": "Pixelabfrage"
   },
   "tools-search": {
@@ -285,7 +288,7 @@
     "li13": "Links behalten die 3D-Ansicht mit Neigung und Richtung, das Höhenmodell und die vertikale Überhöhung.",
     "li2": "Ziehen Sie mit der <b>rechten Maustaste</b> oder halten Sie <span class=\"key\">Ctrl</span> und ziehen Sie, um die Ansicht zu kippen und zu drehen; auf einem Touchscreen mit zwei Fingern. Verschieben und zoomen wie gewohnt. Die <b>3D-Navigation</b> über den Zoom-Schaltflächen erledigt dasselbe allein mit der Maus: Die obere Scheibe verschiebt die Karte, die untere dreht sie (links, rechts) und kippt sie (oben, unten). Klicken Sie auf einen Pfeil für einen Schritt oder halten Sie ihn gedrückt; ziehen Sie den Knopf in der Mitte, je weiter, desto schneller. Die rote Marke zeigt immer nach Norden: Ein Klick darauf dreht die Karte zurück nach Norden, ein Doppelklick auf den unteren Knopf macht sie zudem wieder flach (Ansicht senkrecht von oben). Die Zoom-Schaltflächen liegen unter den Scheiben.",
     "li3": "Eine erste 3D-Ansicht dauert einige Sekunden: Die Höhen werden aus dem Höhenmodell gelesen und in Ihrem Browser zu Gelände verarbeitet.",
-    "li4": "<b>Höhenmodell</b>: <i>swissALTIRegio</i>, das 10-m-Modell von swisstopo des Geländes ohne Bauten und Bewuchs der Schweiz und ihrer Grenzregionen (Standard), oder <i>swissSURFACE3D 10 m</i>, die Oberfläche mit Gebäuden und Bäumen, von swissEO auf 10 m umgerechnet (ausserhalb der Schweiz und in ihren Lücken die Höhen von swissALTIRegio).",
+    "li4": "<b>Höhenmodell</b>: <i>swissALTI3D</i>, das 0,5-m-Modell von swisstopo des Geländes ohne Bauten und Bewuchs, in Ihrer Nähe, und <i>swissALTIRegio</i>, das 10-m-Modell, weiter weg und ausserhalb der Schweiz (Standard); <i>swissALTIRegio</i> allein; oder <i>swissSURFACE3D 10 m</i>, die Oberfläche mit Gebäuden und Bäumen, von swissEO auf 10 m umgerechnet (ausserhalb der Schweiz und in ihren Lücken die Höhen von swissALTIRegio).",
     "li5": "<b>Sonnenschattierung des Geländes</b> und ihre Parameter: die <i>Schattierungsmethode</i> (kombiniert, Standard, einfach, Igor, multidirektional), die <i>Schattierungsstärke</i> sowie die <i>Schatten-</i>, <i>Licht-</i> und <i>Akzentfarbe</i>. Die Farben sind teilweise transparent, damit das Satellitenbild sichtbar bleibt.",
     "li6": "<b>Vertikale Geländeüberhöhung</b> von 50 bis 300 %: Werte über 100 % machen das Relief steiler.",
     "li7": "<b>Werte zurücksetzen</b> stellt alle Einstellungen ausser dem Höhenmodell auf ihre Standardwerte zurück.",
@@ -301,7 +304,7 @@
     "title5": "Was in 3D funktioniert"
   },
   "vis-base": {
-    "p1": "Fahren Sie mit der Maus über die Ebenen-Schaltfläche oben rechts auf der Karte (links vom <span class=\"key\">i</span>), wie im Copernicus Browser, um die <b>Hintergrundkarte</b> zu wählen: <i>Karte</i> (Landeskarte von swisstopo), <i>SWISSIMAGE</i> (Luftbild), <i>Karte grau</i> oder <i>Keine</i>. Unter <i>Kartenüberlagerungen</i> schreibt <b>Beschriftungen</b> die Namen von Orten, Strassen, Gipfeln und Seen aus der Basiskarte von swisstopo über die Satellitendaten, als scharfen Text in jedem Massstab (in 3D aufrecht und Ihnen zugewandt). Die Namen enden an der Grenze der Schweiz und Liechtensteins.",
+    "p1": "Fahren Sie mit der Maus über die Ebenen-Schaltfläche oben rechts auf der Karte (links vom <span class=\"key\">i</span>), wie im Copernicus Browser, um die <b>Hintergrundkarte</b> zu wählen: <i>Karte</i> (Landeskarte von swisstopo), <i>SWISSIMAGE</i> (Luftbild), <i>Karte grau</i> oder <i>Keine</i>; in 3D auch die <i>swissTLM-Karte für 3D</i>, den Hintergrund der 3D-Ansicht von map.geo.admin.ch, mit der 3D beginnt. Unter <i>Kartenüberlagerungen</i> schreibt <b>Beschriftungen</b> die Namen von Orten, Strassen, Gipfeln und Seen aus der Basiskarte von swisstopo über die Satellitendaten, als scharfen Text in jedem Massstab (in 3D aufrecht und Ihnen zugewandt). Wenn Sie SWISSIMAGE wählen, werden die Beschriftungen eingeschaltet. Die Namen enden an der Grenze der Schweiz und Liechtensteins.",
     "title": "Hintergrundkarten und Beschriftungen"
   },
   "vis-compare": {
@@ -350,7 +353,7 @@
     "li2": "<b>Geländeschatten</b>: die Hänge im Schatten des Geländes zum Zeitpunkt der Aufnahme;",
     "li3": "<b>Vegetationsmaske</b>: behält Wald, alle Vegetation, Nadel-, Misch- oder Laubwald, gewählte Baumarten oder gewählte Kategorien der landwirtschaftlichen Nutzung (nächster Abschnitt);",
     "li4": "<b>Eigene Maske</b>: Ihre eigenen Polygone (siehe <a href=\"#vis-mask\">Eigene Masken</a>).",
-    "p1": "Jede Sentinel-2-Ebene hat diese Masken in ihrem Menü; sie blenden Pixel auf der Karte aus und lassen sie bei Statistik, Downloads und Zeitraffer weg:",
+    "p1": "Jede Sentinel-2-Ebene hat diese Masken in ihrem Menü; sie blenden Pixel auf der Karte aus und lassen sie bei Statistik, Downloads und Zeitraffer weg. Die meisten Ebenen blenden Wolken, Wolkenschatten und Geländeschatten aus, sobald sie geöffnet werden (Echtfarben, Falschfarben, SWIR und die Aerosol-Ebene beginnen ohne Masken); schalten Sie eine Maske im Menü der Ebene ein oder aus:",
     "title": "Masken"
   },
   "vis-menu": {
@@ -373,7 +376,7 @@
     "li3": "Die Zwei-Daten-Ebenen (NDDI-Veränderung, NDVI-Differenz zu einem Referenzdatum) verwenden an beiden Daten die Maske des gewählten Datums, so erscheint eine neue Version einer Habitatkarte nie als Veränderung.",
     "li4": "Die Maske gilt auch für die <a href=\"#tools-stats\">Statistik</a> (wo Sie eine andere wählen können), die <a href=\"#tools-spec\">Spektralanalyse</a>, die Downloads und den Zeitraffer; der Veränderungsbericht gibt die maskierte Fläche in Hektaren an.",
     "li5": "Die <a href=\"#tools-insp\">Pixelabfrage</a> zeigt an jeder Stelle die Habitatkarte, die swissTLM3D-Waldklasse, die Laubholzwahrscheinlichkeit (Waldmischungsgrad LFI), den Laubholzanteil und die dominante Baumart (ETH) sowie die Kategorie der Nutzungsflächen, unabhängig von der gewählten Maske; mit einer Maske nach Waldtyp auch die Klasse bei den aktuellen Grenzen.",
-    "p1": "Das Ausklappmenü <i>Vegetationsmaske</i> steht standardmässig auf <i>Aus</i> («Eine auswählen»). Seine Einträge in dieser Reihenfolge:",
+    "p1": "Das Ausklappmenü <i>Vegetationsmaske</i> steht bei den Vegetationsindizes (NDVI, EVI, SAVI, Feuchtigkeitsindizes, NDDI) und beim NBR zu Beginn auf <i>Alle Vegetation</i>, bei den Waldebenen und bei jedem Vegetationsindex in der Konfiguration <i>Wald</i> auf <i>Wald</i>, und bei den Kompositen und den übrigen Indizes auf <i>Aus</i> («Eine auswählen»). Seine Einträge in dieser Reihenfolge:",
     "p2": "Gut zu wissen:",
     "td1": "Habitatkarte: Wald, Alle Vegetation",
     "td10": "ETH-Baumarten (30 m): Nadelwald, Mischwald, Laubwald",

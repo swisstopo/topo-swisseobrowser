@@ -45,6 +45,9 @@ if [ -n "$env" ]; then
     { echo "::error::the page still has the VERIFIED_IDS placeholder: tools/build-catalog.py did not run"; exit 1; }
   grep -q '^const CONFIGS = {' "$page" ||
     { echo "::error::the page has no configurations"; exit 1; }
+  # the version of the Info tab (README, Releases), written by the deploy
+  grep -q '^const APP_VERSION = {"v":"[^"]*","sha":"[0-9a-f]\{40\}","date":"[0-9-]\{10\}"};' "$page" ||
+    { echo "::error::the page does not say which version it is (APP_VERSION)"; exit 1; }
   # the languages: production offers only reviewed ones (written by the deploy), integration all;
   # every offered language needs its translation file, and English its reference
   if [ "$env" = prod ]; then

@@ -11,13 +11,17 @@
 # The previous version is read from origin, never from local tags: a clone that also fetched the upstream
 # Copernicus Browser holds its tags v1.10.4 ... v1.58.0, which are not ours.
 #
-#   bash tools/release.sh             what the workflow runs (needs GH_TOKEN with contents: write)
-#   bash tools/release.sh --dry-run   prints the version and the notes, creates nothing
+#   bash tools/release.sh                  what the workflow runs (needs GH_TOKEN with contents: write)
+#   bash tools/release.sh --dry-run        prints the version and the notes, creates nothing
+#   bash tools/release.sh --print-version  prints only the version this commit gets, for the page (Info tab):
+#                                          its tag if it has one, else the next version; with "release: none"
+#                                          the previous version plus the commit, e.g. v1.1.0+abc1234
 # For a dry run, RELEASE_LABELS, PR_NUMBER and PR_TITLE stand in for the pull request (and are looked up with gh
 # when it is installed and they are not set); RELEASE_PREV pretends a previous version, e.g. v1.0.0.
 set -euo pipefail
 
-DRY=0; [ "${1:-}" = "--dry-run" ] && DRY=1
+DRY=0; PRINT=0
+case "${1:-}" in --dry-run) DRY=1 ;; --print-version) PRINT=1 ;; esac
 SHA=$(git rev-parse "${GITHUB_SHA:-HEAD}")
 REPO=${GITHUB_REPOSITORY:-$(git remote get-url origin | sed -E 's#^(https://github\.com/|git@github\.com:)##; s#\.git$##')}
 PROD=https://swisseobrowser.swisstopo.admin.ch
@@ -26,6 +30,7 @@ FIRST=afe553e      # "Merge the initial commit of swisstopo/topo-swisseobrowser"
 # the release tags on origin: "sha refs/tags/vX.Y.Z" (an annotated tag also lists its commit as ...^{})
 tags=$(git ls-remote --tags origin 'v*' | sed -nE 's#^([0-9a-f]+)[[:space:]]+refs/tags/(v[0-9]+\.[0-9]+\.[0-9]+)(\^\{\})?$#\1 \2#p')
 if printf '%s\n' "$tags" | grep -q "^$SHA "; then
+  if [ "$PRINT" = 1 ]; then printf '%s\n' "$tags" | grep "^$SHA " | head -1 | cut -d' ' -f2; exit 0; fi
   echo "$SHA already has the release $(printf '%s\n' "$tags" | grep "^$SHA " | head -1 | cut -d' ' -f2): nothing to do"
   exit 0
 fi
@@ -43,7 +48,9 @@ if [ -z "${RELEASE_LABELS+x}${PR_NUMBER+x}" ] && command -v gh >/dev/null; then
   PR_NUMBER=$(printf '%s' "$pr" | cut -f1); PR_TITLE=$(printf '%s' "$pr" | cut -f2); RELEASE_LABELS=$(printf '%s' "$pr" | cut -f3)
 fi
 labels=",${RELEASE_LABELS:-},"
-case "$labels" in *",release: none,"*) echo "label 'release: none': no release"; exit 0;; esac
+case "$labels" in *",release: none,"*)
+  if [ "$PRINT" = 1 ]; then echo "${prev:-v0.0.0}+$(git rev-parse --short=7 "$SHA")"; exit 0; fi
+  echo "label 'release: none': no release"; exit 0;; esac
 
 if [ -z "$prev" ]; then
   next=v1.0.0
@@ -55,6 +62,8 @@ else
     *)                    next="v$MA.$((MI + 1)).0" ;;
   esac
 fi
+
+if [ "$PRINT" = 1 ]; then echo "$next"; exit 0; fi
 
 notes=$(mktemp)
 {

@@ -59,7 +59,7 @@
   pinned). Its tile grid is a quad tree from the swisstopo origin at 2560 m/px ÷ 2^z (zoom 8 = 10 m/px), not the
   swisstopo WMTS levels; every raster tile is drawn by the page through the `swisseo://` protocol (`addRaster`).
   The `zoom` of links and compare entries stays the swisstopo level (`zoomToRes` / `resToZoom`), so old links keep
-  working. Features of the view (`viewBox`, exports) assume the flat north-up map; in 3D (terrain from swissALTIRegio)
+  working. Features of the view (`viewBox`, exports) assume the flat north-up map; in 3D (terrain from swissALTI3D near the camera and swissALTIRegio far, basemap the swissTLM map for 3D)
   they use the area around the centre, and the compare split is not available. The labels are swisstopo's vector tiles
   (Web Mercator), moved into the LV95 grid in MapLibre's workers (`swisseo-vt://`, `vtWorker`); their style's zoom
   stops are shifted by `VT_DZ`.
@@ -78,7 +78,8 @@
   `python3 tools/build-catalog.py --env int --write-readme` and commit page and README together. Every id
   is quoted in the YAML: `true` is a layer id and YAML would read it as a boolean.
 - **New layers**: add them to `LAYERS`, give them a description in `COP_META`, add them to
-  `catalog/layers.yaml` with `verified: false`, put them into a configuration in
+  `catalog/layers.yaml` with `verified: false` and their default `masks` (README *Default masks*; never mask
+  defaults in `rec.def`), put them into a configuration in
   `catalog/configurations.yaml`, regenerate, and add them to the README layer lists.
 - **Languages** (i18next, README *Languages*): every user-facing text goes through a key, never a bare
   literal: markup gets `data-i18n` (`key`, `[attr]key`, `[html]key`), script text `t("key", "English")` or
