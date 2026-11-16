@@ -235,7 +235,7 @@
     "img1": "Finestra di download delle immagini, scheda Analitico",
     "li1": "<b>Semplice</b>: la vista attuale come PNG o JPG, con didascalie (fonte dei dati, data, maschera della vegetazione, barra della scala), una descrizione facoltativa, le etichette della mappa, la legenda e l'area di interesse; anche in modalità di confronto e in 3D.",
     "li2": "<b>Analitico</b>: più livelli e bande grezze insieme, per la vista o l'area di interesse, a 40, 20 o 10 m o a una risoluzione personalizzata (fino a 2500 × 2500 pixel). Formati: PNG, JPG o GeoTIFF in coordinate svizzere (LV95): 8 bit, 16 bit (i valori memorizzati) o <b>32 bit in virgola mobile con i valori dell'indice o fisici</b> per la tua analisi. Più file vengono compressi. Valgono le maschere del livello.",
-    "li3": "<b>Stampa ad alta risoluzione</b>: la vista elaborata per un formato di stampa: larghezza e altezza in cm (o A4 / A3, verticale od orizzontale), DPI e una scala. <i>Adatta</i> mantiene tutta la vista (o l'area di interesse) sul foglio; una scala fissa come 1:25 000 centra la stampa sull'area di interesse e avvisa quando non ci sta.",
+    "li3": "<b>Stampa ad alta risoluzione</b>: la vista elaborata per un formato di stampa: larghezza e altezza in cm (o A4 / A3, verticale od orizzontale), DPI e una scala. <i>Adatta</i> mantiene tutta la vista (o l'area di interesse) sul foglio; una scala fissa come 1:25 000 centra la stampa sull'area di interesse e avvisa quando non ci sta. L'elenco <i>Dimensione</i> offre anche formati per i social media, per esempio 1080 × 1920 px per una Storia o un Reel: tutta la vista o tutta l'area vi viene adattata.",
     "title": "Download di immagini"
   },
   "tools-insp": {
@@ -268,7 +268,7 @@
     "li1": "scegli il periodo e <i>Seleziona 1 immagine per</i> orbita, giorno, settimana, mese o anno; i pulsanti dei mesi saltano le stagioni che non vuoi (per esempio l'inverno);",
     "li2": "clicca su <b>Cerca</b>: per ogni intervallo viene scelta l'immagine con la migliore copertura della tua area e il cielo più sereno;",
     "li3": "controlla l'elenco: miniature, copertura nuvolosa e copertura della tua area; i cursori filtrano le immagini nuvolose o incomplete;",
-    "li4": "riproduci l'<b>anteprima</b> (velocità, dissolvenza, legenda, didascalie) e scaricala come <b>GIF</b> o <b>video</b>.",
+    "li4": "riproduci l'<b>anteprima</b> (velocità, dissolvenza, legenda, didascalie) e scaricala come <b>GIF</b> o <b>video</b>, nella dimensione della tua area o in un formato per i social media (<i>Dimensione</i>, per esempio un video di 1080 × 1920 px per una Storia o un Reel).",
     "p1": "Il pulsante pellicola crea un'animazione del livello attuale, con le sue maschere, sull'area di interesse (o sulla vista):",
     "p2": "Non ci sono limiti rigidi: un'animazione settimanale di un ghiacciaio su dieci anni funziona, richiede solo alcuni minuti.",
     "title": "Timelapse"
@@ -330,9 +330,9 @@
     "p2": "I colori naturali sono l'immagine fornita con ogni mosaico swissEO. Tutti gli altri livelli sono calcolati dalle bande nel tuo browser o letti dai prodotti swissEO (VHI, NDVIdiff, NDVIz). Quando più passaggi del satellite coprono lo stesso giorno, vengono uniti in un mosaico, il più recente sopra.",
     "td1": "Predefinita",
     "td10": "colori naturali, NDVI, EVI, swissEO VHI foresta, deficit VHI cumulato, giorni VHI in stress estremo, swissEO NDVIdiff e NDVIz, differenza di NDVI rispetto a una data di riferimento, NBR, indice di umidità, classificazione dei disturbi forestali",
-    "td2": "compositi (colori naturali, falsi colori, urbano, SWIR, agricoltura, geologia), indici (NDVI, NDWI, indice di umidità, NDSI, NBR, AOT), swissEO VHI foresta e vegetazione, swissEO NDVIdiff, classificazione della scena, maschera delle nubi, terreno",
+    "td2": "compositi (colori naturali, falsi colori, urbano, SWIR, agricoltura, geologia, suolo nudo), indici (NDVI, NDWI, indice di umidità, NDSI, NBR, AOT, SAVI), swissEO VHI foresta e vegetazione, swissEO NDVIdiff, classificazione della scena, maschera delle nubi, terreno",
     "td3": "Agricoltura",
-    "td4": "colori naturali, falsi colori, NDVI, EVI, suolo nudo, NDMI per lo stress idrico, indice di umidità, agricoltura, SAVI",
+    "td4": "colori naturali, NDVI, EVI, NDRE, MTVI2 (gli indici raccomandati da Agroscope per le colture), sui terreni agricoli delle superfici di utilizzazione",
     "td5": "Siccità",
     "td6": "colori naturali, NDVI, EVI, indice di umidità, swissEO VHI, swissEO NDVIdiff e NDVIz, NDDI e variazione dell'NDDI, differenza di NDVI rispetto a una data di riferimento",
     "td7": "Siccità 2026",
@@ -354,7 +354,8 @@
     "li3": "<b>Maschera della vegetazione</b>: tiene il bosco, tutta la vegetazione, il bosco di conifere, misto o di latifoglie, specie scelte o categorie scelte dell'uso agricolo del suolo (sezione successiva);",
     "li4": "<b>Maschera personalizzata</b>: i tuoi poligoni (vedi <a href=\"#vis-mask\">Maschere personalizzate</a>).",
     "p1": "Ogni livello Sentinel-2 ha queste maschere nel suo menu; nascondono pixel sulla mappa e li escludono da statistiche, download e timelapse. La maggior parte dei livelli nasconde nuvole, ombre delle nuvole e ombre del terreno appena viene aperta (Colori naturali, Falsi colori, SWIR e il livello degli aerosol iniziano senza maschere); attivate o disattivate una maschera nel menu del livello:",
-    "title": "Maschere"
+    "title": "Maschere",
+    "li2b": "<b>Illuminazione scarsa</b>: i pendii che il sole illumina appena, dove il suo angolo di incidenza raggiunge una soglia (70°, a meno che tu non sposti il cursore sotto l'interruttore); disattivata finché non la attivi;"
   },
   "vis-menu": {
     "cap1": "<b>Fig. 10</b> Effetti e opzioni avanzate.",
@@ -376,7 +377,7 @@
     "li3": "I livelli a due date (variazione dell'NDDI, differenza di NDVI rispetto a una data di riferimento) usano la maschera della data scelta per entrambe le date, così una nuova versione di una carta degli habitat non appare mai come un cambiamento.",
     "li4": "La maschera vale anche per le <a href=\"#tools-stats\">statistiche</a> (dove puoi sceglierne un'altra), l'<a href=\"#tools-spec\">esploratore spettrale</a>, i download e il timelapse; il rapporto sui cambiamenti indica la superficie mascherata in ettari.",
     "li5": "L'<a href=\"#tools-insp\">ispettore di pixel</a> mostra in ogni punto la carta degli habitat, la classe forestale swissTLM3D, la probabilità di latifoglie (Grado di mescolanza IFN), la quota di latifoglie e la specie dominante (ETH) e la categoria delle Nutzungsflächen, qualunque sia la maschera scelta; con una maschera per tipo di bosco anche la classe ai limiti attuali.",
-    "p1": "Il menu a discesa <i>Maschera della vegetazione</i> inizia con <i>Tutta la vegetazione</i> per gli indici di vegetazione (NDVI, EVI, SAVI, indici di umidità, NDDI) e l'NBR, con <i>Bosco</i> per i livelli forestali e per ogni indice di vegetazione nella configurazione <i>Bosco</i>, e con <i>Spento</i> («Scegline una») per i compositi e gli altri indici. Le sue voci, in quest'ordine:",
+    "p1": "Il menu a discesa <i>Maschera della vegetazione</i> inizia con <i>Tutta la vegetazione</i> per gli indici di vegetazione (NDVI, EVI, SAVI, NDRE, MTVI2, indici di umidità, NDDI) e l'NBR, con <i>Bosco</i> per i livelli forestali e per ogni indice di vegetazione nella configurazione <i>Bosco</i>, e con <i>Spento</i> («Scegline una») per i compositi e gli altri indici. Nella configurazione <i>Agricoltura</i> ogni indice di vegetazione inizia con i terreni agricoli delle superfici di utilizzazione (tutte le categorie tranne il bosco). Le sue voci, in quest'ordine:",
     "p2": "Buono a sapersi:",
     "td1": "Carta degli habitat: bosco, tutta la vegetazione",
     "td10": "Specie arboree ETH (30 m): bosco di conifere, bosco misto, bosco di latifoglie",

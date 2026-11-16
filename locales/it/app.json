@@ -189,7 +189,6 @@
       "layers": "Livelli",
       "low40MPx": "BASSA (40 m/px)",
       "medium20MPx": "MEDIA (20 m/px)",
-      "paper": "Carta",
       "pngNoGeoreference": "PNG (senza georeferenziazione)",
       "raw": "Grezzo",
       "resolutionXMPx": "Risoluzione X (m/px)",
@@ -202,7 +201,8 @@
       "tiff32BitFloat": "TIFF (32 bit a virgola mobile)",
       "tiff32BitFloat2": "TIFF (32 bit a virgola mobile): i livelli di indice forniscono il valore dell'indice, le bande grezze il valore fisico (riflettanza, AOT). TIFF (16 bit): le bande grezze forniscono il DN memorizzato. Più livelli vengono scaricati in un unico ZIP.",
       "tiff8Bit": "TIFF (8 bit)",
-      "visualised": "Visualizzati"
+      "visualised": "Visualizzati",
+      "size": "Dimensione"
     },
     "import": {
       "anAreaImportedFrom": "Un'area importata da un file <b>non viene condivisa quando copiate il link</b>: solo le aree piccole (fino a circa 270 vertici) entrano in un link. Per condividere un'area importata, caricatela da un URL.",
@@ -302,7 +302,6 @@
       "selectAll": "Seleziona tutto",
       "showCaptions": "Mostra didascalie",
       "showLegend": "Mostra legenda",
-      "sizePx": "Dimensioni [px]",
       "speed": "Velocità",
       "timeRange": "Periodo",
       "timelapse": "Timelapse",
@@ -311,7 +310,9 @@
       "videoMp4Webm": "Video (MP4 / WebM)",
       "visualisation": "Visualizzazione",
       "week": "settimana",
-      "year": "anno"
+      "year": "anno",
+      "size": "Dimensione",
+      "sizeArea": "Area (libera, px)"
     },
     "feedback": {
       "title": "Riscontro via e-mail",
@@ -324,6 +325,15 @@
       "copyText": "Copia il testo",
       "copied": "Copiato",
       "openMailApp": "Apri il programma di posta"
+    },
+    "sizes": {
+      "paper": "Carta",
+      "socialMedia": "Social media",
+      "story": "Storia / Reel 9:16 · 1080 × 1920 px",
+      "carousel": "Carosello 3:4 · 1080 × 1440 px",
+      "post": "Post verticale 4:5 · 1080 × 1350 px",
+      "square": "Quadrato 1:1 · 1080 × 1080 px",
+      "landscape": "Orizzontale 16:9 · 1920 × 1080 px"
     }
   },
   "env": {
@@ -552,7 +562,8 @@
     "tlm": "Bosco swissTLM3D",
     "unread": "({{n}} non leggibili)",
     "vegetation": "vegetazione",
-    "vhiDays": "Giorni con un valore VHI"
+    "vhiDays": "Giorni con un valore VHI",
+    "illumMasked": "mascherato: illuminazione scarsa (≥ {{thr}}°)"
   },
   "layer": {
     "adaptiveGain": "Guadagno adattivo",
@@ -603,7 +614,10 @@
     "standard": "Standard",
     "terrainShadow": "Ombra del terreno",
     "terrainShadowHelp": "Maschera del terreno valore 200: ombra portata o propria",
-    "threshold": "Soglia"
+    "threshold": "Soglia",
+    "illumThreshold": "Soglia [°]",
+    "illumination": "Illuminazione scarsa",
+    "illuminationHelp": "Maschera del terreno: angolo di incidenza solare pari o superiore alla soglia, pendii che il sole illumina appena"
   },
   "layerList": {
     "addCompare": "Aggiungi al confronto",
@@ -775,6 +789,16 @@
       "name": "swissEO VHI vegetazione",
       "note": "Visualizzato da wms.geo.admin.ch. No-data = 110.",
       "subtitle": "Vegetation Health Index su tutta la vegetazione, rispetto al 1991–2020"
+    },
+    "ndre": {
+      "name": "NDRE",
+      "subtitle": "Normalized Difference Red Edge (B8 - B5)/(B8 + B5)",
+      "description": "# Normalized Difference Red Edge (NDRE)\n\nL'NDRE sostituisce la banda rossa dell'NDVI con il red edge (B05, 705 nm), dove la riflettanza delle foglie cresce rapidamente e dipende dal loro contenuto di clorofilla. Rispecchia quindi lo stato di clorofilla e di azoto di una coltura e continua a crescere nelle coperture dense dove l'NDVI satura, il che lo rende utile più avanti nella stagione. Valori tipici: suolo nudo circa 0–0.1, colture circa 0.2–0.6. Uno degli indici raccomandati da Agroscope per il monitoraggio delle colture, insieme a NDVI, EVI e MTVI2.\n\nDati: riflettanza swissEO S2-SR ρ = DN × 0.0001 − 0.1 di B08 (10 m) e B05 (20 m), ρ negative poste a 0.\n\nRiferimenti: Gitelson & Merzlyak 1994, [doi:10.1016/1011-1344(93)06963-4](https://doi.org/10.1016/1011-1344%2893%2906963-4); [Awesome Spectral Indices](https://github.com/awesome-spectral-indices/awesome-spectral-indices) (NDREI, Montero et al. 2023); [Index DataBase](https://www.indexdatabase.de/db/i-single.php?id=223)."
+    },
+    "mtvi2": {
+      "name": "MTVI2",
+      "subtitle": "Modified Triangular Vegetation Index 2 (B3, B4, B8)",
+      "description": "# Modified Triangular Vegetation Index 2 (MTVI2)\n\nL'MTVI2 (Haboudane et al. 2004) è stato concepito per stimare l'indice di area fogliare verde (LAI) delle colture senza dipendere dal contenuto di clorofilla delle foglie; il denominatore contiene una correzione per il suolo. Segue la densità della copertura su un intervallo più ampio dell'NDVI. I valori vanno da circa −1 a 1; i campi vegetati si trovano perlopiù tra 0.2 e 0.8. Uno degli indici raccomandati da Agroscope per il monitoraggio delle colture, insieme a NDVI, EVI e NDRE.\n\nDati: riflettanza swissEO S2-SR ρ = DN × 0.0001 − 0.1 di B03 (verde), B04 (rosso) e B08 (NIR), tutte a 10 m, ρ negative poste a 0 (così √ρ(B04) è definito). La formula richiede la riflettanza, non i DN.\n\nRiferimenti: Haboudane et al. 2004, Remote Sensing of Environment 90, 337–352, [doi:10.1016/j.rse.2003.12.013](https://doi.org/10.1016/j.rse.2003.12.013); [Awesome Spectral Indices](https://github.com/awesome-spectral-indices/awesome-spectral-indices) (Montero et al. 2023); [Index DataBase](https://www.indexdatabase.de/db/i-single.php?id=47)."
     }
   },
   "legal": {
@@ -1039,7 +1063,8 @@
     "shadow": "Ombra",
     "title": "Statistiche: {{name}}",
     "validBoth": "Validi in entrambe le date",
-    "validPixels": "Pixel validi"
+    "validPixels": "Pixel validi",
+    "excludeIllum": "Escludere l'illuminazione scarsa (incidenza solare ≥ {{thr}}°)"
   },
   "status": {
     "catalogueFailed": "Richiesta al catalogo non riuscita: {{msg}}",

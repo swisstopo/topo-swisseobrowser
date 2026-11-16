@@ -6,6 +6,9 @@
 #   verified: true   no label, offered everywhere
 #   masks:           the masks that are on when the layer is opened (the user can still change them):
 #                      cloud, shadow, terrain   true or false (only Sentinel-2 layers can be masked)
+#                      illumination             true or false: the low-illumination mask (solar incidence
+#                                               angle >= 70 degrees, adjustable in the layer menu); off
+#                                               when missing, as on every layer today
 #                      vegetation               off, forest or vegetation (the habitat map of the date),
 #                                               or any other value of the vegetationMask URL parameter
 #                                               (README, URL parameters), e.g. tlm or lfi-broad:30.85
@@ -93,6 +96,14 @@ layers:
     masks: { cloud: true, shadow: true, terrain: true, vegetation: "vegetation" }
   - id: "savi"
     label: "SAVI"
+    verified: false
+    masks: { cloud: true, shadow: true, terrain: true, vegetation: "vegetation" }
+  - id: "ndre"
+    label: "NDRE"
+    verified: false
+    masks: { cloud: true, shadow: true, terrain: true, vegetation: "vegetation" }
+  - id: "mtvi2"
+    label: "MTVI2"
     verified: false
     masks: { cloud: true, shadow: true, terrain: true, vegetation: "vegetation" }
   - id: "barren"

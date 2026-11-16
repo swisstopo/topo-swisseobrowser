@@ -235,7 +235,7 @@
     "img1": "Boîte de dialogue de téléchargement d'image, onglet Analytique",
     "li1": "<b>Simple</b> : la vue actuelle en PNG ou JPG, avec mentions (source des données, date, masque de végétation, barre d'échelle), une description facultative, les étiquettes de la carte, la légende et la zone d'intérêt ; aussi en mode comparaison et en 3D.",
     "li2": "<b>Analytique</b> : plusieurs couches et bandes brutes à la fois, pour la vue ou la zone d'intérêt, à 40, 20 ou 10 m ou à une résolution personnalisée (jusqu'à 2500 × 2500 pixels). Formats : PNG, JPG ou GeoTIFF en coordonnées suisses (LV95) : 8 bits, 16 bits (les valeurs stockées) ou <b>32 bits flottants avec les valeurs d'indice ou physiques</b> pour votre propre analyse. Plusieurs fichiers sont zippés. Les masques de la couche s'appliquent.",
-    "li3": "<b>Impression haute résolution</b> : la vue calculée pour un format imprimé : largeur et hauteur en cm (ou A4 / A3, portrait ou paysage), DPI et une échelle. <i>Ajuster</i> garde toute la vue (ou la zone d'intérêt) sur le papier ; une échelle fixe comme 1:25 000 centre l'impression sur la zone d'intérêt et avertit quand elle ne tient pas.",
+    "li3": "<b>Impression haute résolution</b> : la vue calculée pour un format imprimé : largeur et hauteur en cm (ou A4 / A3, portrait ou paysage), DPI et une échelle. <i>Ajuster</i> garde toute la vue (ou la zone d'intérêt) sur le papier ; une échelle fixe comme 1:25 000 centre l'impression sur la zone d'intérêt et avertit quand elle ne tient pas. La liste <i>Taille</i> propose aussi des formats pour les réseaux sociaux, par exemple 1080 × 1920 px pour une Story ou un Reel : toute la vue ou toute la zone y est ajustée.",
     "title": "Téléchargement d'image"
   },
   "tools-insp": {
@@ -268,7 +268,7 @@
     "li1": "choisissez la période et <i>Sélectionner 1 image par</i> orbite, jour, semaine, mois ou année ; les boutons des mois ignorent les saisons que vous ne voulez pas (par exemple l'hiver) ;",
     "li2": "cliquez sur <b>Rechercher</b> : pour chaque intervalle, l'image avec la meilleure couverture de votre zone et le ciel le plus dégagé est choisie ;",
     "li3": "vérifiez la liste : vignettes, couverture nuageuse et couverture de votre zone ; les curseurs filtrent les images nuageuses ou incomplètes ;",
-    "li4": "lisez l'<b>aperçu</b> (vitesse, fondu, légende, mentions) et téléchargez-le en <b>GIF</b> ou en <b>vidéo</b>.",
+    "li4": "lisez l'<b>aperçu</b> (vitesse, fondu, légende, mentions) et téléchargez-le en <b>GIF</b> ou en <b>vidéo</b>, à la taille de votre zone ou dans un format pour les réseaux sociaux (<i>Taille</i>, par exemple une vidéo de 1080 × 1920 px pour une Story ou un Reel).",
     "p1": "Le bouton film crée une animation de la couche actuelle, avec ses masques, sur la zone d'intérêt (ou la vue) :",
     "p2": "Il n'y a pas de limites strictes : une animation hebdomadaire d'un glacier sur dix ans fonctionne, elle prend juste quelques minutes.",
     "title": "Timelapse"
@@ -330,9 +330,9 @@
     "p2": "Les couleurs naturelles sont l'image livrée avec chaque mosaïque swissEO. Toutes les autres couches sont calculées à partir des bandes dans votre navigateur, ou lues dans les produits swissEO (VHI, NDVIdiff, NDVIz). Quand plusieurs passages du satellite couvrent le même jour, ils sont assemblés en une mosaïque, le plus récent au-dessus.",
     "td1": "Par défaut",
     "td10": "couleurs naturelles, NDVI, EVI, swissEO VHI forêt, déficit VHI cumulé, jours VHI en stress extrême, swissEO NDVIdiff et NDVIz, différence de NDVI par rapport à une date de référence, NBR, indice d'humidité, classification des perturbations forestières",
-    "td2": "composites (couleurs naturelles, fausses couleurs, urbain, SWIR, agriculture, géologie), indices (NDVI, NDWI, indice d'humidité, NDSI, NBR, AOT), swissEO VHI forêt et végétation, swissEO NDVIdiff, classification de la scène, masque des nuages, relief",
+    "td2": "composites (couleurs naturelles, fausses couleurs, urbain, SWIR, agriculture, géologie, sol nu), indices (NDVI, NDWI, indice d'humidité, NDSI, NBR, AOT, SAVI), swissEO VHI forêt et végétation, swissEO NDVIdiff, classification de la scène, masque des nuages, relief",
     "td3": "Agriculture",
-    "td4": "couleurs naturelles, fausses couleurs, NDVI, EVI, sol nu, NDMI pour le stress hydrique, indice d'humidité, agriculture, SAVI",
+    "td4": "couleurs naturelles, NDVI, EVI, NDRE, MTVI2 (les indices recommandés par Agroscope pour les cultures), sur les terres agricoles des surfaces d'exploitation",
     "td5": "Sécheresse",
     "td6": "couleurs naturelles, NDVI, EVI, indice d'humidité, swissEO VHI, swissEO NDVIdiff et NDVIz, NDDI et changement de NDDI, différence de NDVI par rapport à une date de référence",
     "td7": "Sécheresse 2026",
@@ -354,7 +354,8 @@
     "li3": "<b>Masque de végétation</b> : garde la forêt, toute la végétation, la forêt de résineux, mixte ou de feuillus, des essences choisies ou des catégories choisies de l'utilisation agricole du sol (section suivante) ;",
     "li4": "<b>Masque personnalisé</b> : vos propres polygones (voir <a href=\"#vis-mask\">Masques personnalisés</a>).",
     "p1": "Chaque couche Sentinel-2 a ces masques dans son menu ; ils masquent des pixels sur la carte et les excluent des statistiques, des téléchargements et du timelapse. La plupart des couches masquent les nuages, les ombres de nuages et les ombres du relief dès leur ouverture (Couleurs naturelles, Fausses couleurs, SWIR et la couche des aérosols commencent sans masque) ; activez ou désactivez un masque dans le menu de la couche :",
-    "title": "Masques"
+    "title": "Masques",
+    "li2b": "<b>Faible éclairement</b> : les pentes à peine éclairées par le soleil, où son angle d'incidence atteint un seuil (70°, sauf si vous déplacez le curseur sous l'interrupteur) ; désactivé tant que vous ne l'activez pas ;"
   },
   "vis-menu": {
     "cap1": "<b>Fig. 10</b> Effets et options avancées.",
@@ -376,7 +377,7 @@
     "li3": "Les couches à deux dates (changement de NDDI, différence de NDVI par rapport à une date de référence) utilisent le masque de la date choisie pour les deux dates, si bien qu'une nouvelle version d'une carte des habitats n'apparaît jamais comme un changement.",
     "li4": "Le masque s'applique aussi aux <a href=\"#tools-stats\">statistiques</a> (où vous pouvez en choisir un autre), à l'<a href=\"#tools-spec\">explorateur spectral</a>, aux téléchargements et au timelapse ; le rapport de changement indique la surface masquée en hectares.",
     "li5": "L'<a href=\"#tools-insp\">inspecteur de pixels</a> montre à chaque endroit la carte des habitats, la classe forestière swissTLM3D, la probabilité de feuillus (Degré de mélange LFI), la part de feuillus et l'essence dominante (ETH) ainsi que la catégorie des Nutzungsflächen, quel que soit le masque choisi ; avec un masque par type de forêt aussi la classe aux limites actuelles.",
-    "p1": "La liste déroulante <i>Masque de végétation</i> commence par <i>Toute la végétation</i> pour les indices de végétation (NDVI, EVI, SAVI, indices d'humidité, NDDI) et le NBR, par <i>Forêt</i> pour les couches forestières et pour chaque indice de végétation dans la configuration <i>Forêt</i>, et par <i>Désactivé</i> (« En choisir une ») pour les composites et les autres indices. Ses entrées, dans cet ordre :",
+    "p1": "La liste déroulante <i>Masque de végétation</i> commence par <i>Toute la végétation</i> pour les indices de végétation (NDVI, EVI, SAVI, NDRE, MTVI2, indices d'humidité, NDDI) et le NBR, par <i>Forêt</i> pour les couches forestières et pour chaque indice de végétation dans la configuration <i>Forêt</i>, et par <i>Désactivé</i> (« En choisir une ») pour les composites et les autres indices. Dans la configuration <i>Agriculture</i>, chaque indice de végétation commence avec les terres agricoles des surfaces d'exploitation (toutes les catégories sauf la forêt). Ses entrées, dans cet ordre :",
     "p2": "Bon à savoir :",
     "td1": "Carte des habitats : forêt, toute la végétation",
     "td10": "Essences ETH (30 m) : forêt de résineux, forêt mixte, forêt de feuillus",

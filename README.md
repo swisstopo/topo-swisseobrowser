@@ -290,12 +290,13 @@ The swissEO Browser therefore always uses the physical reflectance.
 - **Configurations**: as the themes of the Copernicus Browser, the *Configuration* pull-down lists the
   layers for a task; each layer keeps its own data source, and the calendar shows the dates of the
   selected layer's source:
-  - *Default*: composites (true color, false color, urban, SWIR, agriculture, geology), indices (NDVI,
-    NDWI, moisture index, NDSI, NBR, AOT, **swissEO VHI** forest and vegetation, **swissEO NDVIdiff**),
+  - *Default*: composites (true color, false color, urban, SWIR, agriculture, geology, Barren Soil), indices (NDVI,
+    NDWI, moisture index, NDSI, NBR, AOT, SAVI, **swissEO VHI** forest and vegetation, **swissEO NDVIdiff**),
     masks & quality (scene classification, cloud mask, terrain);
-  - *Agriculture*: as the Copernicus Browser Agriculture theme, with the TCI as true color and without
-    custom scripts: true color, false color, NDVI, EVI, Barren Soil, Moisture Stress, moisture index,
-    agriculture, SAVI (colour steps and scripts of the Copernicus layers);
+  - *Agriculture* ([#52](https://github.com/swisstopo/topo-swisseobrowser/issues/52)): true color (TCI) and the
+    indices Agroscope recommends for crops, NDVI, EVI, **NDRE** (red edge, B05 and B08) and **MTVI2** (B03, B04,
+    B08), masked by default to the farmland of the BLW Nutzungsflächen (every category but forest,
+    `lnf:a.dw.dp.r.o.dk.g.s.h.u.so.v`);
   - *Drought*: true color (TCI), NDVI, EVI, moisture index, swissEO VHI forest / vegetation, swissEO NDVIdiff,
     **swissEO NDVIdiff v200 BETA**, swissEO NDVIz, NDDI, NDDI change vs. the previous year and the NDVI difference to a reference date;
   - *Drought 2026*: like the Copernicus Browser *Drought and Floods* theme, with true color, moisture index,
@@ -329,8 +330,11 @@ The swissEO Browser therefore always uses the physical reflectance.
   JPEG / YCbCr) and shown as delivered (its internal mask decides what is data, so black pixels stay black),
   and the composites computed from the bands (false color, urban, SWIR, agriculture,
   geology 12-8-2, Barren Soil, Highlight Optimized Natural Color); NDVI, NDWI, moisture index, NDSI, NBR,
-  AOT, EVI, SAVI, Moisture Stress, NDDI, Forest Disturbance Classification; scene classification, cloud mask,
-  terrain / solar incidence.
+  AOT, EVI, SAVI, NDRE, MTVI2, Moisture Stress, NDDI, Forest Disturbance Classification; scene classification,
+  cloud mask, terrain / solar incidence. NDRE = (ρ(B08) − ρ(B05)) / (ρ(B08) + ρ(B05)), B05 with 20 m pixels
+  (Gitelson & Merzlyak 1994); MTVI2 = 1.5 × [1.2 × (ρ(B08) − ρ(B03)) − 2.5 × (ρ(B04) − ρ(B03))] /
+  √[(2 × ρ(B08) + 1)² − (6 × ρ(B08) − 5 × √ρ(B04)) − 0.5] (Haboudane et al. 2004); both on the reflectance ρ with
+  negative values set to 0, references and typical values in the layer description.
   VHI: forest and vegetation (WMS), and the season sums VHI cumulative deficit and VHI days in extreme stress
   (from the daily forest COGs). Layers are listed with the Copernicus Browser preview thumbnails as icons.
 - **Drought and forest layers**
@@ -436,7 +440,10 @@ The swissEO Browser therefore always uses the physical reflectance.
     ([#14](https://github.com/swisstopo/topo-swisseobrowser/issues/14): in November, with a low sun, 40 % of the pixels
     there are that dark and were left empty). The footprint comes from the TCI's internal mask at about 160 m;
     the edge zone is computed once per scene;
-  - masks: clouds and cloud shadows (OmniCloudMask), terrain shadow (terrain mask 200), a vegetation
+  - masks: clouds and cloud shadows (OmniCloudMask), terrain shadow (terrain mask 200), **low illumination**
+    ([#53](https://github.com/swisstopo/topo-swisseobrowser/issues/53): a solar incidence angle of the terrain mask
+    at or above a threshold, default 70°, adjustable in the layer menu from 0 to 90°, so slopes the sun hardly
+    lights are left out; off by default, also in the AOI statistics and the 32-bit export), a vegetation
     mask (pull-down: off, forest or all vegetation of the habitat map swissEO VHI uses on the date, the swissTLM3D forest classes, conifer, mixed or broadleaf forest of Forest Type NFI 2023 or of the ETH tree species maps, the ETH dominant tree species, or
     Nutzungsflächen categories; see [Vegetation masks](#vegetation-masks)) and a **custom mask**: your own polygons
     (e.g. a forest map) loaded from a file or URL with the same import and limits as the area of interest;
@@ -528,8 +535,11 @@ The swissEO Browser therefore always uses the physical reflectance.
     32-bit float = index or physical value) in CH1903+ / LV95, optionally with a dataMask band. Several
     files are zipped.
   - *High-res print*: the view re-rendered for a printed size, with the same captions, legend and AOI options,
-    as PNG or JPG ([#2](https://github.com/swisstopo/topo-swisseobrowser/issues/2)): width and height in cm,
-    independent of each other, or a paper preset (A4 / A3, portrait / landscape), and DPI. *Scale*: *Fit*
+    as PNG or JPG ([#2](https://github.com/swisstopo/topo-swisseobrowser/issues/2)). *Size*: width and height in cm,
+    independent of each other, a paper preset (A4 / A3, portrait / landscape) with DPI, or a **social media size**
+    ([#51](https://github.com/swisstopo/topo-swisseobrowser/issues/51): Story / Reel 9:16 1080 × 1920 px, carousel
+    3:4 1080 × 1440, portrait post 4:5 1080 × 1350, square 1080 × 1080, landscape 16:9 1920 × 1080), which fixes
+    the pixels and always fits the view or area (cm, scale and DPI are then off). *Scale*: *Fit*
     enlarges the view (or, with *Crop to AOI*, the area of interest) to the paper's aspect ratio, so it is always
     fully printed; a fixed scale (1:10 000 to 1:500 000) sets the extent to paper size × scale, centred on the
     area of interest (or the view), warns when the area does not fit (and gives the scale it needs) and adds the
@@ -552,7 +562,11 @@ The swissEO Browser therefore always uses the physical reflectance.
   - preview player with speed (fps), transition None / Fade with fade duration, delay last frame,
     adaptive gain per frame for the band composites (snowy winter frames), legend and captions (date label,
     scale bar, source);
-  - download as GIF or as video (MP4 or WebM, depending on the browser), default 1024 px (up to 2048).
+  - *Size*: the area (default 1024 px on the longer side, up to 2048, aspect ratio of the area) or one of the
+    social media sizes of the print ([#51](https://github.com/swisstopo/topo-swisseobrowser/issues/51), e.g. a
+    1080 × 1920 px video for a Story or Reel); a social media size enlarges the area around its centre to its
+    aspect ratio, and outside an area of interest the basemap fills the frame;
+  - download as GIF or as video (MP4 or WebM, depending on the browser).
     For long series a video is much smaller than a GIF (a GIF takes roughly 0.4 byte per pixel and frame);
     the video is recorded in real time, so 500 frames at 8 fps take about a minute. VHI layers work too
     (via the WMS; the VHI season layers from the COGs, which shows how the deficit builds up over a season).
@@ -663,11 +677,13 @@ layer menu, and a link carries only what differs from these defaults:
 
 - `cloud`, `shadow`, `terrain`: the OmniCloudMask clouds (1, 2) and cloud shadows (3) and the terrain shadow
   (terrain mask 200), `true` or `false`. Only Sentinel-2 layers of a maskable type can have them.
+- `illumination`: the low-illumination mask (solar incidence angle ≥ 70°, the threshold is set in the layer
+  menu), `true` or `false`; off where it is missing, which is every layer today.
 - `vegetation`: `off`, `forest` or `vegetation` (the habitat map of the date) or any other value of the
   `vegetationMask` URL parameter, e.g. `tlm` or `lfi-broad:30.85`.
 - A layer without `masks` starts without any.
 - A configuration can set its own vegetation mask, `masks: { vegetation: "forest" }` in
-  `catalog/configurations.yaml`: it replaces the layer's vegetation mask wherever that is not `off`. Switching
+  `catalog/configurations.yaml` (Forest; Agriculture has the Nutzungsflächen without forest): it replaces the layer's vegetation mask wherever that is not `off`. Switching
   the configuration changes a vegetation mask the user has not touched and keeps one they chose.
 
 Today:
@@ -676,7 +692,7 @@ Today:
 | --- | --- | --- |
 | True color, False color, False color (urban), SWIR, Aerosol optical thickness | off | off |
 | Agriculture, Geology 12, 8, 2, Highlight Optimized Natural Color, Barren Soil, NDWI, NDSI | on | off |
-| NDVI, Moisture index, EVI, SAVI, Moisture Stress, NDDI, NDDI change, NBR | on | *All vegetation* (*Forest* in the Forest configuration) |
+| NDVI, Moisture index, EVI, SAVI, NDRE, MTVI2, Moisture Stress, NDDI, NDDI change, NBR | on | *All vegetation* (*Forest* in the Forest configuration, the Nutzungsflächen without forest in Agriculture) |
 | Forest Disturbance Classification, NDVI difference to a reference date | on | *Forest* |
 | Terrain / solar incidence | clouds and cloud shadows (not the terrain mask, which it shows) | off |
 
@@ -730,14 +746,14 @@ the README of `main` on GitHub.
 
 <!-- verification:start -->
 - [x] `true`: True color *(Default, Agriculture, Drought, Drought 2026, Forest)*
-- [x] `nir`: False color *(Default, Agriculture)*
+- [x] `nir`: False color *(Default)*
 - [ ] `urban`: False color (urban) *(Default, Drought 2026)*
 - [x] `swir`: SWIR *(Default, Drought 2026)*
-- [ ] `agri`: Agriculture *(Default, Agriculture)*
+- [ ] `agri`: Agriculture *(Default)*
 - [ ] `geo`: Geology 12, 8, 2 *(Default)*
 - [x] `ndvi`: NDVI *(Default, Agriculture, Drought, Drought 2026, Forest)*
 - [ ] `ndwi`: NDWI *(Default, Drought 2026)*
-- [ ] `ndmi`: Moisture index *(Default, Agriculture, Drought, Drought 2026, Forest)*
+- [ ] `ndmi`: Moisture index *(Default, Drought, Drought 2026, Forest)*
 - [ ] `ndsi`: NDSI *(Default)*
 - [ ] `nbr`: Normalized Burn Ratio (NBR) *(Default, Forest)*
 - [ ] `aot`: Aerosol optical thickness *(Default)*
@@ -747,9 +763,11 @@ the README of `main` on GitHub.
 - [x] `vhi`: swissEO VHI forest *(Default, Drought, Forest)*
 - [x] `vhiveg`: swissEO VHI vegetation *(Default, Drought)*
 - [ ] `evi`: EVI *(Agriculture, Drought, Forest)*
-- [ ] `savi`: SAVI *(Agriculture)*
-- [ ] `barren`: Barren Soil *(Agriculture)*
-- [ ] `mstress`: Moisture Stress *(Agriculture, Drought 2026)*
+- [ ] `savi`: SAVI *(Default)*
+- [ ] `ndre`: NDRE *(Agriculture)*
+- [ ] `mtvi2`: MTVI2 *(Agriculture)*
+- [ ] `barren`: Barren Soil *(Default)*
+- [ ] `mstress`: Moisture Stress *(Drought 2026)*
 - [ ] `hon`: Highlight Optimized Natural Color *(Drought 2026)*
 - [x] `ndvidiff`: swissEO NDVIdiff *(Default, Drought, Forest)*
 - [x] `ndviz`: swissEO NDVIz *(Drought, Forest)*
@@ -1033,7 +1051,7 @@ Parameter names follow the Copernicus Browser where an equivalent exists.
 | `layerMenu` | `open` | The menu of the active layer is open (default: closed) |
 | `showLayer` | `false` | The active layer is hidden, only the background map is shown |
 | `themeId` | `DROUGHT` | Configuration: `DEFAULT`, `AGRICULTURE`, `DROUGHT`, `DROUGHT2026`, `FOREST` (when missing or not containing the layer, the first configuration with the layer is used) |
-| `layerId` | `ndvi` | `true`, `nir`, `urban`, `swir`, `agri`, `geo`, `barren`, `hon`, `ndvi`, `ndwi`, `ndmi`, `ndsi`, `nbr`, `aot`, `evi`, `savi`, `mstress`, `nddi`, `nddichg`, `analyst`, `fdc`, `scl`, `cloud`, `terrain` (S2-SR); `vhi`, `vhiveg` (VHI); `vhidef`, `vhiext` (VHI season sums); `ndvidiff`, `ndvidiff2` (v200 BETA), `ndviz` |
+| `layerId` | `ndvi` | `true`, `nir`, `urban`, `swir`, `agri`, `geo`, `barren`, `hon`, `ndvi`, `ndwi`, `ndmi`, `ndsi`, `nbr`, `aot`, `evi`, `savi`, `ndre`, `mtvi2`, `mstress`, `nddi`, `nddichg`, `analyst`, `fdc`, `scl`, `cloud`, `terrain` (S2-SR); `vhi`, `vhiveg` (VHI); `vhidef`, `vhiext` (VHI season sums); `ndvidiff`, `ndvidiff2` (v200 BETA), `ndviz` |
 | `valueRange` | `[0,0.9]` | Colour-scale min/max of index and continuous layers |
 | `threshold` | `0.5` | NDSI snow threshold (default 0.42; above it snow is shown in blue, otherwise true colour, as in the Copernicus Browser); NDVI difference to a reference date change threshold (default −0.08) |
 | `refDate` | `2025-07-01` | Reference date of the two-date layers (default: the same day one year earlier) |
@@ -1045,6 +1063,7 @@ Parameter names follow the Copernicus Browser where an equivalent exists.
 | `redRange`, `greenRange`, `blueRange` | `[0,0.8]` | Advanced RGB effects |
 | `opacity` | `70` | Layer opacity in % |
 | `cloudMask`, `shadowMask`, `terrainMask` | `false` | Masks (written when they differ from the layer's default, see [Default masks](#default-masks)) |
+| `illuminationMask`, `illuminationThreshold` | `true`, `60` | Low-illumination mask: pixels with a solar incidence angle at or above the threshold (degrees, 0–90, default 70) are left out; the threshold is written only when the mask is on and it differs from 70 |
 | `vegetationMask` | `forest` | Vegetation mask of the S2-SR layers: `off`; `forest` or `vegetation` (the habitat map of the date, as swissEO VHI; older links with a version such as `forest@1-1` open with the map of the date too); `tlm` or `tlm:12.13` (swissTLM3D forest, all or some of the classes 12 Wald, 13 Wald offen, 6 Gebüschwald); `lfi-conif:30.85`, `lfi-mixed:30.85` or `lfi-broad:30.85` (Forest Type NFI 2023, conifer, mixed or broadleaf forest with the lower and upper limit of the broadleaf probability in %; optionally `:m3` for the mean of 3 × 3 pixels and `+tlm` or `+none` for the forest mask, default the habitat map forest of the date, e.g. `lfi-mixed:30.85:m3+tlm`; older values with one number such as `lfi-broad:85` open too); `eth-conif:30.85`, `eth-mixed:30.85` or `eth-broad:30.85` (ETH broadleaf basal-area share, optionally `:m3`); `eth-sp` or `eth-sp:1.2.6` (ETH dominant tree species, all or some of the codes 1 Spruce, 2 Fir, 3 Pine, 4 Larch, 5 Arolla pine, 6 Beech, 7 Maple, 8 Ash, 9 Oak, 10 Chestnut, 11 Other); `lnf` or `lnf:a.dw.dp` (Nutzungsflächen, all or some main categories: `a` Ackerfläche, `dw` Dauerwiesen, `dp` Dauerweiden, `r` Reben, `o` Obstanlagen, `dk` Übrige Dauerkulturen, `g` Geschützter Anbau, `s` Streueflächen, `h` Hecken-, Feld- und Ufergehölze, `u` Übrige Fläche innerhalb der LN, `so` Sömmerungsfläche, `v` Vegetation nicht LN, `w` Wald); written when it differs from the default of the layer in the configuration of the link, see [Default masks](#default-masks) |
 | `basemap`, `labels` | `swissimage`, `false` | Basemap (`pixelkarte` = *Map*, the default in 2D; `swissimage`; `grey` = *Map Grey*; `tlm3d` = *swissTLM map for 3D*, only with `3d=true` and the default there; `none`) and the *Labels* overlay (swisstopo vector labels; on by default with `swissimage`). Written only where they differ from the defaults |
 | `compareLayers`, `comparedOpacity`, `comparedClipping`, `compareMode` | | Compare list (base64url JSON, each entry with its LV95 view; WMS / WMTS entries as `{"l":"ext","x":{"u":service URL,"k":"WMS"/"WMTS","n":layer name,"t":title}}`), per-layer opacity and split range; `compareMode` is `split` / `opacity` when comparing and `off` otherwise (links without it open in compare mode) |

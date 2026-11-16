@@ -337,8 +337,8 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
   <p data-i18n="[html]vis-layers.p1">A <b>configuration</b> (called <i>theme</i> in the Copernicus Browser) is a list of layers for a topic:</p>
   <table>
     <tr><th data-i18n="vis-layers.th1">Configuration</th><th data-i18n="vis-layers.th2">Layers</th></tr>
-    <tr><td data-i18n="vis-layers.td1">Default</td><td data-i18n="vis-layers.td2">composites (true color, false color, urban, SWIR, agriculture, geology), indices (NDVI, NDWI, moisture index, NDSI, NBR, AOT), swissEO VHI forest and vegetation, swissEO NDVIdiff, scene classification, cloud mask, terrain</td></tr>
-    <tr><td data-i18n="vis-layers.td3">Agriculture</td><td data-i18n="vis-layers.td4">true color, false color, NDVI, EVI, Barren Soil, Moisture Stress, moisture index, agriculture, SAVI</td></tr>
+    <tr><td data-i18n="vis-layers.td1">Default</td><td data-i18n="vis-layers.td2">composites (true color, false color, urban, SWIR, agriculture, geology, Barren Soil), indices (NDVI, NDWI, moisture index, NDSI, NBR, AOT, SAVI), swissEO VHI forest and vegetation, swissEO NDVIdiff, scene classification, cloud mask, terrain</td></tr>
+    <tr><td data-i18n="vis-layers.td3">Agriculture</td><td data-i18n="vis-layers.td4">true color, NDVI, EVI, NDRE, MTVI2 (the indices Agroscope recommends for crops), on the farmland of the Nutzungsflächen</td></tr>
     <tr><td data-i18n="vis-layers.td5">Drought</td><td data-i18n="vis-layers.td6">true color, NDVI, EVI, moisture index, swissEO VHI, swissEO NDVIdiff and NDVIz, NDDI and NDDI change, NDVI difference to a reference date</td></tr>
     <tr><td data-i18n="vis-layers.td7">Drought 2026</td><td data-i18n="[html]vis-layers.td8">true color, moisture index, NDWI, Moisture Stress, NDVI, SWIR, urban, Highlight Optimized Natural Color, plus the <a href="#vis-hl">highlights</a></td></tr>
     <tr><td data-i18n="vis-layers.td9">Forest</td><td data-i18n="vis-layers.td10">true color, NDVI, EVI, swissEO VHI forest, VHI cumulative deficit, VHI days in extreme stress, swissEO NDVIdiff and NDVIz, NDVI difference to a reference date, NBR, moisture index, Forest Disturbance Classification</td></tr>
@@ -376,6 +376,8 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
     <li data-i18n="[html]vis-masks.li1"><b>Clouds</b> and <b>Cloud shadows</b>: the cloud mask delivered with each swissEO mosaic (thick and thin cloud,
       cloud shadow);</li>
     <li data-i18n="[html]vis-masks.li2"><b>Terrain shadow</b>: the slopes in the shadow of the terrain at the time of the acquisition;</li>
+    <li data-i18n="[html]vis-masks.li2b"><b>Low illumination</b>: slopes the sun hardly lights, where its angle of incidence reaches a
+      threshold (70° unless you move the slider below the switch); off until you switch it on;</li>
     <li data-i18n="[html]vis-masks.li3"><b>Vegetation mask</b>: keeps forest, all vegetation, conifer, mixed or broadleaf forest, chosen tree species, or
       chosen categories of the agricultural land use (next section);</li>
     <li data-i18n="[html]vis-masks.li4"><b>Custom mask</b>: your own polygons (see <a href="#vis-mask">Custom masks</a>).</li>
@@ -383,8 +385,8 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
 
   <h3 data-i18n="vis-veg.title" id="vis-veg">Vegetation masks</h3>
   <p data-i18n="[html]vis-veg.p1">The pull-down <i>Vegetation mask</i> starts with <i>All vegetation</i> for the vegetation indices (NDVI, EVI,
-    SAVI, moisture indices, NDDI) and NBR, with <i>Forest</i> for the forest layers and for every vegetation index in the <i>Forest</i>
-    configuration, and with <i>Off</i> ("Choose one") for the composites and the other indices. Its entries, in this order:</p>
+    SAVI, NDRE, MTVI2, moisture indices, NDDI) and NBR, with <i>Forest</i> for the forest layers and for every vegetation index in the <i>Forest</i>
+    configuration, with the farmland of the Nutzungsflächen (every category but forest) in the <i>Agriculture</i> configuration, and with <i>Off</i> ("Choose one") for the composites and the other indices. Its entries, in this order:</p>
   <table>
     <tr><th data-i18n="vis-veg.th1">Entry</th><th data-i18n="vis-veg.th2">What it keeps</th><th data-i18n="vis-veg.th3">Source</th></tr>
     <tr><td data-i18n="vis-veg.td1">Habitat Map: Forest, All vegetation</td>
@@ -630,7 +632,8 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
       Several files are zipped. The masks of the layer apply.</li>
     <li data-i18n="[html]tools-exp.li3"><b>High-res print</b>: the view rendered for a printed size: width and height in cm (or A4 / A3, portrait or
       landscape), DPI and a scale. <i>Fit</i> keeps the whole view (or the area of interest) on the paper; a fixed scale such
-      as 1:25 000 centres the print on the area of interest and warns when it does not fit.</li>
+      as 1:25 000 centres the print on the area of interest and warns when it does not fit. The <i>Size</i> list also has
+      social media sizes, for example 1080 × 1920 px for a Story or Reel: the whole view or area is fitted into them.</li>
   </ul>
 
   <h3 data-i18n="tools-tl.title" id="tools-tl">Timelapse</h3>
@@ -640,7 +643,8 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
       seasons you do not want (for example winter);</li>
     <li data-i18n="[html]tools-tl.li2">click <b>Search</b>: per interval the image with the best coverage of your area and the clearest sky is chosen;</li>
     <li data-i18n="tools-tl.li3">check the list: thumbnails, cloud cover and coverage of your area; the sliders filter cloudy or incomplete images;</li>
-    <li data-i18n="[html]tools-tl.li4">play the <b>preview</b> (speed, fade, legend, captions) and download it as <b>GIF</b> or <b>video</b>.</li>
+    <li data-i18n="[html]tools-tl.li4">play the <b>preview</b> (speed, fade, legend, captions) and download it as <b>GIF</b> or <b>video</b>, in the
+      size of your area or in a social media size (<i>Size</i>, for example a 1080 × 1920 px video for a Story or Reel).</li>
   </ol>
   <p data-i18n="tools-tl.p2">There are no hard limits: a weekly glacier animation over ten years works, it just takes a few minutes.</p>
   <figure><img data-i18n="[alt]tools-tl.img1" src="img/timelapse.jpg" alt="Timelapse dialog with monthly images of the Seeland" width="1400" height="900">

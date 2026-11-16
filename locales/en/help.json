@@ -235,7 +235,7 @@
     "img1": "Image download dialog, Analytical tab",
     "li1": "<b>Basic</b>: the current view as PNG or JPG, with captions (data source, date, the vegetation mask, scale bar), an optional description, the map labels, the legend and the area of interest; also in compare mode and in 3D.",
     "li2": "<b>Analytical</b>: several layers and raw bands at once, for the view or the area of interest, at 40, 20 or 10 m or a custom resolution (up to 2500 × 2500 pixels). Formats: PNG, JPG or GeoTIFF in Swiss coordinates (LV95): 8-bit, 16-bit (the stored values) or <b>32-bit float with the index or physical values</b> for your own analysis. Several files are zipped. The masks of the layer apply.",
-    "li3": "<b>High-res print</b>: the view rendered for a printed size: width and height in cm (or A4 / A3, portrait or landscape), DPI and a scale. <i>Fit</i> keeps the whole view (or the area of interest) on the paper; a fixed scale such as 1:25 000 centres the print on the area of interest and warns when it does not fit.",
+    "li3": "<b>High-res print</b>: the view rendered for a printed size: width and height in cm (or A4 / A3, portrait or landscape), DPI and a scale. <i>Fit</i> keeps the whole view (or the area of interest) on the paper; a fixed scale such as 1:25 000 centres the print on the area of interest and warns when it does not fit. The <i>Size</i> list also has social media sizes, for example 1080 × 1920 px for a Story or Reel: the whole view or area is fitted into them.",
     "title": "Image download"
   },
   "tools-insp": {
@@ -268,7 +268,7 @@
     "li1": "choose the time range and <i>Select 1 image per</i> orbit, day, week, month or year; the month buttons skip seasons you do not want (for example winter);",
     "li2": "click <b>Search</b>: per interval the image with the best coverage of your area and the clearest sky is chosen;",
     "li3": "check the list: thumbnails, cloud cover and coverage of your area; the sliders filter cloudy or incomplete images;",
-    "li4": "play the <b>preview</b> (speed, fade, legend, captions) and download it as <b>GIF</b> or <b>video</b>.",
+    "li4": "play the <b>preview</b> (speed, fade, legend, captions) and download it as <b>GIF</b> or <b>video</b>, in the size of your area or in a social media size (<i>Size</i>, for example a 1080 × 1920 px video for a Story or Reel).",
     "p1": "The film button builds an animation of the current layer, with its masks, over the area of interest (or the view):",
     "p2": "There are no hard limits: a weekly glacier animation over ten years works, it just takes a few minutes.",
     "title": "Timelapse"
@@ -330,9 +330,9 @@
     "p2": "The true color is the image delivered with each swissEO mosaic. All other layers are computed from the bands in your browser, or read from the swissEO products (VHI, NDVIdiff, NDVIz). When several satellite passes cover the same day, they are joined into one mosaic, the most recent on top.",
     "td1": "Default",
     "td10": "true color, NDVI, EVI, swissEO VHI forest, VHI cumulative deficit, VHI days in extreme stress, swissEO NDVIdiff and NDVIz, NDVI difference to a reference date, NBR, moisture index, Forest Disturbance Classification",
-    "td2": "composites (true color, false color, urban, SWIR, agriculture, geology), indices (NDVI, NDWI, moisture index, NDSI, NBR, AOT), swissEO VHI forest and vegetation, swissEO NDVIdiff, scene classification, cloud mask, terrain",
+    "td2": "composites (true color, false color, urban, SWIR, agriculture, geology, Barren Soil), indices (NDVI, NDWI, moisture index, NDSI, NBR, AOT, SAVI), swissEO VHI forest and vegetation, swissEO NDVIdiff, scene classification, cloud mask, terrain",
     "td3": "Agriculture",
-    "td4": "true color, false color, NDVI, EVI, Barren Soil, Moisture Stress, moisture index, agriculture, SAVI",
+    "td4": "true color, NDVI, EVI, NDRE, MTVI2 (the indices Agroscope recommends for crops), on the farmland of the Nutzungsflächen",
     "td5": "Drought",
     "td6": "true color, NDVI, EVI, moisture index, swissEO VHI, swissEO NDVIdiff and NDVIz, NDDI and NDDI change, NDVI difference to a reference date",
     "td7": "Drought 2026",
@@ -351,6 +351,7 @@
   "vis-masks": {
     "li1": "<b>Clouds</b> and <b>Cloud shadows</b>: the cloud mask delivered with each swissEO mosaic (thick and thin cloud, cloud shadow);",
     "li2": "<b>Terrain shadow</b>: the slopes in the shadow of the terrain at the time of the acquisition;",
+    "li2b": "<b>Low illumination</b>: slopes the sun hardly lights, where its angle of incidence reaches a threshold (70° unless you move the slider below the switch); off until you switch it on;",
     "li3": "<b>Vegetation mask</b>: keeps forest, all vegetation, conifer, mixed or broadleaf forest, chosen tree species, or chosen categories of the agricultural land use (next section);",
     "li4": "<b>Custom mask</b>: your own polygons (see <a href=\"#vis-mask\">Custom masks</a>).",
     "p1": "Every Sentinel-2 layer has these masks in its menu; they hide pixels on the map and leave them out of statistics, downloads and the timelapse. Most layers hide clouds, cloud shadows and terrain shadows as soon as they are opened (True color, False color, SWIR and the aerosol layer start without masks); switch a mask on or off in the layer's menu:",
@@ -376,7 +377,7 @@
     "li3": "The two-date layers (NDDI change, NDVI difference to a reference date) use the mask of the selected date on both dates, so a new version of a habitat map never shows up as a change.",
     "li4": "The mask also applies to the <a href=\"#tools-stats\">statistics</a> (where you can choose another one), the <a href=\"#tools-spec\">spectral explorer</a>, the downloads and the timelapse; the change report gives the masked area in hectares.",
     "li5": "The <a href=\"#tools-insp\">pixel inspector</a> shows at every spot the habitat map, the swissTLM3D forest class, the broadleaf probability (Forest Type NFI), the broadleaf share and dominant tree species (ETH) and the Nutzungsflächen category, whichever mask is chosen; with a leaf type mask also the class at the current limits.",
-    "p1": "The pull-down <i>Vegetation mask</i> starts with <i>All vegetation</i> for the vegetation indices (NDVI, EVI, SAVI, moisture indices, NDDI) and NBR, with <i>Forest</i> for the forest layers and for every vegetation index in the <i>Forest</i> configuration, and with <i>Off</i> (\"Choose one\") for the composites and the other indices. Its entries, in this order:",
+    "p1": "The pull-down <i>Vegetation mask</i> starts with <i>All vegetation</i> for the vegetation indices (NDVI, EVI, SAVI, NDRE, MTVI2, moisture indices, NDDI) and NBR, with <i>Forest</i> for the forest layers and for every vegetation index in the <i>Forest</i> configuration, with the farmland of the Nutzungsflächen (every category but forest) in the <i>Agriculture</i> configuration, and with <i>Off</i> (\"Choose one\") for the composites and the other indices. Its entries, in this order:",
     "p2": "Good to know:",
     "td1": "Habitat Map: Forest, All vegetation",
     "td10": "ETH tree species (30 m): Conifer forest, Mixed forest, Broadleaf forest",

@@ -186,7 +186,6 @@
       "layers": "Layers",
       "low40MPx": "LOW (40 m/px)",
       "medium20MPx": "MEDIUM (20 m/px)",
-      "paper": "Paper",
       "pngNoGeoreference": "PNG (no georeference)",
       "raw": "Raw",
       "resolutionXMPx": "Resolution X (m/px)",
@@ -194,6 +193,7 @@
       "scale": "Scale",
       "showCaptions": "Show captions",
       "showLegend": "Show legend",
+      "size": "Size",
       "theLabelsAsOn": "The labels as on the map (swisstopo), when they are on.",
       "tiff16Bit": "TIFF (16-bit)",
       "tiff32BitFloat": "TIFF (32-bit float)",
@@ -234,6 +234,15 @@
       "url": "URL",
       "useCurrentMapView": "Use current map view",
       "wgs84LongitudeLatitude": "WGS84 (longitude / latitude)"
+    },
+    "sizes": {
+      "carousel": "Carousel 3:4 · 1080 × 1440 px",
+      "landscape": "Landscape 16:9 · 1920 × 1080 px",
+      "paper": "Paper",
+      "post": "Portrait post 4:5 · 1080 × 1350 px",
+      "socialMedia": "Social media",
+      "square": "Square 1:1 · 1080 × 1080 px",
+      "story": "Story / Reel 9:16 · 1080 × 1920 px"
     },
     "spectral": {
       "close": "Close",
@@ -311,7 +320,8 @@
       "selectAll": "Select All",
       "showCaptions": "Show captions",
       "showLegend": "Show legend",
-      "sizePx": "Size [px]",
+      "size": "Size",
+      "sizeArea": "Area (custom, px)",
       "speed": "Speed",
       "timeRange": "Time range",
       "timelapse": "Timelapse",
@@ -518,6 +528,7 @@
     "forest": "forest",
     "forestVeg": "Forest / vegetation ({{map}})",
     "forestVhi": "Forest VHI",
+    "illumMasked": "masked: low illumination (≥ {{thr}}°)",
     "incidence": "{{v}}° incidence",
     "leafAt": "{{type}} at {{lo}} / {{hi}} %",
     "leafBroadleaf": "broadleaf",
@@ -573,6 +584,9 @@
     "green": "Green",
     "here": "here",
     "hideEffects": "Hide effects and advanced options",
+    "illumThreshold": "Threshold [°]",
+    "illumination": "Low illumination",
+    "illuminationHelp": "Terrain mask: solar incidence angle at or above the threshold, slopes the sun hardly lights",
     "legend": "Legend",
     "look": "Look",
     "lookHelp": "Standard stretch, or the Copernicus Browser True color optimized curve (highlight compression)",
@@ -666,6 +680,11 @@
       "name": "Moisture Stress",
       "subtitle": "Classified NDMI for irrigation"
     },
+    "mtvi2": {
+      "description": "# Modified Triangular Vegetation Index 2 (MTVI2)\n\nThe MTVI2 (Haboudane et al. 2004) was designed to estimate the green leaf area index (LAI) of crops while staying insensitive to the leaf chlorophyll content, with a soil adjustment in the denominator. It responds to canopy density over a wider range than the NDVI. Values reach about −1 to 1; vegetated fields are mostly between 0.2 and 0.8. One of the indices Agroscope recommends for crop monitoring, together with NDVI, EVI and NDRE.\n\nInput: swissEO S2-SR reflectance ρ = DN × 0.0001 − 0.1 of B03 (green), B04 (red) and B08 (NIR), all 10 m, negative ρ set to 0 (so √ρ(B04) is defined). The formula needs reflectance, not DN.\n\nReferences: Haboudane et al. 2004, Remote Sensing of Environment 90, 337–352, [doi:10.1016/j.rse.2003.12.013](https://doi.org/10.1016/j.rse.2003.12.013); [Awesome Spectral Indices](https://github.com/awesome-spectral-indices/awesome-spectral-indices) (Montero et al. 2023); [Index DataBase](https://www.indexdatabase.de/db/i-single.php?id=47).",
+      "name": "MTVI2",
+      "subtitle": "Modified Triangular Vegetation Index 2 (B3, B4, B8)"
+    },
     "nbr": {
       "description": "# Normalized Burn Ratio (NBR)\n\nNormalized Burn Ratio is frequently used to estimate burn severity. It uses near-infrared (NIR) and shortwave-infrared (SWIR) wavelengths. Healthy vegetation has a high reflectance in the near-infrared portion of the spectrum, and a low short-wave infrared reflectance. On the other hand, burned areas have a high shortwave infrared reflectance but low reflectance in the near infrared Darker pixels indicate burned areas.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/custom-scripts/sentinel-2/nbr/).",
       "name": "Normalized Burn Ratio (NBR)",
@@ -685,6 +704,11 @@
       "description": "# Normalized Difference Moisture Index (NDMI)\n\nThe normalized difference moisture Index (NDMI) is used to determine vegetation water content and monitor droughts. The value range of the NDMI is -1 to 1. Negative values of NDMI (values approaching -1) correspond to barren soil. Values around zero (-0.2 to 0.4) generally correspond to water stress. High, positive values represent high canopy without water stress (approximately 0.4 to 1).\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/sentinel-2/ndmi/)",
       "name": "Moisture index",
       "subtitle": "Based on a combination of bands (B8A - B11)/(B8A + B11)"
+    },
+    "ndre": {
+      "description": "# Normalized Difference Red Edge (NDRE)\n\nThe NDRE replaces the red band of the NDVI with the red edge (B05, 705 nm), where the reflectance of leaves rises steeply and depends on their chlorophyll content. It therefore reflects the chlorophyll and nitrogen status of a crop and keeps rising in dense canopies where the NDVI saturates, which makes it useful later in the season. Typical values: bare soil around 0–0.1, crops about 0.2–0.6. One of the indices Agroscope recommends for crop monitoring, together with NDVI, EVI and MTVI2.\n\nInput: swissEO S2-SR reflectance ρ = DN × 0.0001 − 0.1 of B08 (10 m) and B05 (20 m), negative ρ set to 0.\n\nReferences: Gitelson & Merzlyak 1994, [doi:10.1016/1011-1344(93)06963-4](https://doi.org/10.1016/1011-1344%2893%2906963-4); [Awesome Spectral Indices](https://github.com/awesome-spectral-indices/awesome-spectral-indices) (NDREI, Montero et al. 2023); [Index DataBase](https://www.indexdatabase.de/db/i-single.php?id=223).",
+      "name": "NDRE",
+      "subtitle": "Normalized Difference Red Edge (B8 - B5)/(B8 + B5)"
     },
     "ndsi": {
       "description": "# Normalised Difference Snow Index (NDSI)\n\nThe Sentinel-2 normalised difference snow index can be used to differentiate between cloud and snow cover as snow absorbs in the short-wave infrared light, but reflects the visible light, whereas cloud is generally reflective in both wavelengths. Snow cover is represented in bright vivid blue.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/sentinel-2/ndsi/).",
@@ -995,6 +1019,7 @@
     "computing10Progress": "Computing at full resolution: {{p}}",
     "diffHead": "{{date}} vs. the reference around {{ref}} ({{dates}}, per cell the first clear one) · cells valid on both sides are compared (clouds and shadows masked as chosen above).",
     "downloadCsv": "Download CSV",
+    "excludeIllum": "Exclude low illumination (solar incidence ≥ {{thr}}°)",
     "failed": "Reading failed: {{msg}}",
     "fast": "Fast (coarse grid)",
     "full": "<b>Full resolution:</b> the selected date is computed at 10 m, in pieces of 1024 × 1024 cells (about {{cells}} cells; a canton takes several minutes, a time series longer).",

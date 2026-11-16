@@ -397,6 +397,8 @@ body.is3d .maplibregl-ctrl-bottom-right .zoom-ctl{margin-right:34px}
 .tl-ctl #tlDate{min-width:150px;text-align:right;font-weight:700;color:var(--blue);font-size:12.5px}
 .tl-set{display:grid;grid-template-columns:auto 1fr auto 1fr;gap:6px 12px;align-items:center;font-size:12px}
 .tl-set input[type=number]{width:72px}
+#tlPreset{max-width:100%;margin-bottom:4px}
+.tlwh{display:block;white-space:nowrap}
 .tl-opts{display:flex;gap:16px;flex-wrap:wrap}
 .tl-opts .chk{margin-top:6px}
 
@@ -929,9 +931,16 @@ table.kv td:first-child{color:var(--muted)}
           <div class="exgrid" style="margin-top:10px">
             <span data-i18n="dialogs.export.imageFormat2">Image format</span>
             <select id="exFmtP"><option data-i18n="dialogs.export.pngNoGeoreference" value="png">PNG (no georeference)</option><option data-i18n="dialogs.export.jpgNoGeoreference" value="jpg">JPG (no georeference)</option></select>
-            <span data-i18n="dialogs.export.paper">Paper</span>
-            <select id="exPaper"><option data-i18n="dialogs.export.customSize" value="custom">Custom size</option><option data-i18n="dialogs.export.a4Portrait" value="21x29.7">A4 portrait</option>
-              <option data-i18n="dialogs.export.a4Landscape" value="29.7x21">A4 landscape</option><option data-i18n="dialogs.export.a3Portrait" value="29.7x42">A3 portrait</option><option data-i18n="dialogs.export.a3Landscape" value="42x29.7">A3 landscape</option></select>
+            <span data-i18n="dialogs.export.size">Size</span>
+            <select id="exPaper"><option data-i18n="dialogs.export.customSize" value="custom">Custom size</option>
+              <optgroup data-i18n="[label]dialogs.sizes.paper" label="Paper"><option data-i18n="dialogs.export.a4Portrait" value="21x29.7">A4 portrait</option>
+              <option data-i18n="dialogs.export.a4Landscape" value="29.7x21">A4 landscape</option><option data-i18n="dialogs.export.a3Portrait" value="29.7x42">A3 portrait</option><option data-i18n="dialogs.export.a3Landscape" value="42x29.7">A3 landscape</option></optgroup>
+              <optgroup data-i18n="[label]dialogs.sizes.socialMedia" label="Social media">
+                <option data-i18n="dialogs.sizes.story" value="px:1080x1920">Story / Reel 9:16 · 1080 × 1920 px</option>
+                <option data-i18n="dialogs.sizes.carousel" value="px:1080x1440">Carousel 3:4 · 1080 × 1440 px</option>
+                <option data-i18n="dialogs.sizes.post" value="px:1080x1350">Portrait post 4:5 · 1080 × 1350 px</option>
+                <option data-i18n="dialogs.sizes.square" value="px:1080x1080">Square 1:1 · 1080 × 1080 px</option>
+                <option data-i18n="dialogs.sizes.landscape" value="px:1920x1080">Landscape 16:9 · 1920 × 1080 px</option></optgroup></select>
             <span data-i18n="dialogs.export.imageWidthCm">Image width [cm]</span><input type="number" id="exWcm" value="25" min="2" step="0.1">
             <span data-i18n="dialogs.export.imageHeightCm">Image height [cm]</span><input type="number" id="exHcm" min="2" step="0.1">
             <span data-i18n="dialogs.export.scale">Scale</span>
@@ -1016,6 +1025,7 @@ table.kv td:first-child{color:var(--muted)}
         <label class="chk" id="stCloudRow"><input type="checkbox" id="stCloud" checked> <span data-i18n="dialogs.statistics.excludeCloudsAndCloud">Exclude clouds and cloud shadows (OmniCloudMask 1–3)</span></label>
         <label class="chk" id="stSclRow"><input type="checkbox" id="stScl" checked> <span data-i18n="dialogs.statistics.excludeCloudsFromThe">Exclude clouds from the scene classification (SCL 3, 8, 9, 10)</span></label>
         <label class="chk" id="stTerrRow"><input type="checkbox" id="stTerr"> <span data-i18n="dialogs.statistics.excludeTerrainShadowTerrain">Exclude terrain shadow (terrain mask 200)</span></label>
+        <label class="chk" id="stIllumRow"><input type="checkbox" id="stIllum"> <span id="stIllumTxt"></span></label>
         <div class="chk vrow" id="stVegRow"><span data-i18n="dialogs.statistics.vegetationMask">Vegetation mask</span> <span id="stVeg"></span></div>
         <div class="msec"><span data-i18n="dialogs.statistics.selectedDate">Selected date ·</span> <span id="stDate"></span></div>
         <div id="stCur"></div>
@@ -1080,7 +1090,14 @@ table.kv td:first-child{color:var(--muted)}
             <div class="tl-set">
               <span data-i18n="dialogs.timelapse.speed">Speed</span><span><input type="range" id="tlFps" min="1" max="10" step="1" value="2" style="width:120px;vertical-align:middle"> <b id="tlFpsV">2 fps</b></span>
               <span data-i18n="dialogs.timelapse.transition">Transition</span><select id="tlTr"><option data-i18n="dialogs.timelapse.none" value="none">None</option><option data-i18n="dialogs.timelapse.fade" value="fade">Fade</option></select>
-              <span data-i18n="dialogs.timelapse.sizePx">Size [px]</span><span><input type="number" id="tlW" min="64" max="2048"> × <input type="number" id="tlH" min="64" max="2048"></span>
+              <span data-i18n="dialogs.timelapse.size">Size</span><span><select id="tlPreset"><option data-i18n="dialogs.timelapse.sizeArea" value="area">Area (custom, px)</option>
+                <optgroup data-i18n="[label]dialogs.sizes.socialMedia" label="Social media">
+                <option data-i18n="dialogs.sizes.story" value="px:1080x1920">Story / Reel 9:16 · 1080 × 1920 px</option>
+                <option data-i18n="dialogs.sizes.carousel" value="px:1080x1440">Carousel 3:4 · 1080 × 1440 px</option>
+                <option data-i18n="dialogs.sizes.post" value="px:1080x1350">Portrait post 4:5 · 1080 × 1350 px</option>
+                <option data-i18n="dialogs.sizes.square" value="px:1080x1080">Square 1:1 · 1080 × 1080 px</option>
+                <option data-i18n="dialogs.sizes.landscape" value="px:1920x1080">Landscape 16:9 · 1920 × 1080 px</option></optgroup></select>
+                <span class="tlwh"><input type="number" id="tlW" min="64" max="2048"> × <input type="number" id="tlH" min="64" max="2048"> px</span></span>
               <span data-i18n="dialogs.timelapse.fadeDuration" class="tlfade">Fade duration</span><span class="tlfade"><input type="range" id="tlFade" min="0.1" max="1" step="0.1" value="0.5" style="width:120px;vertical-align:middle"> <b id="tlFadeV">50 %</b></span>
               <span data-i18n="dialogs.timelapse.format">Format</span><select id="tlFmt"><option value="gif">GIF</option><option data-i18n="dialogs.timelapse.videoMp4Webm" value="video">Video (MP4 / WebM)</option></select>
             </div>
@@ -2675,6 +2692,22 @@ const LAYERS = [
     formula:"SAVI = (ρ(B08) − ρ(B04)) / (ρ(B08) + ρ(B04) + L) × (1 + L),  L = 0.428",
     fn:v => (v[0] - v[1]) / (v[0] + v[1] + 0.428) * 1.428 },
 
+  /* Issue #52: the red-edge and chlorophyll indices Agroscope recommends for crops, next to NDVI and EVI. B05 is a
+     20 m band, read onto the same grid as B08 like every 20 m band. */
+  { id:"ndre", group:"Indices", name:"NDRE", type:"index", source:"s2", bands:["b08","b05"], ramp:R_NDVI,
+    min:-0.2, max:0.6, lim:[-1, 1], icon:"leaf", sw:"linear-gradient(135deg,#ddd89b,#0f540a)", fg:"#f2f7ea",
+    sub:"Normalized Difference Red Edge (B8 - B5)/(B8 + B5)",
+    desc:"Red-edge index: chlorophyll and nitrogen status of crops; saturates later than NDVI in dense canopies.",
+    formula:"NDRE = (ρ(B08) − ρ(B05)) / (ρ(B08) + ρ(B05))\nB05 (red edge, 705 nm) has 20 m pixels; B08 (NIR, 842 nm) 10 m", fn:nd },
+
+  { id:"mtvi2", group:"Indices", name:"MTVI2", type:"index", source:"s2", bands:["b08","b04","b03"], ramp:R_NDVI,
+    min:-0.2, max:0.8, lim:[-1, 1], icon:"crop", sw:"linear-gradient(135deg,#fff9cc,#216011)", fg:"#1d2410",
+    sub:"Modified Triangular Vegetation Index 2 (B3, B4, B8)",
+    desc:"Green leaf area index of crops, little affected by the leaf chlorophyll content.",
+    formula:"MTVI2 = 1.5 × [1.2 × (ρ(B08) − ρ(B03)) − 2.5 × (ρ(B04) − ρ(B03))]\n        / √[(2 × ρ(B08) + 1)² − (6 × ρ(B08) − 5 × √ρ(B04)) − 0.5]",
+    // the root is always > 0 for ρ ≥ 0: 4N² − 2N + 0.5 has its minimum 0.25 at N = 0.25
+    fn:v => 1.5 * (1.2 * (v[0] - v[2]) - 2.5 * (v[1] - v[2])) / Math.sqrt((2 * v[0] + 1) ** 2 - (6 * v[0] - 5 * Math.sqrt(v[1])) - 0.5) },
+
   { id:"barren", group:"Composites", name:"Barren Soil", type:"fnrgb", source:"s2", bands:["b11","b04","b08","b02"],
     icon:"strata", sw:"linear-gradient(135deg,#c86a78,#3f6fb0)", fg:"#1a0a0a",
     sub:"Based on the combination: BSI, B08, B11", desc:"Barren soil visualisation.",
@@ -2803,6 +2836,8 @@ const COP_META = {
   aot: { more: "https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-s2-sr" }, cloud: { more: "https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-s2-sr" }, terrain: { more: "https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-s2-sr" },
   vhi: { more: "https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-vhi" }, vhiveg: { more: "https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-vhi" },
   evi: { thumb: "AGRICULTURE-3f9be2-4_EVI.png", cop: "# Enhanced Vegetation Index (EVI)\n\nThe enhanced vegetation index (EVI) is an 'optimized' vegetation index as it corrects for soil background signals and atmospheric influences. It is very useful in areas of dense canopy cover. The range of values for EVI is -1 to 1, with healthy vegetation generally around 0.20 to 0.80.\n\n\n\n\n\nMore infos [here](https://custom-scripts.sentinel-hub.com/sentinel-2/evi/) and [here.](https://en.wikipedia.org/wiki/Enhanced_vegetation_index)" },
+  ndre: { cop: "# Normalized Difference Red Edge (NDRE)\n\nThe NDRE replaces the red band of the NDVI with the red edge (B05, 705 nm), where the reflectance of leaves rises steeply and depends on their chlorophyll content. It therefore reflects the chlorophyll and nitrogen status of a crop and keeps rising in dense canopies where the NDVI saturates, which makes it useful later in the season. Typical values: bare soil around 0–0.1, crops about 0.2–0.6. One of the indices Agroscope recommends for crop monitoring, together with NDVI, EVI and MTVI2.\n\nInput: swissEO S2-SR reflectance ρ = DN × 0.0001 − 0.1 of B08 (10 m) and B05 (20 m), negative ρ set to 0.\n\nReferences: Gitelson & Merzlyak 1994, [doi:10.1016/1011-1344(93)06963-4](https://doi.org/10.1016/1011-1344%2893%2906963-4); [Awesome Spectral Indices](https://github.com/awesome-spectral-indices/awesome-spectral-indices) (NDREI, Montero et al. 2023); [Index DataBase](https://www.indexdatabase.de/db/i-single.php?id=223)." },
+  mtvi2: { cop: "# Modified Triangular Vegetation Index 2 (MTVI2)\n\nThe MTVI2 (Haboudane et al. 2004) was designed to estimate the green leaf area index (LAI) of crops while staying insensitive to the leaf chlorophyll content, with a soil adjustment in the denominator. It responds to canopy density over a wider range than the NDVI. Values reach about −1 to 1; vegetated fields are mostly between 0.2 and 0.8. One of the indices Agroscope recommends for crop monitoring, together with NDVI, EVI and NDRE.\n\nInput: swissEO S2-SR reflectance ρ = DN × 0.0001 − 0.1 of B03 (green), B04 (red) and B08 (NIR), all 10 m, negative ρ set to 0 (so √ρ(B04) is defined). The formula needs reflectance, not DN.\n\nReferences: Haboudane et al. 2004, Remote Sensing of Environment 90, 337–352, [doi:10.1016/j.rse.2003.12.013](https://doi.org/10.1016/j.rse.2003.12.013); [Awesome Spectral Indices](https://github.com/awesome-spectral-indices/awesome-spectral-indices) (Montero et al. 2023); [Index DataBase](https://www.indexdatabase.de/db/i-single.php?id=47)." },
   savi: { thumb: "AGRICULTURE-3f9be2-SAVI.png", cop: "# Soil Adjusted Vegetation Index (SAVI)\n\n The Soil Adjusted Vegetation Index is similar to Normalized Difference Vegetation Index (NDVI) but is used in areas where vegetative cover is low (< 40%). The index is a transformation technique that minimizes soil brightness influences from spectral vegetation indices involving red and near-infrared (NIR) wavelengths. The index is helpful when analysing young crops, arid regions with sparse vegetation and exposed soil surfaces.\n\n\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/sentinel-2/savi/) and [here.](https://eos.com/blog/6-spectral-indexes-on-top-of-ndvi-to-make-your-vegetation-analysis-complete/)" },
   barren: { thumb: "AGRICULTURE-3f9be2-8_BARREN-SOIL.png", cop: "# Barren Soil Visualization\n\nThe Barren Soil Visualization can be useful for soil mapping, to investigate the location of landslides or the extent of erosion in non-vegetated areas. This visualization shows all vegetation in green and the barren ground in red. Water appears black.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/sentinel-2/barren_soil/) and [here.](https://medium.com/sentinel-hub/create-useful-and-beautiful-satellite-images-with-custom-scripts-8ef0e6a474c6)" },
   mstress: { thumb: "AGRICULTURE-3f9be2-9_MOISTURE-STRESS.png", cop: "# NDMI for Moisture Stress\n\nThe Normalized Difference Moisture Index (NDMI) for moisture stress can be used to detect irrigation. For all the index values above 0, knowing the land use and land cover, it is possible to determine whether irrigation has taken place. Knowing the type of crop grown (e.g. citrus crops), it is possible to identify whether irrigation is being effective or not during the crucial growing summer season, as well as find out if some parts of the farm are being under or over-irrigated.\n\n\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/sentinel-2/ndmi_special/#)" },
@@ -2881,11 +2916,11 @@ const HIGHLIGHTS = {
 /* catalog:configs:start */
 const CONFIGS = {
   DEFAULT: { name: "Default", beta: false, groups: [
-    ["Composites", ["true", "nir", "urban", "swir", "agri", "geo"]],
-    ["Indices", ["ndvi", "ndwi", "ndmi", "ndsi", "nbr", "aot", "vhi", "vhiveg", "ndvidiff"]],
+    ["Composites", ["true", "nir", "urban", "swir", "agri", "geo", "barren"]],
+    ["Indices", ["ndvi", "ndwi", "ndmi", "ndsi", "nbr", "aot", "savi", "vhi", "vhiveg", "ndvidiff"]],
     ["Masks & quality", ["scl", "cloud", "terrain"]]] },
-  AGRICULTURE: { name: "Agriculture", beta: false, groups: [
-    ["Layers", ["true", "nir", "ndvi", "evi", "barren", "mstress", "ndmi", "agri", "savi"]]] },
+  AGRICULTURE: { name: "Agriculture", beta: false, veg: "lnf:a.dw.dp.r.o.dk.g.s.h.u.so.v", groups: [
+    ["Layers", ["true", "ndvi", "evi", "ndre", "mtvi2"]]] },
   DROUGHT: { name: "Drought", beta: false, groups: [
     ["Layers", ["true", "ndvi", "evi", "ndmi", "vhi", "vhiveg", "ndvidiff", "ndvidiff2", "ndviz", "nddi", "nddichg", "analyst"]]] },
   DROUGHT2026: { name: "Drought 2026", beta: false, highlights: HIGHLIGHTS.drought2026, groups: [
@@ -2904,6 +2939,8 @@ const MASK_DEFAULTS = {
   "terrain": { cloud: true, shadow: true },
   "evi": { cloud: true, shadow: true, terrain: true, veg: "vegetation" },
   "savi": { cloud: true, shadow: true, terrain: true, veg: "vegetation" },
+  "ndre": { cloud: true, shadow: true, terrain: true, veg: "vegetation" },
+  "mtvi2": { cloud: true, shadow: true, terrain: true, veg: "vegetation" },
   "barren": { cloud: true, shadow: true, terrain: true },
   "mstress": { cloud: true, shadow: true, terrain: true, veg: "vegetation" },
   "hon": { cloud: true, shadow: true, terrain: true },
@@ -2957,6 +2994,13 @@ function mdLite(text) {
 }
 LAYERS.forEach(r => { if (r.ramp) r.domain = [r.min, r.max]; });
 const MASKABLE = { rgb: 1, index: 1, cont: 1, terrain: 1, fnrgb: 1, diff2: 1, fnclass: 1 };
+/* The terrain mask (terrainmask_10m: 0–180 solar incidence angle in degrees, 200 shadow, 255 no data) as a test of one
+   layer's settings: terrain shadow (200) and, with the illumination mask, an incidence angle at or above the threshold,
+   i.e. a slope the sun hardly lights (issue #53). null when neither is on, so the grid is not read. */
+const ILLUM_THR = 70;
+const terrOut = s => s.terrain || s.illum
+  ? v => (s.terrain && v === 200) || (!!s.illum && v >= s.illumThr && v <= 180) : null;
+const terrOutOpt = o => terrOut({ terrain: !!o.maskTerrain, illum: o.maskIllum != null, illumThr: o.maskIllum });
 const SCL_CLOUD = { 3: 1, 8: 1, 9: 1, 10: 1 };   // SCL cloud shadow, cloud medium / high probability, cirrus
 
 /* Vegetation masks of the S2-SR layers (value of the setting, also in the link):
@@ -3411,7 +3455,8 @@ function vegDefault(rec, cfg) {
 function defaults(rec, cfg = configId) {
   const m = maskDefaults(rec);
   return Object.assign({ gain: 1, gamma: 1, r: [0, 1], g: [0, 1], b: [0, 1], min: rec.min, max: rec.max, thr: rec.threshold,
-           opacity: 100, cloud: !!m.cloud, shadow: !!m.shadow, terrain: !!m.terrain, veg: vegDefault(rec, cfg),
+           opacity: 100, cloud: !!m.cloud, shadow: !!m.shadow, terrain: !!m.terrain, illum: !!m.illumination, illumThr: ILLUM_THR,
+           veg: vegDefault(rec, cfg),
            autoGain: false, look: "standard", refDate: "", mode: "diff", ndwi: "swir", cmask: "off" }, rec.def || {});
 }
 const settings = Object.create(null);
@@ -3419,7 +3464,7 @@ const S = rec => settings[rec.id] || (settings[rec.id] = defaults(rec));
 
 const RNG_KEYS = [["r", "redRange"], ["g", "greenRange"], ["b", "blueRange"]];
 const SETTING_KEYS = ["gain", "gamma", "redRange", "greenRange", "blueRange", "valueRange", "threshold",
-                      "opacity", "cloudMask", "shadowMask", "terrainMask", "vegetationMask", "autoGain", "look", "refDate", "displayMode", "ndwi", "customMask"];
+                      "opacity", "cloudMask", "shadowMask", "terrainMask", "illuminationMask", "illuminationThreshold", "vegetationMask", "autoGain", "look", "refDate", "displayMode", "ndwi", "customMask"];
 const r3 = v => +(+v).toFixed(4);
 
 /* Non-default settings as a flat object, named like the Copernicus Browser URL params. */
@@ -3441,6 +3486,8 @@ function settingsToObj(rec, s) {
     if (s.cloud !== d.cloud) o.cloudMask = s.cloud;
     if (s.shadow !== d.shadow) o.shadowMask = s.shadow;
     if (s.terrain !== d.terrain) o.terrainMask = s.terrain;
+    if (s.illum !== d.illum) o.illuminationMask = s.illum;
+    if (s.illum && s.illumThr !== d.illumThr) o.illuminationThreshold = s.illumThr;
   }
   if (rec.source === "s2" && s.veg !== d.veg) o.vegetationMask = s.veg;
   if (rec.type === "rgb" && !rec.tci && !rec.look && s.autoGain) o.autoGain = true;
@@ -3471,6 +3518,8 @@ function objToSettings(rec, o) {
   if (o.cloudMask != null) s.cloud = bool(o.cloudMask);
   if (o.shadowMask != null) s.shadow = bool(o.shadowMask);
   if (o.terrainMask != null) s.terrain = bool(o.terrainMask);
+  if (o.illuminationMask != null) s.illum = bool(o.illuminationMask);
+  if (num(o.illuminationThreshold) != null) s.illumThr = clamp(Math.round(num(o.illuminationThreshold)), 0, 90);
   if (rec.source === "s2" && (vegOn(o.vegetationMask) || o.vegetationMask === "off"))      // normalized ("forest@1-1" -> "forest")
     s.veg = vegOn(o.vegetationMask) ? vegStr(vegParse(o.vegetationMask)) : "off";
   s.autoGain = rec.type === "rgb" && !rec.tci && bool(o.autoGain);
@@ -3804,7 +3853,8 @@ async function renderScene(rec, s, id, bbox, W, H, signal) {
   const urlOf = b => rec.cogUrl ? rec.cogUrl(id) : assetUrl(id, b);
   const reads = all.map(b => readGrid(urlOf(b), bbox, W, H, signal, rec.cogUrl ? rec.cogFill : b === "terrain" ? 255 : 0));
   reads.push(maskable && (s.cloud || s.shadow) ? readGrid(assetUrl(id, "cloud"), bbox, W, H, signal, 0) : null);
-  reads.push(maskable && s.terrain ? readGrid(assetUrl(id, "terrain"), bbox, W, H, signal, 255) : null);
+  const tOut = maskable ? terrOut(s) : null;
+  reads.push(tOut ? readGrid(assetUrl(id, "terrain"), bbox, W, H, signal, 255) : null);
   reads.push(s2 && vegOn(s.veg) ? readVegMask(s.veg, id.slice(0, 10), bbox, W, H, signal) : null);
   const [res, tci] = await Promise.all([Promise.all(reads),
     rec.tci ? readGridBands(assetUrl(id, "tci"), bbox, W, H, signal, 0, 3) : null]);
@@ -3814,7 +3864,7 @@ async function renderScene(rec, s, id, bbox, W, H, signal) {
   const cg = cmaskOn(s) ? customMaskGrid(bbox, W, H) : null, cmode = s.cmask;
   const masked = k => (vm && vm[k] === 0) ||
     (cm && ((s.cloud && (cm[k] === 1 || cm[k] === 2)) || (s.shadow && cm[k] === 3))) ||
-    (tm && tm[k] === 200) || (cg && cmaskOut(cmode, cg, k));
+    (tm && tOut(tm[k])) || (cg && cmaskOut(cmode, cg, k));
   const img = new ImageData(W, H), d = img.data, n = W * H;
   const put = (k, c) => { d[k*4] = c[0]; d[k*4+1] = c[1]; d[k*4+2] = c[2]; d[k*4+3] = 255; };
 
@@ -3986,6 +4036,7 @@ async function renderScene(rec, s, id, bbox, W, H, signal) {
 async function dateIndex(rec, s, scenes, bbox, W, H, signal) {
   const n = W * H, out = new Float32Array(n).fill(NaN), done = new Uint8Array(n);
   let left = n;
+  const tOut = terrOut(s);
   for (const id of scenes) {
     if (!left) break;
     const box = sceneBox(id);
@@ -3993,11 +4044,11 @@ async function dateIndex(rec, s, scenes, bbox, W, H, signal) {
     const [a, cm, tm] = await Promise.all([
       Promise.all(rec.bands.map(b => readGrid(assetUrl(id, b), bbox, W, H, signal, 0))),
       s.cloud || s.shadow ? readGrid(assetUrl(id, "cloud"), bbox, W, H, signal, 0) : null,
-      s.terrain ? readGrid(assetUrl(id, "terrain"), bbox, W, H, signal, 255) : null]);
+      tOut ? readGrid(assetUrl(id, "terrain"), bbox, W, H, signal, 255) : null]);
     if (a.some(x => !x)) continue;
     for (let k = 0; k < n; k++) {
       if (done[k] || a.some(x => x[k] === 0)) continue;
-      if ((cm && ((s.cloud && (cm[k] === 1 || cm[k] === 2)) || (s.shadow && cm[k] === 3))) || (tm && tm[k] === 200)) continue;
+      if ((cm && ((s.cloud && (cm[k] === 1 || cm[k] === 2)) || (s.shadow && cm[k] === 3))) || (tm && tOut(tm[k]))) continue;
       const v = rec.fn(rec.bands.map((b, i) => physIdx(b, a[i][k])), s);
       if (isFinite(v)) { out[k] = v; done[k] = 1; left--; }
     }
@@ -4242,7 +4293,8 @@ async function autoGainFactor(rec, s, scenes, bbox, signal, grid) {
     g = { bbox, W, H, mask: new Uint8Array(W * H).fill(1), n: W * H };
   }
   const r = await sampleAoi({ type: "rgb", source: "s2", bands: rec.bands }, scenes, g,
-    { maskClouds: s.cloud || s.shadow, cloudCodes: { 1: s.cloud, 2: s.cloud, 3: s.shadow }, maskTerrain: s.terrain, veg: s.veg,
+    { maskClouds: s.cloud || s.shadow, cloudCodes: { 1: s.cloud, 2: s.cloud, 3: s.shadow }, maskTerrain: s.terrain,
+      maskIllum: s.illum ? s.illumThr : null, veg: s.veg,
       cmask: cmaskOn(s) ? s.cmask : "off" }, signal);
   const br = [];
   for (let k = 0; k < g.W * g.H; k++) {
@@ -4899,18 +4951,21 @@ function layerBody(rec) {
   /* ---- masks ---- */
   if (rec.source === "s2") sec(t("layer.masks", "Masks"));
   if (MASKABLE[rec.type]) {
-    const tog = (key, label, small) => {
+    const tog = (key, label, small, relist) => {
       const l = el("label", "tog");
       l.innerHTML = "<span>" + label + "<small>" + small + "</small></span>";
       const i = el("input");
       i.type = "checkbox"; i.checked = s[key];
-      i.onchange = () => { s[key] = i.checked; onSettings(rec); };
+      i.onchange = () => { s[key] = i.checked; if (relist) renderLayerList(); onSettings(rec); };
       l.append(i);
       body.append(l);
     };
     tog("cloud", t("layer.clouds", "Clouds"), t("layer.cloudsHelp", "OmniCloudMask thick (1) and thin (2) cloud"));
     tog("shadow", t("layer.cloudShadows", "Cloud shadows"), t("layer.cloudShadowsHelp", "OmniCloudMask cloud shadow (3)"));
     tog("terrain", t("layer.terrainShadow", "Terrain shadow"), t("layer.terrainShadowHelp", "Terrain mask value 200: cast or self-shadow"));
+    tog("illum", t("layer.illumination", "Low illumination"),
+        t("layer.illuminationHelp", "Terrain mask: solar incidence angle at or above the threshold, slopes the sun hardly lights"), true);
+    if (s.illum) body.append(sliderRow(t("layer.illumThreshold", "Threshold [°]"), 0, 90, 1, s.illumThr, v => { s.illumThr = v; onSettings(rec); }));
   }
   if (rec.source === "s2") {
     const l = el("div", "tog vrow");
@@ -6228,14 +6283,16 @@ async function sampleAoi(r, scenes, grid, o, signal) {
 
     // 2. masks: when everything left is masked, the remaining bands are not needed
     const useMask = r.type !== "class";
+    // the terrain layer counts its own shadow cells; only the illumination threshold masks it
+    const tOut = !useMask ? null : r.type === "terrain" ? terrOutOpt({ maskIllum: o.maskIllum }) : terrOutOpt(o);
     const [cm, tm, sm] = await Promise.all([
       useMask && o.maskClouds ? rd(id, "cloud") : null,
-      useMask && o.maskTerrain && r.type !== "terrain" ? rd(id, "terrain") : null,
+      tOut ? rd(id, "terrain") : null,
       useMask && o.maskScl ? rd(id, "scl") : null]);
     let left = 0;
     for (let k = 0; k < n; k++) {
       if (!has[k]) continue;
-      if ((cm && (o.cloudCodes ? o.cloudCodes[cm[k]] : cm[k] >= 1 && cm[k] <= 3)) || (tm && tm[k] === 200) ||
+      if ((cm && (o.cloudCodes ? o.cloudCodes[cm[k]] : cm[k] >= 1 && cm[k] <= 3)) || (tm && tOut(tm[k])) ||
           (sm && SCL_CLOUD[sm[k]])) {
         if (wasMasked) wasMasked[k] = 1; else { masked++; done[k] = 1; }
         has[k] = 0;
@@ -6396,10 +6453,13 @@ function openStats() {
   $("#stCloudRow").hidden = !s2 || r.type === "class";
   $("#stSclRow").hidden = !s2 || r.type === "class";
   $("#stTerrRow").hidden = !s2 || r.type === "class" || r.type === "terrain";
+  $("#stIllumRow").hidden = !s2 || r.type === "class";
+  $("#stIllumTxt").textContent = t("stats.excludeIllum", "Exclude low illumination (solar incidence ≥ {{thr}}°)", { thr: S(rec).illumThr });
   $("#stVegRow").hidden = !s2;
   stVeg = s2 ? S(rec).veg : "off";
   $("#stVeg").replaceChildren(vegSelect(stVeg, v => { stVeg = v; runCurrentStats(); }));
   $("#stTerr").checked = S(rec).terrain;
+  $("#stIllum").checked = !!S(rec).illum;
   $("#stDate").textContent = fmtDay(state.date);
   const noTs = r.type === "class" || r.type === "fnclass" || rec.type === "diff2" || rec.type === "vhiseason";
   $("#stTsCtl").hidden = noTs;
@@ -6417,7 +6477,7 @@ function openStats() {
 }
 $("#statModal").onclose = () => { if (stAbort) stAbort.abort(); if (stCurAbort) stCurAbort.abort(); };
 $("#aoiStats").onclick = openStats;
-$("#stCloud").onchange = $("#stScl").onchange = $("#stTerr").onchange = () => { runCurrentStats(); };
+$("#stCloud").onchange = $("#stScl").onchange = $("#stTerr").onchange = $("#stIllum").onchange = () => { runCurrentStats(); };
 
 /* Statistics of the selected date over the area of interest: on the coarse grid (fast) or at 10 m when "Full resolution"
    is chosen in the box below the info line (issue #11); the result comes with a CSV download. */
@@ -6439,7 +6499,8 @@ async function runCurrentStats() {
     const scenes = await scenesFor(rec, state.date, state.cc);
     if (signal.aborted) return;
     if (!scenes.length) { box.innerHTML = '<div class="hint">' + t("stats.noAcq", "No acquisition on {{date}}.", { date: fmtDay(state.date) }) + "</div>"; return; }
-    const opt = { maskClouds: $("#stCloud").checked, maskScl: $("#stScl").checked, maskTerrain: $("#stTerr").checked, veg: stVeg,
+    const opt = { maskClouds: $("#stCloud").checked, maskScl: $("#stScl").checked, maskTerrain: $("#stTerr").checked,
+                  maskIllum: $("#stIllum").checked ? S(rec).illumThr : null, veg: stVeg,
                   cmask: cmaskOn(S(rec)) ? S(rec).cmask : "off" };
     let out;
     if (rec.type === "diff2") out = await diffStats(rec, r, scenes, grid, opt, ten, signal, prog);
@@ -6623,7 +6684,8 @@ function stResBox() {
 const csvLine = a => a.map(v => /[",\n]/.test(String(v)) ? '"' + String(v).replace(/"/g, '""') + '"' : v).join(",");
 const csvHead = (rec, opt, res) => [["layer", rec.name + " (" + rec.id + ")"], ["date", state.date]].concat(rec.source === "s2" ? [
   ["vegetation_mask", vegOn(opt.veg) ? vegName(opt.veg) : "none"], ["clouds_masked", !!opt.maskClouds],
-  ["scl_clouds_masked", !!opt.maskScl], ["terrain_shadow_masked", !!opt.maskTerrain]] : [],
+  ["scl_clouds_masked", !!opt.maskScl], ["terrain_shadow_masked", !!opt.maskTerrain],
+  ["low_illumination_masked", opt.maskIllum != null ? "incidence >= " + opt.maskIllum + " deg" : false]] : [],
   [["custom_mask", opt.cmask || "off"], ["resolution_m", res]]);
 function statsCsv(rec, r, t, opt, res) {
   const rows = csvHead(rec, opt, res).concat([["cells_in_aoi", t.cells], ["cells_inside_masks", t.total]]);
@@ -6888,7 +6950,8 @@ async function runSeries() {
     // the coarse grid (fast) or, when chosen, every date at 10 m in chunks (stats10)
     const grid = aoiGrid(140), ten = stRes === "10" && grid.res > 10;
     stSeriesRes = ten ? 10 : grid.res;
-    const opt = { maskClouds: $("#stCloud").checked, maskScl: $("#stScl").checked, maskTerrain: $("#stTerr").checked, veg: stVeg,
+    const opt = { maskClouds: $("#stCloud").checked, maskScl: $("#stScl").checked, maskTerrain: $("#stTerr").checked,
+                  maskIllum: $("#stIllum").checked ? S(rec).illumThr : null, veg: stVeg,
                   cmask: cmaskOn(S(rec)) ? S(rec).cmask : "off" };
     let redraw = null;
     await pool(todo, ten ? 2 : 4, async d => {
@@ -8093,7 +8156,9 @@ map.on("click", async e => {
     }
     tr("SCL", scl == null ? "n/a" : scl + " · " + palLabel(P_SCL, scl));
     tr(t("inspect.cloudMask", "Cloud mask"), cld == null ? "n/a" : cld + " · " + palLabel(P_CLOUD, cld));
-    tr(t("inspect.terrainMask", "Terrain mask"), TERRAIN_TXT(ter));
+    const sIl = cfg.s;
+    tr(t("inspect.terrainMask", "Terrain mask"), TERRAIN_TXT(ter) + (MASKABLE[rec.type] && sIl.illum && ter != null && ter >= sIl.illumThr && ter <= 180
+      ? " · " + t("inspect.illumMasked", "masked: low illumination (≥ {{thr}}°)", { thr: sIl.illumThr }) : ""));
     // habitat map of the date (as swissEO VHI), the swissTLM3D forest class, the broadleaf probability of Forest Type NFI
     // and the Nutzungsflächen category
     const hp = habitatOf(null, state.date), sp = vegParse(S(rec).veg);
@@ -8601,7 +8666,8 @@ async function runAnalytical(signal, prog) {
     if (fmt === "tiff32" && (rec.type === "index" || rec.type === "cont" || rec.type === "terrain" || rec.type === "diff2" || rec.type === "vhiseason")) {
       // the index / physical value itself (two-date layers: the difference), with the layer's masks
       const grid = { bbox, W, H, mask: inAoi || new Uint8Array(n).fill(1), n };
-      const o = { maskClouds: s.cloud || s.shadow, maskTerrain: s.terrain, cloudCodes: { 1: s.cloud, 2: s.cloud, 3: s.shadow }, veg: s.veg,
+      const o = { maskClouds: s.cloud || s.shadow, maskTerrain: s.terrain, maskIllum: s.illum ? s.illumThr : null,
+                  cloudCodes: { 1: s.cloud, 2: s.cloud, 3: s.shadow }, veg: s.veg,
                   cmask: cmaskOn(s) ? s.cmask : "off" };
       const r = statRec(rec), res = await sampleAoi(r, scenes, grid, o, signal);
       let band = res.vals[0];
@@ -8691,18 +8757,26 @@ async function runAnalytical(signal, prog) {
    is enlarged to the paper's aspect ratio around its centre, so it is always fully on the print. A scale: the extent is
    paper size × scale, centred on the area of interest (or the view); a warning tells when the area does not fit. */
 const printSubject = () => $("#exCropP").checked && aoi ? aoiBox(0.05) : viewBox();
+/* A social media size of the Size lists (issue #51, print and timelapse): [W, H] in pixels, or null. */
+const pxSize = v => { const m = /^px:(\d+)x(\d+)$/.exec(v || ""); return m ? [+m[1], +m[2]] : null; };
+/* A box enlarged around its centre to the aspect ratio asp = height / width, so all of it stays in the picture. */
+function fitAspect(b, asp) {
+  const sw = b[2] - b[0], sh = b[3] - b[1], cx = (b[0] + b[2]) / 2, cy = (b[1] + b[3]) / 2;
+  const [ew, eh] = sh / sw > asp ? [sh / asp, sh] : [sw, sw * asp];
+  return [cx - ew / 2, cy - eh / 2, cx + ew / 2, cy + eh / 2];
+}
 function printGrid() {
-  const wCm = +$("#exWcm").value, hCm = +$("#exHcm").value, dpi = +$("#exDpi").value, scale = +$("#exScale").value;
-  const sb = printSubject(), c = aoi && scale ? aoiBox(0) : sb, cx = (c[0] + c[2]) / 2, cy = (c[1] + c[3]) / 2;
-  let ew, eh;
-  if (scale) { ew = wCm / 100 * scale; eh = hCm / 100 * scale; }
-  else {
-    const sw = sb[2] - sb[0], sh = sb[3] - sb[1];
-    if (sh / sw > hCm / wCm) { eh = sh; ew = sh * wCm / hCm; } else { ew = sw; eh = sw * hCm / wCm; }
-  }
-  const bbox = [cx - ew / 2, cy - eh / 2, cx + ew / 2, cy + eh / 2];
-  const W = Math.round(wCm / 2.54 * dpi), H = Math.round(hCm / 2.54 * dpi);
-  const ok = wCm > 0 && hCm > 0 && dpi >= 72 && W <= 12000 && H <= 12000 && W * H <= 60e6;
+  const px = pxSize($("#exPaper").value);                  // a social media size: fixed pixels, always "Fit"
+  const wCm = +$("#exWcm").value, hCm = +$("#exHcm").value, dpi = +$("#exDpi").value, scale = px ? 0 : +$("#exScale").value;
+  const sb = printSubject();
+  let bbox;
+  if (scale) {
+    const c = aoi ? aoiBox(0) : sb, cx = (c[0] + c[2]) / 2, cy = (c[1] + c[3]) / 2, ew = wCm / 100 * scale, eh = hCm / 100 * scale;
+    bbox = [cx - ew / 2, cy - eh / 2, cx + ew / 2, cy + eh / 2];
+  } else bbox = fitAspect(sb, px ? px[1] / px[0] : hCm / wCm);
+  const ew = bbox[2] - bbox[0];
+  const W = px ? px[0] : Math.round(wCm / 2.54 * dpi), H = px ? px[1] : Math.round(hCm / 2.54 * dpi);
+  const ok = !!px || (wCm > 0 && hCm > 0 && dpi >= 72 && W <= 12000 && H <= 12000 && W * H <= 60e6);
   let warn = "";
   if (aoi && scale) {
     const a = aoiBox(0);
@@ -8712,7 +8786,8 @@ function printGrid() {
              { w: fmtCm(wCm), h: fmtCm(hCm), scale: fmtScale(scale), need: fmtScale(Math.ceil(need / 1000) * 1000) });
     }
   }
-  return { bbox, W, H, k: dpi / 96, mpp: ew / W, ok, scale, wCm, hCm, warn,
+  // text and lines: dpi / 96 on paper; a social media image gets the proportions of a print about 19 cm wide
+  return { bbox, W, H, k: px ? Math.min(W, H) / 720 : dpi / 96, mpp: ew / W, ok, scale, wCm, hCm, px, warn,
            msg: ok ? "" : t("export.tooBigP", "The image is too large (max. 12000 px per side and 60 megapixels). Lower the size or DPI.") };
 }
 const fmtCm = v => fmtLoc(+(+v).toFixed(1));
@@ -8763,7 +8838,7 @@ async function runPrint(signal, prog) {
   prog(t("export.encoding", "Encoding…"));
   const fmt = $("#exFmtP").value;
   saveBlob(await canvasBlob(cv, fmt), "swissEO_print_" + (compareMode ? "compare" : currentRec.id) + "_" + state.date + "_" +
-    $("#exDpi").value + "dpi." + fmt);
+    (g.px ? W + "x" + H : $("#exDpi").value + "dpi") + "." + fmt);
   return "";
 }
 
@@ -8789,7 +8864,7 @@ function exInfo() {
     $("#exInfoP").innerHTML = (g.ok ? "" : '<span style="color:var(--red)">') + g.W + " × " + g.H + " px (" +
       fmtLoc(g.W * g.H / 1e6, 1) + " MP) · " + fmtLoc(g.mpp, g.mpp < 10 ? 2 : 1) + " m/px · " +
       fmtLoc(km(g.bbox[2] - g.bbox[0])) + " × " + fmtLoc(km(g.bbox[3] - g.bbox[1])) + " km" +
-      (g.scale ? "" : " · " + t("export.scaleAbout", "scale about 1:{{s}}", { s: fmtScale(Math.round((g.bbox[2] - g.bbox[0]) / (g.wCm / 100) / 100) * 100) })) +
+      (g.scale || g.px ? "" : " · " + t("export.scaleAbout", "scale about 1:{{s}}", { s: fmtScale(Math.round((g.bbox[2] - g.bbox[0]) / (g.wCm / 100) / 100) * 100) })) +
       (g.ok ? "" : ". " + g.msg + "</span>") + (g.warn ? '<br><span style="color:var(--red)">' + g.warn + "</span>" : "");
   }
 }
@@ -8811,6 +8886,7 @@ function openExport() {
   $("#exProg").textContent = "";
   $("#exOvB").checked = labelsOn();
   printFitHeight();
+  printInputs();
   exLists();
   exShow(exTab);
   openModal("expModal");
@@ -8819,9 +8895,15 @@ $("#btnExport").onclick = openExport;
 $$("#expTabs button").forEach(b => { b.onclick = () => exShow(b.dataset.e); });
 ["#exCropB", "#exResA", "#exRx", "#exRy", "#exCropA", "#exDpi"].forEach(q => { $(q).oninput = $(q).onchange = exInfo; });
 $("#exWcm").oninput = $("#exHcm").oninput = () => { $("#exPaper").value = "custom"; exInfo(); };
+/* A social media size fixes the pixels and the extent (the view or area, fitted): centimetres, scale and DPI are off. */
+function printInputs() {
+  const px = !!pxSize($("#exPaper").value);
+  ["#exWcm", "#exHcm", "#exScale", "#exDpi"].forEach(q => { $(q).disabled = px; });
+}
 $("#exPaper").onchange = () => {
-  const p = $("#exPaper").value.split("x");
-  if (p.length === 2) { $("#exWcm").value = p[0]; $("#exHcm").value = p[1]; } else printFitHeight();
+  const v = $("#exPaper").value, p = v.split("x");
+  if (!pxSize(v) && p.length === 2) { $("#exWcm").value = p[0]; $("#exHcm").value = p[1]; } else printFitHeight();
+  printInputs();
   exInfo();
 };
 $("#exScale").onchange = exInfo;
@@ -8899,20 +8981,36 @@ tlMonthNames();
 I18N.onChange(() => { tlMonthNames(); if (tl.items && tl.items.length) tlRenderList(); else if ($("#tlListInfo").textContent) tlListInfo(); });
 $$("#tlMonths button").forEach(b => { b.onclick = () => b.classList.toggle("on"); });
 
-/* The timelapse covers the area of interest when there is one (data clipped to it), otherwise the view. */
+/* The timelapse covers the area of interest when there is one (data clipped to it), otherwise the view. A social media
+   size (issue #51) enlarges that box around its centre to the size's aspect ratio; the frames have exactly its pixels. */
 function tlArea() {
-  return aoi ? { bbox: aoiBox(0.04), aoi: true } : { bbox: viewBox(), aoi: false };
+  const b = aoi ? aoiBox(0.04) : viewBox(), px = pxSize($("#tlPreset").value);
+  return { bbox: px ? fitAspect(b, px[1] / px[0]) : b, aoi: !!aoi };
 }
 function tlDefaultSize() {
   const b = tlArea().bbox, asp = (b[3] - b[1]) / (b[2] - b[0]);
   return asp > 1 ? [Math.round(1024 / asp), 1024] : [1024, Math.round(1024 * asp)];
 }
 function tlSize() {
+  const px = pxSize($("#tlPreset").value);
+  if (px) return px;
   const W = clamp(Math.round(+$("#tlW").value || 1024), 64, 2048), H = clamp(Math.round(+$("#tlH").value || 1024), 64, 2048);
   return [W, H];
 }
 $("#tlW").oninput = () => { const b = tlArea().bbox; $("#tlH").value = Math.round(+$("#tlW").value * (b[3] - b[1]) / (b[2] - b[0])); };
 $("#tlH").oninput = () => { const b = tlArea().bbox; $("#tlW").value = Math.round(+$("#tlH").value * (b[2] - b[0]) / (b[3] - b[1])); };
+/* The size list: a social media size shows its pixels in the (locked) W × H fields; "Area" fits them to the area again. */
+function tlPresetShow() {
+  const px = pxSize($("#tlPreset").value), sz = px || tlDefaultSize();
+  $("#tlW").value = sz[0]; $("#tlH").value = sz[1];
+  $("#tlW").disabled = $("#tlH").disabled = !!px;
+}
+$("#tlPreset").onchange = () => {
+  tlPresetShow();
+  tl.items.forEach(it => { it.thumb = null; });                 // thumbnails follow the new extent
+  tlQ.length = 0;
+  tlRenderList();
+};
 
 /* Coarse grid over the timelapse box (AOI polygon as mask) for coverage and cloud statistics. */
 function tlGrid(bbox, maxCells) {
@@ -9119,7 +9217,8 @@ const W0 = ctx => ctx.canvas.width;
 
 async function tlFrame(it, area, W, H, o, signal) {
   const rec = currentRec, s = S(rec), cv = makeCanvas(W, H), ctx = cv.getContext("2d");
-  const k = Math.max(1, W / 1000);
+  // text and lines: a social media size is seen on a phone, so it gets the larger scale of the print (min(W, H) / 720)
+  const k = pxSize($("#tlPreset").value) ? Math.min(W, H) / 720 : Math.max(1, W / 1000);
   ctx.fillStyle = "#e9ecef"; ctx.fillRect(0, 0, W, H);
   if (tl.base) ctx.drawImage(tl.base, 0, 0);
   const rings = aoi ? aoiRingsPx(area.bbox, W, H) : [];
@@ -9336,8 +9435,7 @@ function openTimelapse() {
   $("#tlAreaInfo").textContent = area.aoi ? t("timelapse.areaAoi", "Area: the area of interest ({{area}}).", { area: areaLabel(geomArea(aoi)) })
     : t("timelapse.areaView", "Area: the current map view. To create a timelapse of a custom area, create an AOI first.");
   if (!$("#tlTo").value) { $("#tlTo").value = state.date; $("#tlFrom").value = addDays(state.date, -182); }
-  const sz = tlDefaultSize();
-  $("#tlW").value = sz[0]; $("#tlH").value = sz[1];
+  tlPresetShow();
   $("#tlAutoRow").hidden = rec.type !== "rgb" || !!rec.tci;
   $("#tlAuto").checked = rec.type === "rgb" && !rec.tci && S(rec).autoGain;
   $("#tlCc").disabled = rec.source !== "s2";

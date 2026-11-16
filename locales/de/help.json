@@ -235,7 +235,7 @@
     "img1": "Dialog Bild herunterladen, Register Analytisch",
     "li1": "<b>Einfach</b>: die aktuelle Ansicht als PNG oder JPG, mit Bildlegenden (Datenquelle, Datum, Vegetationsmaske, Massstabsbalken), einer optionalen Beschreibung, den Kartenbeschriftungen, der Legende und dem Interessengebiet; auch im Vergleichsmodus und in 3D.",
     "li2": "<b>Analytisch</b>: mehrere Ebenen und Rohbänder auf einmal, für die Ansicht oder das Interessengebiet, mit 40, 20 oder 10 m oder einer eigenen Auflösung (bis 2500 × 2500 Pixel). Formate: PNG, JPG oder GeoTIFF in Schweizer Koordinaten (LV95): 8 Bit, 16 Bit (die gespeicherten Werte) oder <b>32-Bit-Gleitkomma mit den Index- oder physikalischen Werten</b> für Ihre eigene Analyse. Mehrere Dateien werden gezippt. Die Masken der Ebene gelten.",
-    "li3": "<b>Druck in hoher Auflösung</b>: die Ansicht für ein Druckformat gerechnet: Breite und Höhe in cm (oder A4 / A3, hoch oder quer), DPI und ein Massstab. <i>Einpassen</i> behält die ganze Ansicht (oder das Interessengebiet) auf dem Papier; ein fester Massstab wie 1:25 000 zentriert den Druck auf das Interessengebiet und warnt, wenn es nicht passt.",
+    "li3": "<b>Druck in hoher Auflösung</b>: die Ansicht für ein Druckformat gerechnet: Breite und Höhe in cm (oder A4 / A3, hoch oder quer), DPI und ein Massstab. <i>Einpassen</i> behält die ganze Ansicht (oder das Interessengebiet) auf dem Papier; ein fester Massstab wie 1:25 000 zentriert den Druck auf das Interessengebiet und warnt, wenn es nicht passt. Die Liste <i>Grösse</i> enthält auch Formate für soziale Medien, zum Beispiel 1080 × 1920 px für eine Story oder ein Reel: Die ganze Ansicht oder das ganze Gebiet wird darin eingepasst.",
     "title": "Bild herunterladen"
   },
   "tools-insp": {
@@ -268,7 +268,7 @@
     "li1": "wählen Sie den Zeitraum und <i>1 Bild auswählen pro</i> Orbit, Tag, Woche, Monat oder Jahr; die Monats-Schaltflächen überspringen Jahreszeiten, die Sie nicht wollen (zum Beispiel den Winter);",
     "li2": "klicken Sie auf <b>Suchen</b>: Pro Intervall wird das Bild mit der besten Abdeckung Ihres Gebiets und dem klarsten Himmel gewählt;",
     "li3": "prüfen Sie die Liste: Vorschaubilder, Wolkenbedeckung und Abdeckung Ihres Gebiets; die Schieberegler filtern bewölkte oder unvollständige Bilder;",
-    "li4": "spielen Sie die <b>Vorschau</b> ab (Geschwindigkeit, Überblenden, Legende, Bildlegenden) und laden Sie sie als <b>GIF</b> oder <b>Video</b> herunter.",
+    "li4": "spielen Sie die <b>Vorschau</b> ab (Geschwindigkeit, Überblenden, Legende, Bildlegenden) und laden Sie sie als <b>GIF</b> oder <b>Video</b> herunter, in der Grösse Ihres Gebiets oder in einem Format für soziale Medien (<i>Grösse</i>, zum Beispiel ein Video mit 1080 × 1920 px für eine Story oder ein Reel).",
     "p1": "Die Film-Schaltfläche erstellt eine Animation der aktuellen Ebene mit ihren Masken über dem Interessengebiet (oder der Ansicht):",
     "p2": "Es gibt keine harten Grenzen: Eine wöchentliche Gletscheranimation über zehn Jahre funktioniert, sie dauert nur einige Minuten.",
     "title": "Zeitraffer"
@@ -330,9 +330,9 @@
     "p2": "Die Echtfarben sind das Bild, das mit jedem swissEO-Mosaik geliefert wird. Alle anderen Ebenen werden in Ihrem Browser aus den Bändern berechnet oder aus den swissEO-Produkten gelesen (VHI, NDVIdiff, NDVIz). Wenn mehrere Satellitenüberflüge denselben Tag abdecken, werden sie zu einem Mosaik zusammengefügt, der neueste oben.",
     "td1": "Standard",
     "td10": "Echtfarben, NDVI, EVI, swissEO VHI Wald, kumuliertes VHI-Defizit, VHI-Tage in extremem Stress, swissEO NDVIdiff und NDVIz, NDVI-Differenz zu einem Referenzdatum, NBR, Feuchtigkeitsindex, Klassifikation von Waldstörungen",
-    "td2": "Komposite (Echtfarben, Falschfarben, Siedlung, SWIR, Landwirtschaft, Geologie), Indizes (NDVI, NDWI, Feuchtigkeitsindex, NDSI, NBR, AOT), swissEO VHI Wald und Vegetation, swissEO NDVIdiff, Szenenklassifikation, Wolkenmaske, Gelände",
+    "td2": "Komposite (Echtfarben, Falschfarben, Siedlung, SWIR, Landwirtschaft, Geologie, offener Boden), Indizes (NDVI, NDWI, Feuchtigkeitsindex, NDSI, NBR, AOT, SAVI), swissEO VHI Wald und Vegetation, swissEO NDVIdiff, Szenenklassifikation, Wolkenmaske, Gelände",
     "td3": "Landwirtschaft",
-    "td4": "Echtfarben, Falschfarben, NDVI, EVI, offener Boden, NDMI für Trockenstress, Feuchtigkeitsindex, Landwirtschaft, SAVI",
+    "td4": "Echtfarben, NDVI, EVI, NDRE, MTVI2 (die Indizes, die Agroscope für Kulturen empfiehlt), auf dem Landwirtschaftsland der Nutzungsflächen",
     "td5": "Trockenheit",
     "td6": "Echtfarben, NDVI, EVI, Feuchtigkeitsindex, swissEO VHI, swissEO NDVIdiff und NDVIz, NDDI und NDDI-Veränderung, NDVI-Differenz zu einem Referenzdatum",
     "td7": "Trockenheit 2026",
@@ -354,7 +354,8 @@
     "li3": "<b>Vegetationsmaske</b>: behält Wald, alle Vegetation, Nadel-, Misch- oder Laubwald, gewählte Baumarten oder gewählte Kategorien der landwirtschaftlichen Nutzung (nächster Abschnitt);",
     "li4": "<b>Eigene Maske</b>: Ihre eigenen Polygone (siehe <a href=\"#vis-mask\">Eigene Masken</a>).",
     "p1": "Jede Sentinel-2-Ebene hat diese Masken in ihrem Menü; sie blenden Pixel auf der Karte aus und lassen sie bei Statistik, Downloads und Zeitraffer weg. Die meisten Ebenen blenden Wolken, Wolkenschatten und Geländeschatten aus, sobald sie geöffnet werden (Echtfarben, Falschfarben, SWIR und die Aerosol-Ebene beginnen ohne Masken); schalten Sie eine Maske im Menü der Ebene ein oder aus:",
-    "title": "Masken"
+    "title": "Masken",
+    "li2b": "<b>Schwache Beleuchtung</b>: Hänge, die die Sonne kaum beleuchtet, wo ihr Einfallswinkel einen Schwellenwert erreicht (70°, ausser Sie verschieben den Regler unter dem Schalter); aus, bis Sie sie einschalten;"
   },
   "vis-menu": {
     "cap1": "<b>Abb. 10</b> Effekte und erweiterte Optionen.",
@@ -376,7 +377,7 @@
     "li3": "Die Zwei-Daten-Ebenen (NDDI-Veränderung, NDVI-Differenz zu einem Referenzdatum) verwenden an beiden Daten die Maske des gewählten Datums, so erscheint eine neue Version einer Habitatkarte nie als Veränderung.",
     "li4": "Die Maske gilt auch für die <a href=\"#tools-stats\">Statistik</a> (wo Sie eine andere wählen können), die <a href=\"#tools-spec\">Spektralanalyse</a>, die Downloads und den Zeitraffer; der Veränderungsbericht gibt die maskierte Fläche in Hektaren an.",
     "li5": "Die <a href=\"#tools-insp\">Pixelabfrage</a> zeigt an jeder Stelle die Habitatkarte, die swissTLM3D-Waldklasse, die Laubholzwahrscheinlichkeit (Waldmischungsgrad LFI), den Laubholzanteil und die dominante Baumart (ETH) sowie die Kategorie der Nutzungsflächen, unabhängig von der gewählten Maske; mit einer Maske nach Waldtyp auch die Klasse bei den aktuellen Grenzen.",
-    "p1": "Das Ausklappmenü <i>Vegetationsmaske</i> steht bei den Vegetationsindizes (NDVI, EVI, SAVI, Feuchtigkeitsindizes, NDDI) und beim NBR zu Beginn auf <i>Alle Vegetation</i>, bei den Waldebenen und bei jedem Vegetationsindex in der Konfiguration <i>Wald</i> auf <i>Wald</i>, und bei den Kompositen und den übrigen Indizes auf <i>Aus</i> («Eine auswählen»). Seine Einträge in dieser Reihenfolge:",
+    "p1": "Das Ausklappmenü <i>Vegetationsmaske</i> steht bei den Vegetationsindizes (NDVI, EVI, SAVI, NDRE, MTVI2, Feuchtigkeitsindizes, NDDI) und beim NBR zu Beginn auf <i>Alle Vegetation</i>, bei den Waldebenen und bei jedem Vegetationsindex in der Konfiguration <i>Wald</i> auf <i>Wald</i>, und bei den Kompositen und den übrigen Indizes auf <i>Aus</i> («Eine auswählen»). In der Konfiguration <i>Landwirtschaft</i> startet jeder Vegetationsindex mit dem Landwirtschaftsland der Nutzungsflächen (alle Kategorien ausser Wald). Seine Einträge in dieser Reihenfolge:",
     "p2": "Gut zu wissen:",
     "td1": "Habitatkarte: Wald, Alle Vegetation",
     "td10": "ETH-Baumarten (30 m): Nadelwald, Mischwald, Laubwald",

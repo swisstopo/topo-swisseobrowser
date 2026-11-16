@@ -48,7 +48,7 @@ CFG_END = "/* catalog:configs:end */"
 VER_MARKER = "const VERIFIED_IDS = null; // replaced on deploy"
 VER_WRITTEN = 'const VERIFIED_IDS = {ids}; // from catalog/layers.yaml'
 RM_START = "<!-- verification:start -->"
-MASK_KEYS = ("cloud", "shadow", "terrain")
+MASK_KEYS = ("cloud", "shadow", "terrain", "illumination")
 # the values of the vegetationMask URL parameter (README, Vegetation masks); the page normalizes the details
 VEG_RE = re.compile(r"off|forest|vegetation|tlm(:[0-9.]+)?|(lfi|eth)-(conif|mixed|broad)(:[0-9.]+)*(:m3)?(\+(forest|tlm|none))?"
                     r"|eth-sp(:[0-9.]+)?|lnf(:[a-z.]+)?")
@@ -122,9 +122,9 @@ def load():
 
 
 def check_masks(layers, configs, page):
-    """masks: { cloud, shadow, terrain: true/false, vegetation: a vegetationMask value }, only where the page
-    can apply them: cloud, shadow and terrain on the Sentinel-2 layers of a maskable type, the vegetation
-    mask on every Sentinel-2 layer."""
+    """masks: { cloud, shadow, terrain, illumination: true/false, vegetation: a vegetationMask value }, only where
+    the page can apply them: cloud, shadow, terrain and illumination on the Sentinel-2 layers of a maskable
+    type, the vegetation mask on every Sentinel-2 layer."""
     kind = {m.group(1): (m.group(2), m.group(3)) for m in
             re.finditer(r'^\s*\{ id:"([a-z0-9_]+)"[^\n]*?type:"(\w+)"[^\n]*?source:"(\w+)"', page, re.M)}
     m = re.search(r"^const MASKABLE = \{([^}]*)\}", page, re.M)
@@ -156,7 +156,7 @@ def check_masks(layers, configs, page):
                     fail("{}: '{}' cannot have a vegetation mask: it is not a Sentinel-2 layer".format(where, lid),
                          where)
             else:
-                fail("{}: unknown key masks.{} of '{}' (cloud, shadow, terrain, vegetation)".format(where, k, lid),
+                fail("{}: unknown key masks.{} of '{}' (cloud, shadow, terrain, illumination, vegetation)".format(where, k, lid),
                      where)
     for c in configs:
         masks = c.get("masks")
