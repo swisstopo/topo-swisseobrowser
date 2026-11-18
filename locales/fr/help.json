@@ -182,10 +182,10 @@
     "cap1": "<b>Fig. 5</b> NDVI près de Chiètres, 13 août 2026, limité par le masque Nutzungsflächen aux terres assolées, prairies permanentes et pâturages permanents.",
     "img1": "NDVI limité aux terres assolées, prairies et pâturages, avec les cases à cocher des catégories",
     "li1": "Dans le menu de la couche, descendez jusqu'à <b>Masques</b>. La liste déroulante <i>Masque de végétation</i> indique <i>Désactivé</i>.",
-    "li2": "Choisissez un masque, par exemple <i>Utilisation du sol (catégories ci-dessous)</i> sous <i>Nutzungsflächen</i> : l'utilisation agricole du sol des cantons.",
+    "li2": "Choisissez un masque, par exemple <i>Utilisation du sol</i> sous <i>Nutzungsflächen</i> : l'utilisation agricole du sol des cantons.",
     "li3": "Cochez les catégories que vous voulez garder, par exemple les terres assolées, les prairies permanentes et les pâturages permanents. La carte ne montre maintenant la couche que là.",
     "p1": "Souvent, seule une partie du paysage compte : la forêt pour évaluer une sécheresse, les champs pour une récolte. Le <b>masque de végétation</b> masque tout le reste.",
-    "p2": "Les autres masques gardent la forêt (la carte des habitats de swissEO VHI ou la forêt swissTLM3D), la forêt de résineux, mixte ou de feuillus (Degré de mélange LFI 2023, essences ETH), des essences isolées (ETH) ou toute la végétation. Ils sont décrits, avec leurs sources, sous <a href=\"#vis-veg\">Masques de végétation</a>. Les masques s'appliquent aussi aux statistiques, aux téléchargements et au timelapse.",
+    "p2": "Les autres masques gardent la forêt (la carte des habitats de swissEO VHI ou la forêt swissTLM3D), la forêt de résineux, mixte ou de feuillus (Degré de mélange LFI 2023), des essences isolées (ETH) ou toute la végétation. Ils sont décrits, avec leurs sources, sous <a href=\"#vis-veg\">Masques de végétation</a>. Les masques s'appliquent aussi aux statistiques, aux téléchargements et au timelapse.",
     "title": "<span class=\"n\">5</span>Ne garder que la forêt ou les terres agricoles"
   },
   "t6": {
@@ -244,7 +244,8 @@
   },
   "tools-search": {
     "p1": "<b>Aller à un lieu</b> recherche des lieux, adresses, communes, districts et cantons avec la recherche de lieux de map.geo.admin.ch. Un résultat zoome sur son étendue, ou sur son point à une échelle d'environ 1:25 000.",
-    "title": "Recherche de lieu"
+    "title": "Recherche de lieu",
+    "p2": "Elle accepte aussi des <b>coordonnées</b>, comme map.geo.admin.ch : LV95 (<code>2600000 1200000</code>, aussi <code>2'600'000, 1'200'000</code>), LV03 (<code>600000 200000</code>), WGS84 en degrés décimaux (<code>46.95 7.44</code>) ou en degrés, minutes et secondes (<code>46°57'08.66\" N 7°26'22.50\" E</code>) et MGRS (<code>32T LT 8076 0141</code>). Le résultat indique le point en LV95 ; un clic dessus centre la carte sur ce point et y place un repère."
   },
   "tools-spec": {
     "p1": "La réflectance de surface moyenne des douze bandes de Sentinel-2 sur la zone, avec ± un écart type, sous forme de graphique et de CSV. Elle montre la signature spectrale de ce qui se trouve dans votre zone : eau, forêt, cultures ou sol nu. Le masque de végétation peut aussi être choisi ici.",
@@ -380,8 +381,6 @@
     "p1": "La liste déroulante <i>Masque de végétation</i> commence par <i>Toute la végétation</i> pour les indices de végétation (NDVI, EVI, SAVI, NDRE, MTVI2, indices d'humidité, NDDI) et le NBR, par <i>Forêt</i> pour les couches forestières et pour chaque indice de végétation dans la configuration <i>Forêt</i>, et par <i>Désactivé</i> (« En choisir une ») pour les composites et les autres indices. Dans la configuration <i>Agriculture</i>, chaque indice de végétation commence avec les terres agricoles des surfaces d'exploitation (toutes les catégories sauf la forêt). Ses entrées, dans cet ordre :",
     "p2": "Bon à savoir :",
     "td1": "Carte des habitats : forêt, toute la végétation",
-    "td10": "Essences ETH (30 m) : forêt de résineux, forêt mixte, forêt de feuillus",
-    "td11": "Les trois mêmes classes et le même curseur (30 / 85 %) sur la <b>part de feuillus dans la surface terrière</b> : une part, non une probabilité comme dans le Degré de mélange LFI, les limites ne sont donc pas directement comparables. La moyenne 3 × 3 couvre 3 × 3 pixels de 30 m (90 m). Uniquement les pixels forestiers de la carte ETH, sans autre masque forestier.",
     "td12": "<a href=\"https://arxiv.org/abs/2611.08095\" target=\"_blank\" rel=\"noopener\">Essences ETH</a>, Zhou et al. 2026 (ETH Zurich, prépublication arXiv:2611.08095), 30 m, entraîné sur les placettes de l'Inventaire forestier national ; licence CC BY-NC 4.0 (usage non commercial uniquement)",
     "td13": "Essences ETH (30 m) : essence dominante",
     "td14": "Cases à cocher pour la classe avec la plus grande part de surface terrière par pixel de 30 m : épicéa (Fichte), sapin (Tanne), pin (Föhre), mélèze (Lärche), arole (Arve), hêtre (Buche), érable (Ahorn), frêne (Esche), chêne (Eiche), châtaignier (Kastanie), autres (Andere) ; <i>Tous les résineux</i>, <i>Tous les feuillus</i> et <i>Toutes</i> les cochent d'un coup.",

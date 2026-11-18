@@ -149,7 +149,12 @@
     "seasonStart": "Die Saison beginnt am 1. April: Wählen Sie einen späteren Tag.",
     "seasonSums": "Saisonsummen vom 1. April bis {{day}}, über die täglichen VHI-Waldkarten (die erste Ansicht dauert eine Weile).",
     "vhiDay": "VHI-Tag {{day}}",
-    "vhiNearest": "VHI-Tag {{day}} (nächster verfügbarer zum {{date}})"
+    "vhiNearest": "VHI-Tag {{day}} (nächster verfügbarer zum {{date}})",
+    "daysWindow_one": "{{count}}-Tage-Fenster",
+    "daysWindow_other": "{{count}}-Tage-Fenster",
+    "winCompared": "verglichen mit {{from}} bis {{to}}: {{n}}",
+    "winRange": "{{from}} bis {{to}}",
+    "window": "Zeitfenster {{from}} bis {{to}} ({{days}} Tage): {{n}}"
   },
   "dialogs": {
     "export": {
@@ -374,7 +379,8 @@
     "tooBigP": "Das Bild ist zu gross (max. 12000 px pro Seite und 60 Megapixel). Grösse oder DPI verringern.",
     "vhiForest": "VHI Wald",
     "vhiVegetation": "VHI Vegetation",
-    "vsRef": "gegenüber der Referenz um den {{date}}"
+    "vsRef": "gegenüber der Referenz um den {{date}}",
+    "vsWindow": "({{days}}-Tage-Fenster) gegenüber {{from}} bis {{to}}"
   },
   "external": {
     "chooseOrSearchA": "Dienst wählen oder suchen (Anbieter von geo.admin.ch)",
@@ -560,7 +566,14 @@
     "unread": "({{n}} nicht lesbar)",
     "vegetation": "Vegetation",
     "vhiDays": "Tage mit einem VHI-Wert",
-    "illumMasked": "maskiert: schwache Beleuchtung (≥ {{thr}}°)"
+    "illumMasked": "maskiert: schwache Beleuchtung (≥ {{thr}}°)",
+    "clearObs": "{{n}} klar von {{total}} Aufnahmen",
+    "customMask": "eigene Maske",
+    "masked": "Maskiert",
+    "maxNdvi": "Maximaler NDVI",
+    "medianNdvi": "Median-NDVI",
+    "observations": "Beobachtungen",
+    "readingWindows": "Jede Aufnahme beider Zeitfenster wird gelesen…"
   },
   "layer": {
     "adaptiveGain": "Adaptive Verstärkung",
@@ -614,7 +627,16 @@
     "threshold": "Schwellenwert",
     "illumThreshold": "Schwellenwert [°]",
     "illumination": "Schwache Beleuchtung",
-    "illuminationHelp": "Geländemaske: Einfallswinkel der Sonne ab dem Schwellenwert, Hänge, die die Sonne kaum beleuchtet"
+    "illuminationHelp": "Geländemaske: Einfallswinkel der Sonne ab dem Schwellenwert, Hänge, die die Sonne kaum beleuchtet",
+    "acqCount_one": "{{count}} Aufnahme",
+    "acqCount_other": "{{count}} Aufnahmen",
+    "window": "Zeitfenster",
+    "windowDays_one": "{{count}} Tag",
+    "windowDays_other": "{{count}} Tage",
+    "windowHelpMax": "Höchster NDVI der klaren Aufnahmen, verglichen mit demselben Zeitfenster ein Jahr früher",
+    "windowHelpMedian": "Median-NDVI der klaren Aufnahmen, verglichen mit demselben Zeitfenster ein Jahr früher",
+    "windowInfo": "{{now}}: {{n}}; ein Jahr früher, {{ref}}: {{m}}. Die erste Ansicht liest alle und braucht eine Weile.",
+    "windowTitle": "Tage bis zum Datum"
   },
   "layerList": {
     "addCompare": "Zum Vergleich hinzufügen",
@@ -796,6 +818,16 @@
       "name": "MTVI2",
       "subtitle": "Modified Triangular Vegetation Index 2 (B3, B4, B8)",
       "description": "# Modified Triangular Vegetation Index 2 (MTVI2)\n\nDer MTVI2 (Haboudane et al. 2004) wurde entwickelt, um den grünen Blattflächenindex (LAI) von Kulturen zu schätzen, ohne vom Chlorophyllgehalt der Blätter abzuhängen; der Nenner enthält eine Bodenkorrektur. Er folgt der Bestandesdichte über einen grösseren Bereich als der NDVI. Die Werte reichen etwa von −1 bis 1; bewachsene Felder liegen meist zwischen 0.2 und 0.8. Einer der Indizes, die Agroscope für die Beobachtung von Kulturen empfiehlt, zusammen mit NDVI, EVI und NDRE.\n\nEingabe: swissEO-S2-SR-Reflexion ρ = DN × 0.0001 − 0.1 von B03 (Grün), B04 (Rot) und B08 (NIR), alle 10 m, negative ρ auf 0 gesetzt (damit ist √ρ(B04) definiert). Die Formel braucht Reflexion, nicht DN.\n\nQuellen: Haboudane et al. 2004, Remote Sensing of Environment 90, 337–352, [doi:10.1016/j.rse.2003.12.013](https://doi.org/10.1016/j.rse.2003.12.013); [Awesome Spectral Indices](https://github.com/awesome-spectral-indices/awesome-spectral-indices) (Montero et al. 2023); [Index DataBase](https://www.indexdatabase.de/db/i-single.php?id=47)."
+    },
+    "ndvidiff22": {
+      "description": "# swissEO NDVIdiff v200_MVC BETA\n\n**Betaversion, ein laufend berechneter Test, kein offizielles Produkt.** Jährliche NDVI-Veränderung aus einem **Maximum Value Composite (MVC)**: pro Pixel der höchste NDVI des Zeitfensters, der klassische Ansatz von [Holben (1986)](https://doi.org/10.1080/01431168608948945). Wolken, Dunst und Schatten senken den NDVI, darum wählt das Maximum meist die klarste Beobachtung; hat ein Jahr mehr klare Beobachtungen als das andere, fällt das Maximum dort tendenziell höher aus.\n\nDas Zeitfenster endet am gewählten Datum und wird im Ebenenmenü gewählt: **7, 16, 30 oder 60 Tage** (Vorgabe 30; jeder Tag kann gewählt werden, nicht nur Tage mit einer Aufnahme). Gelesen wird jede Aufnahme von swissEO S2-SR v200 im Zeitfenster, deren Bewölkung den Wolkenfilter besteht; pro Pixel werden Beobachtungen weggelassen, die von der Wolkenmaske markiert sind (1, 2, 3, wie bei den Masken gewählt), im Geländeschatten liegen (200) oder ausserhalb des Aufnahmestreifens. NDVI = (NIR − Red) / (NIR + Red) aus der Reflektanz (ρ = DN × 0.0001 − 0.1, negatives ρ auf 0 gesetzt). Dasselbe wird für dasselbe Kalenderfenster ein Jahr früher berechnet, und die Karte zeigt die Differenz. Mit der Waldmaske (Vorgabe) zählt ein Pixel nur, wenn es in der Habitatkarte des Datums und in jener des Datums ein Jahr früher Wald ist. Die Pixelabfrage zeigt beide Komposite und die Zahl der klaren Beobachtungen in jedem Zeitfenster.\n\nBerechnet in Ihrem Browser aus allen Aufnahmen beider Zeitfenster, darum kann ein Zeitfenster von 60 Tagen eine Weile zum Zeichnen brauchen. Kurze Zeitfenster haben nach bewölkten Perioden Lücken.",
+      "name": "swissEO NDVIdiff v200_MVC BETA",
+      "subtitle": "BETA: maximaler NDVI eines Zeitfensters gegenüber demselben Zeitfenster ein Jahr früher"
+    },
+    "ndvidiff23": {
+      "description": "# swissEO NDVIdiff v200_Median BETA\n\n**Betaversion, ein laufend berechneter Test, kein offizielles Produkt.** Jährliche NDVI-Veränderung aus einem **Median-Komposit**: pro Pixel der Median des NDVI der klaren Beobachtungen des Zeitfensters (bei einer geraden Zahl das Mittel der beiden mittleren Werte). Weniger empfindlich als das Maximum Value Composite auf unerkannte Wolken, helle Ausreisser und eine unterschiedliche Zahl von Beobachtungen in den beiden Jahren.\n\nDas Zeitfenster endet am gewählten Datum und wird im Ebenenmenü gewählt: **7, 16, 30 oder 60 Tage** (Vorgabe 30; jeder Tag kann gewählt werden, nicht nur Tage mit einer Aufnahme). Gelesen wird jede Aufnahme von swissEO S2-SR v200 im Zeitfenster, deren Bewölkung den Wolkenfilter besteht; pro Pixel werden Beobachtungen weggelassen, die von der Wolkenmaske markiert sind (1, 2, 3, wie bei den Masken gewählt), im Geländeschatten liegen (200) oder ausserhalb des Aufnahmestreifens. NDVI = (NIR − Red) / (NIR + Red) aus der Reflektanz (ρ = DN × 0.0001 − 0.1, negatives ρ auf 0 gesetzt). Dasselbe wird für dasselbe Kalenderfenster ein Jahr früher berechnet, und die Karte zeigt die Differenz. Mit der Waldmaske (Vorgabe) zählt ein Pixel nur, wenn es in der Habitatkarte des Datums und in jener des Datums ein Jahr früher Wald ist. Die Pixelabfrage zeigt beide Komposite und die Zahl der klaren Beobachtungen in jedem Zeitfenster.\n\nBerechnet in Ihrem Browser aus allen Aufnahmen beider Zeitfenster, darum kann ein Zeitfenster von 60 Tagen eine Weile zum Zeichnen brauchen. Kurze Zeitfenster haben nach bewölkten Perioden Lücken.",
+      "name": "swissEO NDVIdiff v200_Median BETA",
+      "subtitle": "BETA: Median-NDVI eines Zeitfensters gegenüber demselben Zeitfenster ein Jahr früher"
     }
   },
   "legal": {
@@ -863,7 +895,7 @@
     "pixelInspector": "Pixelabfrage",
     "pixelInspectorOffClick": "Pixelabfrage (aus): anklicken, dann auf die Karte klicken, um die Werte eines Pixels zu lesen",
     "searchAPlace": "Ort suchen",
-    "searchPlacesAddressesMunicipalities": "Orte, Adressen, Gemeinden und Kantone suchen (Ortssuche von geo.admin.ch)",
+    "searchPlacesAddressesMunicipalities": "Orte, Adressen, Gemeinden und Kantone (Ortssuche von geo.admin.ch) oder Koordinaten (LV95, LV03, WGS84, MGRS) suchen",
     "spectralExplorerForThe": "Spektralanalyse für das Interessengebiet",
     "statisticalInfoTimeSeries": "Statistik und Zeitreihe für das Interessengebiet",
     "sunShadingOfThe": "Sonnenschattierung des Geländes ein/aus",
@@ -916,7 +948,7 @@
     "leafLong": "{{type}}, {{src}} ({{limits}}; {{base}})",
     "leafShort": "Maske {{type}} ({{src}}, {{limits}}, {{base}})",
     "lfiHelp": "Innerhalb: der Wald der Habitatkarte des Datums, von swissTLM3D (alle Klassen) oder alle Vegetation über 3 m. Wahrscheinlichkeit von Laubbäumen pro 10-m-Pixel (0–100 %); Lärche zählt als Nadelholz. Das LFI bezeichnet über 85 % als reinen Laubwald. Fernerkundung 2021–2023, jährliche Aktualisierungen ab 2027 geplant.",
-    "lnfCategories": "Landnutzung (Kategorien unten)",
+    "lnfCategories": "Landnutzung",
     "lnfLong": "Nutzungsflächen: {{groups}}",
     "lnfRead": "Vom Geoportal des Bundes mit 4 × 4 Stichproben pro Zelle gelesen (2,5 m für eine 10-m-Zelle).",
     "lnfShort": "Maske Nutzungsflächen ({{groups}})",
@@ -928,7 +960,7 @@
     "source": "Quelle:",
     "title": "Vegetationsmaske",
     "tlm": "Wald, swissTLM3D",
-    "tlmClasses": "Wald (Klassen unten)",
+    "tlmClasses": "Wald",
     "tlmShort": "Waldmaske swissTLM3D",
     "vegLong": "{{kind}}, {{map}}",
     "vegShort": "Maske {{kind}} ({{map}})",
@@ -967,7 +999,9 @@
     "stac": "Im swisstopo-STAC-Browser öffnen"
   },
   "search": {
+    "coordinate": "Koordinate",
     "none": "Kein Ort gefunden",
+    "outside": "Die Koordinate {{c}} (LV95) liegt ausserhalb der Karte.",
     "unavailable": "Die Suche ist nicht verfügbar: {{msg}}"
   },
   "season": {
@@ -1057,7 +1091,11 @@
     "title": "Statistik: {{name}}",
     "validBoth": "An beiden Daten gültig",
     "validPixels": "Gültige Pixel",
-    "excludeIllum": "Schwache Beleuchtung ausschliessen (Einfallswinkel der Sonne ≥ {{thr}}°)"
+    "excludeIllum": "Schwache Beleuchtung ausschliessen (Einfallswinkel der Sonne ≥ {{thr}}°)",
+    "noBothWin": "Keine Pixel mit einer klaren Beobachtung in beiden Zeitfenstern.",
+    "noTsWindow": "Für die Zeitfenster-Komposite gibt es keine Zeitreihen. Verwenden Sie NDVI für eine Zeitreihe.",
+    "validBothWin": "In beiden Zeitfenstern gültig",
+    "winHead": "{{comp}} von {{now}} ({{n}}) gegenüber {{ref}} ({{m}}) · verglichen werden Zellen mit einer klaren Beobachtung in beiden Zeitfenstern."
   },
   "status": {
     "catalogueFailed": "Katalogabfrage fehlgeschlagen: {{msg}}",
@@ -1078,7 +1116,8 @@
     "searchNext": "Nächstes Datum mit Daten wird gesucht…",
     "searchPrev": "Vorheriges Datum mit Daten wird gesucht…",
     "useArrows": "Mit ‹ › oder der Pfeil-Schaltfläche zu einem Datum mit Daten springen.",
-    "vhiMaskFailed": "Die Waldmaske von swissEO VHI v100 konnte nicht geladen werden."
+    "vhiMaskFailed": "Die Waldmaske von swissEO VHI v100 konnte nicht geladen werden.",
+    "noAcqWindow": "Keine Aufnahme in den {{days}} Tagen bis <b>{{date}}</b>."
   },
   "sun": {
     "above": "Höhe {{alt}}° über dem Horizont.",

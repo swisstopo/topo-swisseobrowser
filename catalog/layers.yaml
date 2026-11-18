@@ -151,3 +151,11 @@ layers:
     label: "NDVI difference to a reference date"
     verified: false
     masks: { cloud: true, shadow: true, terrain: true, vegetation: "forest" }
+  - id: "ndvidiff22"
+    label: "swissEO NDVIdiff v200_MVC BETA"
+    verified: false
+    masks: { cloud: true, shadow: true, terrain: true, vegetation: "forest" }
+  - id: "ndvidiff23"
+    label: "swissEO NDVIdiff v200_Median BETA"
+    verified: false
+    masks: { cloud: true, shadow: true, terrain: true, vegetation: "forest" }

@@ -789,7 +789,7 @@ table.kv td:first-child{color:var(--muted)}
       <div id="placeSearch">
         <button data-i18n="[title]map.searchAPlace" class="ps-ico" id="psIco" title="Search a place"></button>
         <input data-i18n="[title]map.searchPlacesAddressesMunicipalities;[placeholder]map.goToPlace" id="psIn" type="text" spellcheck="false" autocomplete="off" placeholder="Go to Place"
-          title="Search places, addresses, municipalities, cantons (geo.admin.ch location search)">
+          title="Search places, addresses, municipalities, cantons (geo.admin.ch location search) or coordinates (LV95, LV03, WGS84, MGRS)">
         <button data-i18n="[title]map.clearTheSearch" id="psClear" title="Clear the search" hidden>×</button>
         <div id="psRes" hidden></div>
       </div>
@@ -2156,6 +2156,8 @@ const SOURCES = {
     items: ["2017-07-31t235959", "2017-08-31t235959", "2017-09-30t235959", "2018-07-31t235959", "2018-08-31t235959", "2018-09-30t235959", "2019-07-31t235959", "2019-08-31t235959", "2019-09-30t235959", "2020-07-31t235959", "2020-08-31t235959", "2020-09-30t235959", "2021-07-31t235959", "2021-08-31t235959", "2021-09-30t235959", "2022-07-31t235959", "2022-08-31t235959", "2022-09-30t235959", "2023-07-31t235959", "2023-08-31t235959", "2023-09-30t235959", "2024-07-31t235959", "2024-08-31t235959", "2024-09-30t235959", "2025-07-31t235959", "2025-08-31t235959", "2025-09-30t235959", "2026-07-31t235959", "2026-08-31t235959", "2026-09-30t235959"] }
 };
 const NDVIDIFF2_BASE = "https://cms.geo.admin.ch/Topo/umweltbeobachtung/beispiele/NDVIDIFFV2/";
+// NDVIdiff v200_MVC / _Median BETA (ndvidiff22, ndvidiff23): the window lengths in days the user can choose, and the default
+const WIN_DAYS = [7, 16, 30, 60], WIN_DAYS_DEF = 30;
 
 const SUFFIX = {
   b01:"b01_60m", b02:"b02_10m", b03:"b03_10m", b04:"b04_10m", b05:"b05_20m",
@@ -2801,7 +2803,23 @@ const LAYERS = [
     sw:"linear-gradient(135deg,#b71c1c,#f5f5f5,#004d40)", fg:"#1a1206",
     sub:"NDVI change between two dates in forest, with change detection",
     desc:"NDVI difference between the selected date and a reference date, masked to forest.",
-    formula:"NDVI = (ρ(B08) − ρ(B04)) / (ρ(B08) + ρ(B04)), ρ < 0 → 0\nΔNDVI = NDVI(date) − NDVI(reference)\nchange = ΔNDVI < threshold (−0.08), then 3 × 3 majority filter (edge-effect removal)" }
+    formula:"NDVI = (ρ(B08) − ρ(B04)) / (ρ(B08) + ρ(B04)), ρ < 0 → 0\nΔNDVI = NDVI(date) − NDVI(reference)\nchange = ΔNDVI < threshold (−0.08), then 3 × 3 majority filter (edge-effect removal)" },
+
+  // BETA, computed in the page: NDVI composites of a window of 7, 16, 30 or 60 days ending on the date, minus the same window one year earlier
+  { id:"ndvidiff22", group:"Indices", name:"swissEO NDVIdiff v200_MVC BETA", type:"wincomp", comp:"max", source:"s2", bands:["b08","b04"], fn:nd,
+    ramp:R_NDVIDIFF, min:-0.3, max:0.3, lim:[-2, 2], unit:"ΔNDVI", icon:"tree",
+    sw:"linear-gradient(135deg,#b71c1c,#f5f5f5,#004d40)", fg:"#1a1206",
+    sub:"BETA: maximum NDVI of a window of days vs. the same window one year earlier",
+    desc:"Per pixel the highest NDVI of the clear acquisitions in the window, minus the same of the window one year earlier.",
+    formula:"NDVI = (ρ(B08) − ρ(B04)) / (ρ(B08) + ρ(B04)), ρ < 0 → 0, per clear acquisition (cloud mask 1, 2, 3 and terrain shadow 200 left out)\n" +
+      "composite = max NDVI over the window [date − N + 1, date], N = 7, 16, 30 or 60 days (Holben 1986)\nΔNDVI = composite(window) − composite(same window one year earlier)" },
+  { id:"ndvidiff23", group:"Indices", name:"swissEO NDVIdiff v200_Median BETA", type:"wincomp", comp:"median", source:"s2", bands:["b08","b04"], fn:nd,
+    ramp:R_NDVIDIFF, min:-0.3, max:0.3, lim:[-2, 2], unit:"ΔNDVI", icon:"tree",
+    sw:"linear-gradient(135deg,#b71c1c,#f5f5f5,#004d40)", fg:"#1a1206",
+    sub:"BETA: median NDVI of a window of days vs. the same window one year earlier",
+    desc:"Per pixel the median NDVI of the clear acquisitions in the window, minus the same of the window one year earlier.",
+    formula:"NDVI = (ρ(B08) − ρ(B04)) / (ρ(B08) + ρ(B04)), ρ < 0 → 0, per clear acquisition (cloud mask 1, 2, 3 and terrain shadow 200 left out)\n" +
+      "composite = median NDVI over the window [date − N + 1, date], N = 7, 16, 30 or 60 days (an even count takes the mean of the two middle values)\nΔNDVI = composite(window) − composite(same window one year earlier)" }
 ];
 // without a prototype: ids of external layers come from links and services (no "__proto__" pitfalls)
 const LAYER = Object.assign(Object.create(null), Object.fromEntries(LAYERS.map(r => [r.id, r])));
@@ -2856,6 +2874,10 @@ const COP_META = {
     cop: "# VHI days in extreme stress\n\nThe number of days in extreme stress of the [Waldtrockenheit dashboard](https://waldtrockenheit-dashboard.vercel.app/vhi.html), computed **per pixel**: the days from 1 April to the selected day (at most 31 October) on which the daily swissEO VHI forest map is below 10 (*extremely stressed*). As in the dashboard the days are counted in total, not consecutively, because a counter of consecutive days would reset at every short cool or wet spell without the forest actually recovering. Classes as in the dashboard: 0, 1 to 5, 6 to 15, 16 to 30 and more than 30 days.\n\nDays without a VHI value do not count (see *VHI cumulative deficit*).\n\nMore info [here](https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-vhi)." },
   fdc: { more: "https://custom-scripts.sentinel-hub.com/sentinel-2/forest_disturbance_classification/",
     cop: "# Forest Disturbance Classification\n\nA LightGBM classification of forest disturbances by Jonas Viehweger and Martin Puhm (Joanneum Research, EvoLand project), published as a Sentinel Hub custom script. From a single date it assigns every pixel to *bark beetle* (brown), *clear cut* (grey), *salvage logged* (grey too, low confidence), *wildfire* (dark brown) or *windthrow* (blue); *healthy* forest is not drawn. It was trained on samples from Germany, Sweden and Spain (macro F1 0.83), works best on recent, large disturbances and is only valid on forest, so the forest mask is on by default. Expect classification errors and validate the results.\n\n**Input scaling:** the trees split on Sentinel Hub L2A digital numbers in the convention DN = 10000 × reflectance (data before processing baseline 04.00, e.g. the script's 2019 example). swissEO stores DN = (ρ + 0.1) × 10000, so the script receives DN − 1000, clamped at 0. The Copernicus Browser feeds recent scenes without removing the offset (see the README on harmonizeValues), so its result can differ there. The 150 trees are loaded unchanged from the script on first use.\n\nMore info [here](https://custom-scripts.sentinel-hub.com/sentinel-2/forest_disturbance_classification/)." },
+  ndvidiff22: { more: "https://doi.org/10.1080/01431168608948945",
+    cop: "# swissEO NDVIdiff v200_MVC BETA\n\n**Beta version, a test computed on the fly, not an official product.** Year-on-year NDVI change from a **maximum value composite (MVC)**: per pixel the highest NDVI of the window, the classic approach of [Holben (1986)](https://doi.org/10.1080/01431168608948945). Clouds, haze and shadows lower the NDVI, so the maximum tends to pick the clearest observation; with more clear observations in one year than in the other the maximum tends to be higher there.\n\nThe window ends on the selected date and is chosen in the layer menu: **7, 16, 30 or 60 days** (30 by default; any day can be selected, not only days with an acquisition). Every swissEO S2-SR v200 acquisition of the window whose cloud cover passes the cloud filter is read; per pixel, observations flagged by the cloud mask (1, 2, 3, as chosen in the masks), in terrain shadow (200) or outside the scene footprint are left out. NDVI = (NIR − Red) / (NIR + Red) of the reflectance (ρ = DN × 0.0001 − 0.1, negative ρ set to 0). The same is computed for the same calendar window one year earlier, and the map shows the difference. With the forest mask (default) a pixel counts only if it is forest in the habitat map of the date and in that of the date one year earlier. The pixel inspector gives both composites and the number of clear observations in each window.\n\nComputed in your browser from all acquisitions of both windows, so a 60-day window can take a while to draw. Short windows leave gaps after cloudy spells." },
+  ndvidiff23: { more: "https://doi.org/10.1080/01431168608948945",
+    cop: "# swissEO NDVIdiff v200_Median BETA\n\n**Beta version, a test computed on the fly, not an official product.** Year-on-year NDVI change from a **median composite**: per pixel the median NDVI of the clear observations of the window (an even count takes the mean of the two middle values). Less sensitive than the maximum value composite to undetected clouds, to bright outliers and to a different number of observations in the two years.\n\nThe window ends on the selected date and is chosen in the layer menu: **7, 16, 30 or 60 days** (30 by default; any day can be selected, not only days with an acquisition). Every swissEO S2-SR v200 acquisition of the window whose cloud cover passes the cloud filter is read; per pixel, observations flagged by the cloud mask (1, 2, 3, as chosen in the masks), in terrain shadow (200) or outside the scene footprint are left out. NDVI = (NIR − Red) / (NIR + Red) of the reflectance (ρ = DN × 0.0001 − 0.1, negative ρ set to 0). The same is computed for the same calendar window one year earlier, and the map shows the difference. With the forest mask (default) a pixel counts only if it is forest in the habitat map of the date and in that of the date one year earlier. The pixel inspector gives both composites and the number of clear observations in each window.\n\nComputed in your browser from all acquisitions of both windows, so a 60-day window can take a while to draw. Short windows leave gaps after cloudy spells." },
   analyst: { cop: "# NDVI difference to a reference date\n\nMethod of the NDVI Analyst by Raffael Bienz (Canton of Aargau): the NDVI difference between two dates (later minus earlier), using swissEO S2-SR reflectance with negative values set to 0, masked to forest. Changes are pixels with an NDVI drop below the threshold (default −0.08); a 3 × 3 majority filter removes edge effects. *Detected change* shows the binary result. The statistics of an area of interest report the forest area and the affected area in ha and %, with and without edge-effect removal, like the original script.\n\nMore info [here](https://github.com/RaffiBienz/ndvi_analyst)." }
 };
 Object.keys(COP_META).forEach(id => Object.assign(LAYER[id], COP_META[id]));
@@ -2922,11 +2944,11 @@ const CONFIGS = {
   AGRICULTURE: { name: "Agriculture", beta: false, veg: "lnf:a.dw.dp.r.o.dk.g.s.h.u.so.v", groups: [
     ["Layers", ["true", "ndvi", "evi", "ndre", "mtvi2"]]] },
   DROUGHT: { name: "Drought", beta: false, groups: [
-    ["Layers", ["true", "ndvi", "evi", "ndmi", "vhi", "vhiveg", "ndvidiff", "ndvidiff2", "ndviz", "nddi", "nddichg", "analyst"]]] },
+    ["Layers", ["true", "ndvi", "evi", "ndmi", "vhi", "vhiveg", "ndvidiff", "ndvidiff2", "ndvidiff22", "ndvidiff23", "ndviz", "nddi", "nddichg", "analyst"]]] },
   DROUGHT2026: { name: "Drought 2026", beta: false, highlights: HIGHLIGHTS.drought2026, groups: [
     ["Layers", ["true", "ndmi", "ndwi", "mstress", "ndvi", "swir", "urban", "hon"]]] },
   FOREST: { name: "Forest", beta: false, veg: "forest", groups: [
-    ["Layers", ["true", "ndvi", "evi", "vhi", "vhidef", "vhiext", "ndvidiff", "ndvidiff2", "ndviz", "analyst", "nbr", "ndmi", "fdc"]]] },
+    ["Layers", ["true", "ndvi", "evi", "vhi", "vhidef", "vhiext", "ndvidiff", "ndvidiff2", "ndvidiff22", "ndvidiff23", "ndviz", "analyst", "nbr", "ndmi", "fdc"]]] },
 };
 const MASK_DEFAULTS = {
   "agri": { cloud: true, shadow: true, terrain: true },
@@ -2948,6 +2970,8 @@ const MASK_DEFAULTS = {
   "nddi": { cloud: true, shadow: true, terrain: true, veg: "vegetation" },
   "nddichg": { cloud: true, shadow: true, terrain: true, veg: "vegetation" },
   "analyst": { cloud: true, shadow: true, terrain: true, veg: "forest" },
+  "ndvidiff22": { cloud: true, shadow: true, terrain: true, veg: "forest" },
+  "ndvidiff23": { cloud: true, shadow: true, terrain: true, veg: "forest" },
 };
 /* catalog:configs:end */
 const cfgLayers = id => CONFIGS[id].groups.flatMap(g => g[1]);
@@ -2993,7 +3017,7 @@ function mdLite(text) {
     : "<p>" + inline(t).replace(/\n/g, "<br>") + "</p>").join("");
 }
 LAYERS.forEach(r => { if (r.ramp) r.domain = [r.min, r.max]; });
-const MASKABLE = { rgb: 1, index: 1, cont: 1, terrain: 1, fnrgb: 1, diff2: 1, fnclass: 1 };
+const MASKABLE = { rgb: 1, index: 1, cont: 1, terrain: 1, fnrgb: 1, diff2: 1, fnclass: 1, wincomp: 1 };
 /* The terrain mask (terrainmask_10m: 0–180 solar incidence angle in degrees, 200 shadow, 255 no data) as a test of one
    layer's settings: terrain shadow (200) and, with the illumination mask, an incidence angle at or above the threshold,
    i.e. a slope the sun hardly lights (issue #53). null when neither is on, so the grid is not read. */
@@ -3457,14 +3481,14 @@ function defaults(rec, cfg = configId) {
   return Object.assign({ gain: 1, gamma: 1, r: [0, 1], g: [0, 1], b: [0, 1], min: rec.min, max: rec.max, thr: rec.threshold,
            opacity: 100, cloud: !!m.cloud, shadow: !!m.shadow, terrain: !!m.terrain, illum: !!m.illumination, illumThr: ILLUM_THR,
            veg: vegDefault(rec, cfg),
-           autoGain: false, look: "standard", refDate: "", mode: "diff", ndwi: "swir", cmask: "off" }, rec.def || {});
+           autoGain: false, look: "standard", refDate: "", mode: "diff", ndwi: "swir", cmask: "off", days: WIN_DAYS_DEF }, rec.def || {});
 }
 const settings = Object.create(null);
 const S = rec => settings[rec.id] || (settings[rec.id] = defaults(rec));
 
 const RNG_KEYS = [["r", "redRange"], ["g", "greenRange"], ["b", "blueRange"]];
 const SETTING_KEYS = ["gain", "gamma", "redRange", "greenRange", "blueRange", "valueRange", "threshold",
-                      "opacity", "cloudMask", "shadowMask", "terrainMask", "illuminationMask", "illuminationThreshold", "vegetationMask", "autoGain", "look", "refDate", "displayMode", "ndwi", "customMask"];
+                      "opacity", "cloudMask", "shadowMask", "terrainMask", "illuminationMask", "illuminationThreshold", "vegetationMask", "autoGain", "look", "refDate", "displayMode", "ndwi", "customMask", "days"];
 const r3 = v => +(+v).toFixed(4);
 
 /* Non-default settings as a flat object, named like the Copernicus Browser URL params. */
@@ -3480,6 +3504,7 @@ function settingsToObj(rec, s) {
   if (rec.type === "diff2" && s.refDate) o.refDate = s.refDate;
   if (rec.modal && s.mode !== d.mode) o.displayMode = s.mode;
   if (rec.ndwiOpt && s.ndwi !== d.ndwi) o.ndwi = s.ndwi;
+  if (rec.type === "wincomp" && s.days !== d.days) o.days = s.days;
   if (rec.type !== "wms" && !rec.ext && (s.cmask === "in" || s.cmask === "out")) o.customMask = s.cmask;
   if (s.opacity !== 100) o.opacity = s.opacity;
   if (MASKABLE[rec.type]) {
@@ -3513,6 +3538,7 @@ function objToSettings(rec, o) {
   if (rec.type === "diff2" && DATE_RE.test(o.refDate || "")) s.refDate = o.refDate;
   if (rec.modal && (o.displayMode === "diff" || o.displayMode === "change")) s.mode = o.displayMode;
   if (rec.ndwiOpt && (o.ndwi === "swir" || o.ndwi === "green")) s.ndwi = o.ndwi;
+  if (rec.type === "wincomp" && WIN_DAYS.includes(+o.days)) s.days = +o.days;
   if (rec.type !== "wms" && !rec.ext && (o.customMask === "in" || o.customMask === "out")) s.cmask = o.customMask;
   if (num(o.opacity) != null) s.opacity = clamp(Math.round(num(o.opacity)), 0, 100);
   if (o.cloudMask != null) s.cloud = bool(o.cloudMask);
@@ -3706,8 +3732,9 @@ function productItems(src) {
 }
 /* The item ids to draw for a layer on a date: every S2 mosaic of that day that passes the cloud
    filter (most recent first), the VHI day (nearest if missing) or the nearest NDVIdiff / NDVIz product. */
-async function resolveScenes(rec, date, cc) {
+async function resolveScenes(rec, date, cc, s) {
   if (rec.source === "ext") return (await extPrepare(rec).catch(() => false)) ? ["ext"] : [];   // WMS / WMTS: no dates
+  if (rec.type === "wincomp") return (await windowItems(date, (s || S(rec)).days, cc)).ids;     // every acquisition of the window
   if (SOURCES[rec.source].sparse) {
     const ids = await productItems(rec.source), d = Date.parse(date + "T12:00:00Z");
     let best = null, bd = Infinity;
@@ -3756,6 +3783,120 @@ function resolveRef(s, date) {
   return refCache.get(key);
 }
 const refLabel = r => r.dates.length ? r.dates.slice(0, 3).map(fmtDay).join(", ") + (r.dates.length > 3 ? ", …" : "") : t("dateInfo.none", "none");
+
+/* Windows of the composite layers (ndvidiff22, ndvidiff23): the S2-SR acquisitions from `end` − days + 1 to `end` that pass
+   the cloud filter, newest first. The reference is the same calendar window one year earlier (yearBack of both ends). */
+const winCache = new Map();
+function windowItems(end, days, cc) {
+  const from = addDays(end, 1 - days), key = from + "|" + end + "|" + cc;
+  if (!winCache.has(key)) {
+    const q = (async () => {
+      const months = [];
+      for (let ym = from.slice(0, 7); ym <= end.slice(0, 7); ym = shiftMonth(ym, 1)) months.push(ym);
+      const fs = (await Promise.all(months.map(m => loadMonth("s2", m)))).flat()
+        .filter(f => { const d = f.id.slice(0, 10); return d >= from && d <= end; });
+      const cs = cc >= 100 ? [] : await Promise.all(fs.map(f => cloudOf(f.id)));    // no cloud filter: no metadata to read
+      const ids = fs.filter((f, i) => cs[i] == null || cs[i] <= cc).map(f => f.id).sort((a, b) => b.localeCompare(a));
+      return { from, to: end, ids };
+    })();
+    q.catch(() => winCache.delete(key));
+    winCache.set(key, q);
+  }
+  return winCache.get(key);
+}
+const winRef = (cfg, cc) => windowItems(yearBack(cfg.date || state.date), cfg.s.days, cc != null ? cc : cfg.cc != null ? cfg.cc : state.cc);
+const winLabel = w => t("dateInfo.winRange", "{{from}} to {{to}}", { from: fmtDay(w.from), to: fmtDay(w.to) });
+
+/* The NDVI composite of a window per pixel: of every acquisition, the pixels inside its footprint (DN ≠ 0) that are not
+   masked (cloud mask 1, 2 / 3 and the terrain masks as chosen) give one NDVI; the composite is their maximum (MVC,
+   Holben 1986) or median. Returns the composite (NaN: no clear observation) and the number of clear observations.
+   For the median the values are kept per acquisition as Int16 (NDVI × 10000), which is exact to 0.0001. */
+async function windowIndex(rec, s, ids, bbox, W, H, signal) {
+  const n = W * H, med = rec.comp === "median", tOut = terrOut(s), cnt = new Uint8Array(n);
+  const best = med ? null : new Float32Array(n).fill(-Infinity), stack = med ? [] : null, NO = -32768;
+  const soft = q => q && q.catch(e => { if (e && e.name === "AbortError") throw e; return null; });
+  const todo = ids.filter(id => {
+    const box = sceneBox(id);
+    return !(box && (bbox[2] < box[0] || bbox[0] > box[2] || bbox[3] < box[1] || bbox[1] > box[3])) && coversNow(id, bbox) !== false;
+  });
+  await pool(todo, 4, async id => {
+    const [a, cm, tm] = await Promise.all([
+      Promise.all(rec.bands.map(b => soft(readGrid(assetUrl(id, b), bbox, W, H, signal, 0)))),
+      s.cloud || s.shadow ? soft(readGrid(assetUrl(id, "cloud"), bbox, W, H, signal, 0)) : null,
+      tOut ? soft(readGrid(assetUrl(id, "terrain"), bbox, W, H, signal, 255)) : null]);
+    if (a.some(x => !x)) return;
+    const v = med ? new Int16Array(n).fill(NO) : null;
+    let any = false;
+    for (let k = 0; k < n; k++) {
+      if (a.some(x => x[k] === 0)) continue;
+      if ((cm && ((s.cloud && (cm[k] === 1 || cm[k] === 2)) || (s.shadow && cm[k] === 3))) || (tm && tOut(tm[k]))) continue;
+      const x = rec.fn(rec.bands.map((b, i) => physIdx(b, a[i][k])), s);
+      if (!isFinite(x)) continue;
+      if (cnt[k] < 255) cnt[k]++;
+      if (med) v[k] = Math.round(x * 10000); else if (x > best[k]) best[k] = x;
+      any = true;
+    }
+    if (med && any) stack.push(v);
+  });
+  const out = new Float32Array(n).fill(NaN);
+  if (!med) { for (let k = 0; k < n; k++) if (cnt[k]) out[k] = best[k]; }
+  else {
+    const buf = new Int16Array(stack.length);
+    for (let k = 0; k < n; k++) {
+      if (!cnt[k]) continue;
+      let m = 0;
+      for (const v of stack) if (v[k] !== NO) buf[m++] = v[k];
+      const b = buf.subarray(0, m).sort();
+      out[k] = (m % 2 ? b[(m - 1) >> 1] : (b[m / 2 - 1] + b[m / 2]) / 2) / 10000;
+    }
+  }
+  return { v: out, n: cnt };
+}
+
+/* ΔNDVI of a composite layer on a grid: both windows, each with the vegetation mask of its own date (the habitat map
+   follows the date; a pixel must be inside both), and the custom mask. */
+async function winDiff(cfg, bbox, W, H, signal, veg) {
+  const s = cfg.s, date = cfg.date || state.date, v = veg !== undefined ? veg : s.veg;
+  if (!cfg.winP) cfg.winP = winRef(cfg);
+  const ref = await cfg.winP;
+  cfg.winInfo = ref;
+  const p = vegParse(v), dated = p && (p.kind === "forest" || p.kind === "vegetation" || (p.kind === "lfi" && p.base === "forest"));
+  const [A, B, vm, vm1] = await Promise.all([
+    windowIndex(cfg.rec, s, cfg.scenes, bbox, W, H, signal), windowIndex(cfg.rec, s, ref.ids, bbox, W, H, signal),
+    p ? readVegMask(v, date, bbox, W, H, signal) : null, dated ? readVegMask(v, yearBack(date), bbox, W, H, signal) : null]);
+  const n = W * H, dif = new Float32Array(n).fill(NaN), out = new Uint8Array(n);
+  const cg = cmaskOn(s) ? customMaskGrid(bbox, W, H) : null;
+  for (let k = 0; k < n; k++) {
+    if ((vm && vm[k] === 0) || (vm1 && vm1[k] === 0) || (cg && cmaskOut(s.cmask, cg, k))) { out[k] = 1; continue; }
+    dif[k] = A.v[k] - B.v[k];
+  }
+  return { dif, A, B, out, ref };
+}
+/* A tile of a composite layer. At most four tiles are computed at a time: each reads every acquisition of both windows. */
+let winBusy = 0;
+const winQueue = [];
+async function winGate(fn) {
+  if (winBusy >= 4) await new Promise(r => winQueue.push(r)); else winBusy++;
+  try { return await fn(); }
+  finally { if (winQueue.length) winQueue.shift()(); else winBusy--; }        // the slot passes to the next tile
+}
+function renderWinComp(cfg, bbox, W, H, signal) {
+  return winGate(async () => {
+    if (signal && signal.aborted) throw new DOMException("Aborted", "AbortError");
+    const { dif } = await winDiff(cfg, bbox, W, H, signal);
+    const rec = cfg.rec, s = cfg.s, img = new ImageData(W, H), d = img.data;
+    const d0 = rec.domain[0], d1 = rec.domain[1], k2 = (d1 - d0) / ((s.max - s.min) || 1e-9);
+    let any = false;
+    for (let k = 0; k < W * H; k++) {
+      if (dif[k] !== dif[k]) continue;
+      const c = rec.ramp(d0 + (dif[k] - s.min) * k2);
+      if (!c) continue;
+      d[k * 4] = c[0]; d[k * 4 + 1] = c[1]; d[k * 4 + 2] = c[2]; d[k * 4 + 3] = 255;
+      any = true;
+    }
+    return any ? img : null;
+  });
+}
 
 /* LV95 bbox of a scene, so tiles outside its swath are skipped without touching the COG. */
 const boxCache = new Map();
@@ -4173,6 +4314,7 @@ async function renderSeason(cfg, bbox, W, H, signal) {
 /* Mosaic of every scene of the day: the first scene with data wins per pixel. */
 async function renderTile(cfg, bbox, W, H, signal) {
   if (cfg.rec.type === "diff2") return renderDiff2(cfg, bbox, W, H, signal);
+  if (cfg.rec.type === "wincomp") return renderWinComp(cfg, bbox, W, H, signal);
   if (cfg.rec.type === "vhiseason") return renderSeason(cfg, bbox, W, H, signal);
   let s = cfg.gf && cfg.gf !== 1 ? Object.assign({}, cfg.s, { gain: cfg.s.gain * cfg.gf }) : cfg.s;
   // TCI: dark scene edges are held back when the day has another scene (orbit) that may fill them
@@ -4347,7 +4489,7 @@ async function applyLayer() {
   catch (e) { if (tok === applyToken) setStatus(t("status.catalogueFailed", "Catalogue request failed: {{msg}}", { msg: escA(e.message) })); return; }
   if (tok !== applyToken) return;
 
-  currentCfg = { rec, s: S(rec), scenes, date: state.date };
+  currentCfg = { rec, s: S(rec), scenes, date: state.date, cc: state.cc };
   if (terrainOn && sunMode === "scene") apply3D();     // the sun follows the scene shown
   // the habitat map follows the date: the menu names the version of the new date (issue #9)
   $$("#layerlist .vegname").forEach(e => { e.textContent = vegOn(S(rec).veg) ? vegName(S(rec).veg) : t("mask.chooseOne", "Choose one"); });
@@ -4357,7 +4499,7 @@ async function applyLayer() {
   const xpOn = () => xp.open && xp.sel;          // the WMS / WMTS panel shows its layer instead
   if (layerOff || xpOn()) { setStatus(""); return; }     // hidden: the date and scene info stay, nothing is drawn
   if (!scenes.length) {
-    setStatus(rec.source === "vhi"
+    setStatus(rec.type === "wincomp" ? t("status.noAcqWindow", "No acquisition in the {{days}} days up to <b>{{date}}</b>.", { days: S(rec).days, date: fmtDay(state.date) }) : rec.source === "vhi"
       ? t("status.noVhi", "No VHI product within ±45 days of {{date}}.", { date: fmtDay(state.date) })
       : (state.cc < 100 ? t("status.noAcqCloud", "No acquisition on <b>{{date}}</b> with ≤ {{cc}} % cloud.", { date: fmtDay(state.date), cc: state.cc })
                         : t("status.noAcq", "No acquisition on <b>{{date}}</b>.", { date: fmtDay(state.date) })) + " " +
@@ -4378,6 +4520,7 @@ async function applyLayer() {
 let redrawTimer = null;
 function onSettings(rec, kind) {
   writeUrlSoon();
+  if (kind === "window" && !compareMode && rec === currentRec) { applyLayer(); return; }   // another window: other acquisitions
   if (compareMode || rec !== currentRec || !current) return;
   if (kind === "opacity") { setLayerOpacity(current, S(rec).opacity / 100); return; }
   if (currentCfg) currentCfg.refP = null;          // the reference date may have changed
@@ -4449,6 +4592,7 @@ async function setDate(d) {
 
 function updateDateGrey() {
   const src = currentRec.source, d = state.date;
+  if (currentRec.type === "wincomp") { $("#dateTxt").classList.remove("nodata"); return; }    // any day ends a window
   const p = monthCache.get(src + "|" + d.slice(0, 7));
   if (!p) return;
   p.then(fs => {
@@ -4462,6 +4606,18 @@ function updateDateGrey() {
 
 function updateDateInfo(rec, scenes) {
   let txt;
+  if (rec.type === "wincomp") {
+    const days = S(rec).days, from = addDays(state.date, 1 - days);
+    txt = t("dateInfo.window", "Window {{from}} to {{to}} ({{days}} days): {{n}}", { from: fmtDay(from), to: fmtDay(state.date), days,
+      n: tn("dateInfo.acquisitions", "{{count}} acquisition", "{{count}} acquisitions", scenes.length) });
+    $("#dateInfo").textContent = txt;
+    windowItems(yearBack(state.date), days, state.cc).then(r => {
+      if (currentRec === rec) $("#dateInfo").textContent = txt + "; " + t("dateInfo.winCompared", "compared with {{from}} to {{to}}: {{n}}",
+        { from: fmtDay(r.from), to: fmtDay(r.to), n: tn("dateInfo.acquisitions", "{{count}} acquisition", "{{count}} acquisitions", r.ids.length) });
+    }).catch(() => {});
+    $("#badgeTxt").textContent = fmtDay(state.date) + " · " + tn("dateInfo.daysWindow", "{{count}}-day window", "{{count}}-day window", days);
+    return;
+  }
   if (!scenes.length) txt = t("dateInfo.noData", "No data on this date.");
   else if (rec.source === "vhi") {
     const day = scenes[0].slice(0, 10);
@@ -4711,14 +4867,14 @@ function vegSelect(value, on) {
   let x = grp(t("mask.habitatGroup", "Habitat Map (swissEO VHI, version of the date)"));
   opt(x, "forest", voc("veg", "forest", VEG_KIND.forest)); opt(x, "vegetation", voc("veg", "vegetation", VEG_KIND.vegetation));
   x = grp("swissTLM3D");
-  opt(x, "tlm", t("mask.tlmClasses", "Forest (classes below)"));
+  opt(x, "tlm", t("mask.tlmClasses", "Forest"));
   x = grp("Forest Type NFI 2023 (WSL)");
   ["conif", "mixed", "broad"].forEach(k => opt(x, "lfi-" + k, voc("leaf", k, LEAF_TYPE[k])));
   x = grp(t("mask.ethGroup", "ETH tree species (30 m)"));
-  ["conif", "mixed", "broad"].forEach(k => opt(x, "eth-" + k, voc("leaf", k, LEAF_TYPE[k])));
-  opt(x, "eth-sp", t("mask.ethDominant", "Dominant tree species"));
+  opt(x, "eth-sp", t("mask.ethDominant", "Dominant tree species"));   // conifer, mixed, broadleaf: the quick buttons below (#54)
+  const ethX = x;
   x = grp("Nutzungsflächen (BLW)");
-  opt(x, "lnf", t("mask.lnfCategories", "Land use (categories below)"));
+  opt(x, "lnf", t("mask.lnfCategories", "Land use"));
   let p = vegParse(value);
   const keyOf = q => !q ? "off" : q.kind === "lfi" || q.kind === "eth" ? q.kind + "-" + q.type : q.kind === "ethsp" ? "eth-sp"
     : q.kind === "tlm" || q.kind === "lnf" ? q.kind : vegStr(q);
@@ -4747,7 +4903,8 @@ function vegSelect(value, on) {
   function extras() {
     ex.replaceChildren();
     if (!p) return;
-    if (p.kind === "tlm") ex.append(...classes(TLM_KEYS, TLM_KEYS.map(k => voc("tlm", k, TLM_CLASSES[k])), p.classes, TLM_KEYS.map(k => TLM_RGB[k]),
+    // check boxes only, no colour squares, as for the other masks (#19, #54)
+    if (p.kind === "tlm") ex.append(...classes(TLM_KEYS, TLM_KEYS.map(k => voc("tlm", k, TLM_CLASSES[k])), p.classes, null,
                                                c => ({ kind: "tlm", classes: c })));
     else if (p.kind === "lnf") {
       // check boxes only, no colour squares: the mask keeps the chosen categories, it does not draw them in these colours (#19)
@@ -4790,6 +4947,8 @@ function vegSelect(value, on) {
     }
     ex.hidden = !ex.childElementCount;
   }
+  // older links with the ETH broadleaf share (eth-conif / eth-mixed / eth-broad) keep their entry while it is chosen
+  if (p && p.kind === "eth") { const o = el("option", null, voc("leaf", p.type, LEAF_TYPE[p.type])); o.value = "eth-" + p.type; ethX.prepend(o); }
   g.value = keyOf(p);
   g.onchange = () => {
     const k = g.value, q = p;
@@ -4899,6 +5058,34 @@ function layerBody(rec) {
     nw.append(seg);
     body.append(nw);
     if (s.ndwi === "green") body.append(el("div", "warnbox", t("layer.ndwiWarn", "Warning: with the green / NIR NDWI of the openEO notebook, NDVI + NDWI is close to zero over vegetation, so the NDDI explodes. In a test over Aarau (2026-07-04) 99.8 % of the pixels were outside −1…1 (with or without the −0.1 reflectance offset), and the map shows almost only +1 (red) and −1 (white). Use SWIR for a usable index.")));
+  }
+
+  /* ---- composite layers: the window ---- */
+  if (rec.type === "wincomp") {
+    sec(t("layer.window", "Window"));
+    const wr = el("div", "tog");
+    wr.innerHTML = "<span>" + t("layer.windowTitle", "Days up to the date") + "<small>" +
+      (rec.comp === "median" ? t("layer.windowHelpMedian", "Median NDVI of the clear acquisitions, compared with the same window one year earlier")
+                             : t("layer.windowHelpMax", "Highest NDVI of the clear acquisitions, compared with the same window one year earlier")) + "</small></span>";
+    const seg = el("div", "seg");
+    WIN_DAYS.forEach(v => {
+      const b = el("button", s.days === v ? "on" : "", String(v));
+      b.type = "button";
+      b.title = tn("layer.windowDays", "{{count}} day", "{{count}} days", v);
+      b.onclick = e => { e.preventDefault(); if (s.days === v) return; s.days = v; renderLayerList(); onSettings(rec, "window"); };
+      seg.append(b);
+    });
+    wr.append(seg);
+    body.append(wr);
+    const info = el("div", "hint");
+    info.textContent = t("layer.refLooking", "Looking up the reference…");
+    const cc = state.cc;
+    Promise.all([windowItems(state.date, s.days, cc), windowItems(yearBack(state.date), s.days, cc)]).then(([a, b]) => {
+      info.textContent = t("layer.windowInfo", "{{now}}: {{n}}; one year earlier, {{ref}}: {{m}}. The first view reads all of them and takes a while.",
+        { now: winLabel(a), n: tn("layer.acqCount", "{{count}} acquisition", "{{count}} acquisitions", a.ids.length),
+          ref: winLabel(b), m: tn("layer.acqCount", "{{count}} acquisition", "{{count}} acquisitions", b.ids.length) });
+    }).catch(e => { info.textContent = t("layer.refFailed", "Reference lookup failed: {{msg}}", { msg: e.message }); });
+    body.append(info);
   }
 
   /* ---- two-date layers: reference and change detection ---- */
@@ -5312,9 +5499,9 @@ async function rebuildCompare() {
   try {
     cfgs = await Promise.all(compare.map(async it => {
       const rec = LAYER[it.layerId];
-      const scenes = await resolveScenes(rec, it.date, it.cc);
+      const scenes = await resolveScenes(rec, it.date, it.cc, it.s);
       const gf = it.s.autoGain ? await autoGainFactor(rec, it.s, scenes, viewBox()).catch(() => 1) : 1;
-      return { rec, s: it.s, scenes, date: it.date, gf };
+      return { rec, s: it.s, scenes, date: it.date, gf, cc: it.cc };
     }));
   } catch (e) { if (tok === applyToken) setStatus(t("status.catalogueFailed", "Catalogue request failed: {{msg}}", { msg: escA(e.message) })); return; }
   if (tok !== applyToken || !compareMode) return;
@@ -5371,9 +5558,9 @@ const dataDayReq = new Map();
 function dataDay(it) {
   const rec = LAYER[it.layerId];
   if (!rec || rec.ext) return Promise.resolve(null);
-  const key = it.layerId + "|" + it.date + "|" + it.cc;
+  const key = it.layerId + "|" + it.date + "|" + it.cc + (rec.type === "wincomp" ? "|" + it.s.days : "");
   if (!dataDayReq.has(key)) {
-    dataDayReq.set(key, resolveScenes(rec, it.date, it.cc).then(sc => sc.length ? sc[0].slice(0, 10) : ""));
+    dataDayReq.set(key, resolveScenes(rec, it.date, it.cc, it.s).then(sc => sc.length ? sc[0].slice(0, 10) : ""));
     dataDayReq.get(key).catch(() => dataDayReq.delete(key));
   }
   return dataDayReq.get(key).then(d => { it.day = d; return d; }, () => null);
@@ -6176,7 +6363,7 @@ const vhiUrl = (id, rec) => {
 function statRec(rec) {
   let r = rec;
   if (rec.type === "fnrgb") r = Object.assign({}, rec, { type: "index", fn: rec.statFn, ramp: null, name: rec.statName });
-  else if (rec.type === "diff2") r = Object.assign({}, rec, { type: "index" });
+  else if (rec.type === "diff2" || rec.type === "wincomp") r = Object.assign({}, rec, { type: "index" });
   if (rec.ndwiOpt) r = Object.assign({}, r, { fn: v => rec.fn(v, S(rec)) });        // the chosen NDWI
   return r;
 }
@@ -6461,10 +6648,11 @@ function openStats() {
   $("#stTerr").checked = S(rec).terrain;
   $("#stIllum").checked = !!S(rec).illum;
   $("#stDate").textContent = fmtDay(state.date);
-  const noTs = r.type === "class" || r.type === "fnclass" || rec.type === "diff2" || rec.type === "vhiseason";
+  const noTs = r.type === "class" || r.type === "fnclass" || rec.type === "diff2" || rec.type === "wincomp" || rec.type === "vhiseason";
   $("#stTsCtl").hidden = noTs;
   $("#stProg").textContent = r.type === "class" || r.type === "fnclass" ? t("stats.noTsClass", "Time series are not available for categorical layers.") :
     rec.type === "diff2" ? t("stats.noTsDiff", "Time series are not available for the two-date layers. Use the index itself (NDVI, NDDI) for a time series.") :
+    rec.type === "wincomp" ? t("stats.noTsWindow", "Time series are not available for the window composites. Use NDVI for a time series.") :
     rec.type === "vhiseason" ? t("stats.noTsSeason", "The season curve above is the time series of this layer. Use swissEO VHI forest for the daily VHI.") : "";
   $("#stChart").innerHTML = "";
   $("#stTo").value = state.date;
@@ -6504,6 +6692,7 @@ async function runCurrentStats() {
                   cmask: cmaskOn(S(rec)) ? S(rec).cmask : "off" };
     let out;
     if (rec.type === "diff2") out = await diffStats(rec, r, scenes, grid, opt, ten, signal, prog);
+    else if (rec.type === "wincomp") out = await winStats(rec, r, scenes, grid, opt, ten, signal, prog);
     else if (rec.type === "vhiseason") out = await seasonStats(rec, scenes, grid, opt, ten, signal, prog, box);
     else if (ten) {
       const st = await stats10(r, scenes, opt, signal, prog);
@@ -6734,11 +6923,73 @@ async function diffStats(rec, r, scenes, grid, opt, ten, signal, prog) {
     histBars(dr.bins(s.min, s.max, 40), s.min, s.max, col, unitOf(r) + " " + t("stats.legendRange", "(legend range)")) + (ten ? note10(Object.assign({ step: 0.001 }, dr)) : "");
   const ha = c => +(c * dr.res * dr.res / 1e4).toFixed(2), rows = csvHead(rec, opt, dr.res).concat([["reference", ref.target + " (" + ref.dates.slice(0, 3).join(", ") + (ref.dates.length > 3 ? ", …" : "") + ")"],
     ["cells_in_aoi", dr.cells], ["area_cells", dr.inArea], ["area_ha", ha(dr.inArea)], ["compared_cells", dr.n], ["compared_ha", ha(dr.n)]]);
-  if (rec.modal) rows.push(["threshold", s.thr], ["affected_cells", t.raw], ["affected_ha", ha(t.raw)],
-    ["affected_pct", +(100 * t.raw / Math.max(1, t.n)).toFixed(3)], ["affected_filtered_cells", t.filt],
-    ["affected_filtered_ha", ha(t.filt)], ["affected_filtered_pct", +(100 * t.filt / Math.max(1, t.n)).toFixed(3)]);
+  if (rec.modal) rows.push(["threshold", s.thr], ["affected_cells", dr.raw], ["affected_ha", ha(dr.raw)],
+    ["affected_pct", +(100 * dr.raw / Math.max(1, dr.n)).toFixed(3)], ["affected_filtered_cells", dr.filt],
+    ["affected_filtered_ha", ha(dr.filt)], ["affected_filtered_pct", +(100 * dr.filt / Math.max(1, dr.n)).toFixed(3)]);
   rows.push([], ["statistic", unitOf(r)]);
-  [["mean", t.mean], ["sd", t.sd], ["min", t.min], ["max", t.max], ["median", t.median], ["p10", t.p10], ["p90", t.p90]]
+  [["mean", dr.mean], ["sd", dr.sd], ["min", dr.min], ["max", dr.max], ["median", dr.median], ["p10", dr.p10], ["p90", dr.p90]]
+    .forEach(([k, v]) => rows.push([k, +v.toPrecision(6)]));
+  return { html, csv: rows };
+}
+/* Statistics of the window composites (ndvidiff22, ndvidiff23) over the AOI: ΔNDVI as on the map, with the masks of the
+   statistics dialog, on the coarse grid or at 10 m in chunks (mean, sd, min, max exact; median and percentiles from a
+   histogram in steps of 0.001). */
+async function winStats(rec, r, scenes, grid, opt, ten, signal, prog) {
+  const s = S(rec), s2 = Object.assign({}, s, { cloud: !!opt.maskClouds && s.cloud, shadow: !!opt.maskClouds && s.shadow,
+    terrain: !!opt.maskTerrain, illum: opt.maskIllum != null, illumThr: opt.maskIllum != null ? opt.maskIllum : s.illumThr,
+    cmask: opt.cmask || "off" });
+  const cfg = { rec, s: s2, scenes, date: state.date, cc: state.cc };
+  const NB = 4000, hist = new Float64Array(NB);
+  let inArea = 0, n = 0, sum = 0, sq = 0, mn = Infinity, mx = -Infinity, cells = grid.n, chunks = 0, ref = null;
+  const take = (g, w2, x0, y0, w, h, d) => {
+    for (let y = y0; y < y0 + h; y++) for (let x = x0; x < x0 + w; x++) {
+      const k = y * w2 + x;
+      if (!g.mask[k] || d.out[k]) continue;
+      inArea++;
+      const v = d.dif[k];
+      if (v !== v) continue;
+      n++; sum += v; sq += v * v; hist[clamp(Math.floor((v + 2) * 1000), 0, NB - 1)]++;
+      if (v < mn) mn = v;
+      if (v > mx) mx = v;
+    }
+  };
+  if (ten) {
+    const run = await eachChunk10(0, signal, prog, async (g, w, h) => {
+      const d = await winDiff(cfg, g.bbox, g.W, g.H, signal, opt.veg);
+      ref = d.ref;
+      take(g, g.W, 0, 0, w, h, d);
+    });
+    if (!run) return null;
+    cells = run.cells; chunks = run.chunks;
+  } else {
+    const d = await winDiff(cfg, grid.bbox, grid.W, grid.H, signal, opt.veg);
+    ref = d.ref;
+    take(grid, grid.W, 0, 0, grid.W, grid.H, d);
+  }
+  if (signal.aborted) return null;
+  ref = ref || await winRef(cfg);
+  const now = { from: addDays(state.date, 1 - s.days), to: state.date };
+  let html = '<div class="hint" style="margin:0 0 8px">' + t("stats.winHead", "{{comp}} of {{now}} ({{n}}) vs. {{ref}} ({{m}}) · cells with a clear observation in both windows are compared.",
+    { comp: rec.comp === "median" ? t("inspect.medianNdvi", "Median NDVI") : t("inspect.maxNdvi", "Maximum NDVI"), now: winLabel(now), ref: winLabel(ref),
+      n: tn("layer.acqCount", "{{count}} acquisition", "{{count}} acquisitions", scenes.length),
+      m: tn("layer.acqCount", "{{count}} acquisition", "{{count}} acquisitions", ref.ids.length) }) + "</div>";
+  if (!n) return { html: html + '<div class="hint">' + t("stats.noBothWin", "No pixels with a clear observation in both windows.") + "</div>" };
+  const q = p => { let c = 0; const k = p * (n - 1); for (let i = 0; i < NB; i++) { c += hist[i]; if (c > k) return clamp((i + 0.5) / 1000 - 2, mn, mx); } return mx; };
+  const mean = sum / n, dr = { inArea, n, mean, sd: Math.sqrt(Math.max(0, sq / n - mean * mean)), min: mn, max: mx,
+    median: q(0.5), p10: q(0.1), p90: q(0.9), bins: fineBins(hist, -2, 1000), res: ten ? 10 : grid.res, cells, chunks };
+  const d0 = r.domain[0], k2 = (r.domain[1] - d0) / ((s.max - s.min) || 1e-9);
+  const col = v => { const c = r.ramp(d0 + (v - s.min) * k2); return c ? rgbCss(c) : "#999"; };
+  html += '<div class="stgrid"><div>' + t("stats.mean", "Mean") + " " + unitOf(r) + "<b>" + fmtNum(dr.mean) + "</b></div><div>" + t("stats.sd", "Std. dev.") + "<b>" + fmtNum(dr.sd) + "</b></div>" +
+    "<div>" + t("stats.median", "Median") + "<b>" + fmtNum(dr.median) + "</b></div><div>" + t("stats.validBothWin", "Valid in both windows") + "<b>" + fmtLoc(100 * dr.n / Math.max(1, dr.inArea), 1) +
+    " %</b></div><div>P10 / P90<b>" + fmtNum(dr.p10) + " / " + fmtNum(dr.p90) + "</b></div><div>" + t("layer.minMax", "Min / max") + "<b>" + fmtNum(dr.min) + " / " +
+    fmtNum(dr.max) + "</b></div></div>" +
+    histBars(dr.bins(s.min, s.max, 40), s.min, s.max, col, unitOf(r) + " " + t("stats.legendRange", "(legend range)")) + (ten ? note10(Object.assign({ step: 0.001 }, dr)) : "");
+  const ha = c => +(c * dr.res * dr.res / 1e4).toFixed(2), rows = csvHead(rec, opt, dr.res).concat([
+    ["composite", rec.comp], ["window_days", s.days], ["window", now.from + "/" + now.to + " (" + scenes.length + " acquisitions)"],
+    ["reference_window", ref.from + "/" + ref.to + " (" + ref.ids.length + " acquisitions)"],
+    ["cells_in_aoi", dr.cells], ["area_cells", dr.inArea], ["area_ha", ha(dr.inArea)], ["compared_cells", dr.n], ["compared_ha", ha(dr.n)]]);
+  rows.push([], ["statistic", unitOf(r)]);
+  [["mean", dr.mean], ["sd", dr.sd], ["min", dr.min], ["max", dr.max], ["median", dr.median], ["p10", dr.p10], ["p90", dr.p90]]
     .forEach(([k, v]) => rows.push([k, +v.toPrecision(6)]));
   return { html, csv: rows };
 }
@@ -7101,11 +7352,82 @@ function goPlace(it) {
   pin.innerHTML = UI.pin;
   psPin = new maplibregl.Marker({ element: pin, anchor: "bottom", offset: [0, 1] }).setLngLat(lv95(c[0], c[1])).addTo(map);
 }
-psIn.oninput = () => {
+/* Coordinates in the search field, as on map.geo.admin.ch (#55): LV95 and LV03 (either order, ' as thousands separator),
+   WGS84 in decimal degrees or degrees, minutes, seconds (lat lon, or lon lat when only that order fits Switzerland) and
+   MGRS. LV03 is placed by the 2,000,000 / 1,000,000 m offset (the official transformation differs by at most 1.6 m).
+   Returns { lv: [E, N], crs } or null when the text is no coordinate. */
+const CH_NEAR = [CH_BOX[0] - 5e4, CH_BOX[1] - 5e4, CH_BOX[2] + 5e4, CH_BOX[3] + 5e4];
+/* one WGS84 coordinate: 46.95, -7.4, 46.95N, 46°57'08.66" N, 46° 57.144' N or 46 57 8.66 N */
+function parseDms(s) {
+  const m = /^(.*?)\s*([NSEW])?$/i.exec(s.trim()), h = (m[2] || "").toUpperCase();
+  const body = m[1].replace(/''|′′/g, '"');
+  if (!/^-?\d+(?:\.\d+)?(?:\s*[°º]?\s*\d+(?:\.\d+)?\s*['′’]?(?:\s*\d+(?:\.\d+)?\s*["″”]?)?)?\s*[°º]?$/.test(body) && !/^-?[\d.]+$/.test(body)) return null;
+  const n = body.match(/-?\d+(?:\.\d+)?/g).map(Number);
+  if (n.length > 3 || (n.length > 1 && !h && !/[°º'′’]/.test(body))) return null;   // 46 57 8.66 needs its N / E
+  if (n.slice(1).some(x => x < 0 || x >= 60)) return null;
+  let v = Math.abs(n[0]) + (n[1] || 0) / 60 + (n[2] || 0) / 3600;
+  if (n[0] < 0 || h === "S" || h === "W") v = -v;
+  return { v, lat: h === "N" || h === "S", lon: h === "E" || h === "W" };
+}
+async function parseCoord(q) {
+  const s = q.trim().replace(/(\d)['’  ](?=\d{3}\b)/g, "$1");               // 2'600'000 -> 2600000
+  if (/^\d{1,2}\s*[C-HJ-NP-X]\s*[A-HJ-NP-Z]{2}\s*(\d+\s*\d*)$/i.test(s)) {                   // MGRS, e.g. 32T LT 7465 1550
+    const c = s.replace(/\s+/g, "").toUpperCase(), d = c.replace(/^\d{1,2}[A-Z]{3}/, "");
+    if (d.length % 2 || d.length > 10) return null;
+    try { const p = (await lib("mgrs")).toPoint(c), lv = toLV(p); return { lv: [lv.x, lv.y], crs: "MGRS" }; }
+    catch (e) { return null; }
+  }
+  // two parts: split on a comma, semicolon or slash, else on the space between the two coordinates
+  let parts = s.split(/\s*[,;/]\s*/);
+  if (parts.length !== 2) parts = s.split(/\s+/);
+  if (parts.length !== 2) {
+    const m = /^(.+?[NSEW])\s*(.+)$/i.exec(s);                                          // 46°57'08.66" N 7°26'22.50" E
+    if (!m) return null;
+    parts = [m[1], m[2]];
+  }
+  const num = parts.every(p => /^-?\d+(?:\.\d+)?$/.test(p));
+  if (num) {
+    const [a, b] = parts.map(Number);
+    for (const [x, y] of [[a, b], [b, a]]) {
+      const crs = detectCrs(x, y);
+      if (crs === "EPSG:2056") return { lv: [x, y], crs: "LV95" };
+      if (crs === "EPSG:21781") return { lv: [x + 2e6, y + 1e6], crs: "LV03" };
+    }
+  }
+  const d = parts.map(parseDms);
+  if (d.some(x => !x) || d.some(x => Math.abs(x.v) > 180)) return null;
+  let lat, lon;
+  if (d[0].lon || d[1].lat) [lon, lat] = [d[0].v, d[1].v];
+  else if (d[0].lat || d[1].lon) [lat, lon] = [d[0].v, d[1].v];
+  else if (d[1].v >= 45 && d[1].v <= 48.5 && !(d[0].v >= 45 && d[0].v <= 48.5)) [lon, lat] = [d[0].v, d[1].v];   // 7.44, 46.95
+  else [lat, lon] = [d[0].v, d[1].v];
+  if (Math.abs(lat) > 90) return null;
+  const lv = toLV([lon, lat]);
+  return { lv: [lv.x, lv.y], crs: "WGS84" };
+}
+const coordItem = c => {
+  const inMap = c.lv[0] >= CH_NEAR[0] && c.lv[0] <= CH_NEAR[2] && c.lv[1] >= CH_NEAR[1] && c.lv[1] <= CH_NEAR[3];
+  return { label: "<i>" + t("search.coordinate", "Coordinate") + " (" + c.crs + ")</i> <b>" + fmtCH(c.lv[0]) + ", " + fmtCH(c.lv[1]) + "</b>",
+           pt: inMap ? c.lv : null, ext: null, z: null, outside: !inMap };
+};
+async function coordSearch(q) {
+  const seq = ++psSeq, c = await parseCoord(q);
+  if (seq !== psSeq) return true;
+  if (!c) return false;
+  const it = coordItem(c);
+  psItems = it.outside ? [] : [it];
+  psSel = -1;
+  showPs(it.outside ? t("search.outside", "The coordinate {{c}} (LV95) is outside the map.", { c: fmtCH(c.lv[0]) + ", " + fmtCH(c.lv[1]) }) : undefined);
+  return true;
+}
+psIn.oninput = async () => {
   const q = psIn.value;
   $("#psClear").hidden = !q;
   clearTimeout(psTimer);
   if (q.trim().length < 2) { psSeq++; psItems = []; psRes.hidden = true; return; }
+  if (/^[\s\d.,;/'’°º′″"NSEW-]+$/i.test(q) || /^\d{1,2}\s*[C-HJ-NP-X]\s*[A-HJ-NP-Z]{2}\s*[\d\s]+$/i.test(q.trim())) {
+    if (await coordSearch(q)) return;                                                   // a coordinate: no place search
+  }
   psTimer = setTimeout(() => placeSearch(q), 250);
 };
 psIn.onkeydown = e => {
@@ -8087,6 +8409,23 @@ map.on("click", async e => {
         : "<tr><td>" + t("inspect.forestVhi", "Forest VHI") + "</td><td>" + t("inspect.noForestValues", "no forest / no values") + "</td></tr>") + "</table>";
     return;
   }
+  if (cfg && cfg.rec.type === "wincomp") {                   // both window composites at this pixel, with the clear observations
+    $("#inspBody").innerHTML = '<div class="hint">' + t("inspect.readingWindows", "Reading every acquisition of both windows…") + "</div>";
+    const r = await winDiff(cfg, [p.x - 5, p.y - 5, p.x + 5, p.y + 5], 1, 1).catch(() => null);      // the 10 m cell under the click
+    if (seq !== inspSeq) return;
+    const f = v => v === v ? fmtLoc(v, 4) : "n/a", rec = cfg.rec, nm = rec.comp === "median" ? t("inspect.medianNdvi", "Median NDVI") : t("inspect.maxNdvi", "Maximum NDVI");
+    const row = (a, b) => "<tr><td>" + a + "</td><td>" + b + "</td></tr>";
+    const obs = (w, o) => t("inspect.clearObs", "{{n}} clear of {{total}} acquisitions", { n: o, total: w.length });
+    $("#inspBody").innerHTML = "<table>" + row("LV95", p.x.toFixed(2) + ", " + p.y.toFixed(2)) +
+      (!r ? row(t("inspect.reading", "Reading bands…"), "n/a") :
+        row(nm + " " + winLabel({ from: addDays(cfg.date, 1 - cfg.s.days), to: cfg.date }), f(r.A.v[0])) +
+        row(t("inspect.observations", "Observations"), obs(cfg.scenes, r.A.n[0])) +
+        row(nm + " " + winLabel(r.ref), f(r.B.v[0])) +
+        row(t("inspect.observations", "Observations"), obs(r.ref.ids, r.B.n[0])) +
+        (r.out[0] ? row(t("inspect.masked", "Masked"), escA(vegName(cfg.s.veg)) || t("inspect.customMask", "custom mask")) : "") +
+        row("<b>" + unitOf(rec) + "</b>", "<b>" + f(r.dif[0]) + "</b>")) + "</table>";
+    return;
+  }
   if (cfg && cfg.rec.cogUrl && cfg.scenes.length) {        // VHI, NDVIdiff, NDVIz: the product value
     const r = cfg.rec, v = await readPoint(r.cogUrl(cfg.scenes[0]), p.x, p.y).catch(() => null);
     const txt = v == null || v === r.cogFill ? t("inspect.noData", "no data") : v === r.cogMissing ? t("inspect.missing", "missing data") : !r.cogValid(v) ? v + " " + t("inspect.noDataParen", "(no data)")
@@ -8334,7 +8673,9 @@ function drawCaption(ctx, W, H, desc, overlay) {
     const ids = currentCfg ? currentCfg.scenes : [];
     sub = SOURCES[currentRec.source].name + " · " + fmtDay(ids.length && currentRec.source !== "s2" ? ids[0].slice(0, 10) : state.date) +
           (currentRec.type === "diff2" && currentCfg && currentCfg.refInfo ? " " + t("export.vsRef", "vs. reference around {{date}}", { date: fmtDay(currentCfg.refInfo.target) }) : "") +
-          (ids.length && currentRec.source === "s2" ? " · " + ids.map(timeOf).join(", ") : "") +
+          (currentRec.type === "wincomp" && currentCfg && currentCfg.winInfo ? " " + t("export.vsWindow", "({{days}}-day window) vs. {{from}} to {{to}}",
+            { days: currentCfg.s.days, from: fmtDay(currentCfg.winInfo.from), to: fmtDay(currentCfg.winInfo.to) }) : "") +
+          (ids.length && currentRec.source === "s2" && currentRec.type !== "wincomp" ? " · " + ids.map(timeOf).join(", ") : "") +
           (currentRec.source === "s2" && vegOn(S(currentRec).veg) ? " · " + vegName(S(currentRec).veg, state.date, true) : "");
   }
   sub += "  |  " + t("export.credit", "© swisstopo · contains modified Copernicus Sentinel data") + (overlay || "");
@@ -8663,6 +9004,19 @@ async function runAnalytical(signal, prog) {
     const scenes = await resolveScenes(rec, state.date, state.cc);
     if (!scenes.length) { skipped.push(rec.name); continue; }
     const name = "swissEO_" + rec.id + "_" + tag;
+    if (fmt === "tiff32" && rec.type === "wincomp") {
+      // ΔNDVI of the window composites in blocks of 512 × 512 cells (each block reads every acquisition of both windows)
+      const cfg = { rec, s, scenes, date: state.date, cc: state.cc }, band = new Float32Array(n).fill(NaN), B = 512, blocks = [];
+      for (let y0 = 0; y0 < H; y0 += B) for (let x0 = 0; x0 < W; x0 += B) blocks.push([x0, y0, Math.min(B, W - x0), Math.min(B, H - y0)]);
+      let done = 0;
+      await pool(blocks, 2, async ([x0, y0, w, h]) => {
+        const d = await winDiff(cfg, [bbox[0] + x0 * rx, bbox[3] - (y0 + h) * ry, bbox[0] + (x0 + w) * rx, bbox[3] - y0 * ry], w, h, signal);
+        for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { const k = (y0 + y) * W + x0 + x; if (!inAoi || inAoi[k]) band[k] = d.dif[y * w + x]; }
+        prog(t("export.renderingPct", "Rendering {{name}} ({{step}}/{{total}}) · {{pct}} %", { name: layerText(rec, "name"), step, total, pct: Math.round(100 * ++done / blocks.length) }));
+      });
+      files.push({ name: name + ".tif", blob: encodeGeoTiff(Object.assign({ bands: [band], type: "f32", nodata: NaN }, geo)) });
+      continue;
+    }
     if (fmt === "tiff32" && (rec.type === "index" || rec.type === "cont" || rec.type === "terrain" || rec.type === "diff2" || rec.type === "vhiseason")) {
       // the index / physical value itself (two-date layers: the difference), with the layer's masks
       const grid = { bbox, W, H, mask: inAoi || new Uint8Array(n).fill(1), n };
@@ -8818,11 +9172,11 @@ async function runPrint(signal, prog) {
   for (const st of layerSteps) {
     if (signal.aborted) return;
     const rec = st ? LAYER[st.it.layerId] : currentRec, sset = st ? st.it.s : S(currentRec);
-    const scenes = st ? await resolveScenes(rec, st.it.date, st.it.cc) : (currentCfg ? currentCfg.scenes : []);
+    const scenes = st ? await resolveScenes(rec, st.it.date, st.it.cc, st.it.s) : (currentCfg ? currentCfg.scenes : []);
     if (!scenes.length) continue;
     const gf = st ? (sset.autoGain ? await autoGainFactor(rec, sset, scenes, viewBox()).catch(() => 1) : 1)
                   : (currentCfg && currentCfg.rec === rec ? currentCfg.gf : 1);
-    const lc = await renderCfgCanvas({ rec, s: sset, scenes, gf, date: st ? st.it.date : state.date }, bbox, W, H, signal,
+    const lc = await renderCfgCanvas({ rec, s: sset, scenes, gf, date: st ? st.it.date : state.date, cc: st ? st.it.cc : state.cc }, bbox, W, H, signal,
       (d, n) => prog(t("export.renderingPrint", "Rendering {{name}} · {{pct}} %", { name: layerText(rec, "name"), pct: Math.round(100 * d / n) })));
     ctx.save();
     if (st && compareEffect === "split") {

@@ -182,10 +182,10 @@
     "cap1": "<b>Abb. 5</b> NDVI bei Kerzers, 13. August 2026, mit der Maske Nutzungsflächen auf Ackerfläche, Dauerwiesen und Dauerweiden beschränkt.",
     "img1": "NDVI beschränkt auf Ackerfläche, Wiesen und Weiden, mit den Kontrollkästchen der Kategorien",
     "li1": "Scrollen Sie im Ebenenmenü hinunter zu <b>Masken</b>. Das Ausklappmenü <i>Vegetationsmaske</i> steht auf <i>Aus</i>.",
-    "li2": "Wählen Sie eine Maske, zum Beispiel <i>Landnutzung (Kategorien unten)</i> unter <i>Nutzungsflächen</i>: die landwirtschaftliche Nutzung der Kantone.",
+    "li2": "Wählen Sie eine Maske, zum Beispiel <i>Landnutzung</i> unter <i>Nutzungsflächen</i>: die landwirtschaftliche Nutzung der Kantone.",
     "li3": "Haken Sie die Kategorien an, die Sie behalten möchten, zum Beispiel Ackerfläche, Dauerwiesen und Dauerweiden. Die Karte zeigt die Ebene jetzt nur noch dort.",
     "p1": "Oft zählt nur ein Teil der Landschaft: der Wald für eine Trockenheitsbeurteilung, die Felder für eine Ernte. Die <b>Vegetationsmaske</b> blendet alles andere aus.",
-    "p2": "Die anderen Masken behalten Wald (die Habitatkarte von swissEO VHI oder den swissTLM3D-Wald), Nadel-, Misch- oder Laubwald (Waldmischungsgrad LFI 2023, ETH-Baumarten), einzelne Baumarten (ETH) oder alle Vegetation. Sie sind mit ihren Quellen unter <a href=\"#vis-veg\">Vegetationsmasken</a> beschrieben. Masken gelten auch für Statistik, Downloads und den Zeitraffer.",
+    "p2": "Die anderen Masken behalten Wald (die Habitatkarte von swissEO VHI oder den swissTLM3D-Wald), Nadel-, Misch- oder Laubwald (Waldmischungsgrad LFI 2023), einzelne Baumarten (ETH) oder alle Vegetation. Sie sind mit ihren Quellen unter <a href=\"#vis-veg\">Vegetationsmasken</a> beschrieben. Masken gelten auch für Statistik, Downloads und den Zeitraffer.",
     "title": "<span class=\"n\">5</span>Nur Wald oder Landwirtschaftsland behalten"
   },
   "t6": {
@@ -244,7 +244,8 @@
   },
   "tools-search": {
     "p1": "<b>Ort suchen</b> sucht Orte, Adressen, Gemeinden, Bezirke und Kantone mit der Ortssuche von map.geo.admin.ch. Ein Ergebnis zoomt auf seine Ausdehnung oder auf seinen Punkt in einem Massstab von etwa 1:25 000.",
-    "title": "Ortssuche"
+    "title": "Ortssuche",
+    "p2": "Sie nimmt auch <b>Koordinaten</b> an, wie map.geo.admin.ch: LV95 (<code>2600000 1200000</code>, auch <code>2'600'000, 1'200'000</code>), LV03 (<code>600000 200000</code>), WGS84 in Dezimalgrad (<code>46.95 7.44</code>) oder in Grad, Minuten und Sekunden (<code>46°57'08.66\" N 7°26'22.50\" E</code>) und MGRS (<code>32T LT 8076 0141</code>). Das Ergebnis zeigt den Punkt in LV95; ein Klick darauf zoomt die Karte dorthin und setzt eine Markierung."
   },
   "tools-spec": {
     "p1": "Die mittlere Oberflächenreflektanz aller zwölf Sentinel-2-Bänder über dem Gebiet, mit ± einer Standardabweichung, als Diagramm und als CSV. Sie zeigt die spektrale Signatur dessen, was in Ihrem Gebiet liegt: Wasser, Wald, Kulturen oder offener Boden. Auch hier lässt sich die Vegetationsmaske wählen.",
@@ -380,8 +381,6 @@
     "p1": "Das Ausklappmenü <i>Vegetationsmaske</i> steht bei den Vegetationsindizes (NDVI, EVI, SAVI, NDRE, MTVI2, Feuchtigkeitsindizes, NDDI) und beim NBR zu Beginn auf <i>Alle Vegetation</i>, bei den Waldebenen und bei jedem Vegetationsindex in der Konfiguration <i>Wald</i> auf <i>Wald</i>, und bei den Kompositen und den übrigen Indizes auf <i>Aus</i> («Eine auswählen»). In der Konfiguration <i>Landwirtschaft</i> startet jeder Vegetationsindex mit dem Landwirtschaftsland der Nutzungsflächen (alle Kategorien ausser Wald). Seine Einträge in dieser Reihenfolge:",
     "p2": "Gut zu wissen:",
     "td1": "Habitatkarte: Wald, Alle Vegetation",
-    "td10": "ETH-Baumarten (30 m): Nadelwald, Mischwald, Laubwald",
-    "td11": "Dieselben drei Klassen und derselbe Schieberegler (30 / 85 %) auf dem <b>Laubholzanteil an der Basalfläche</b>: ein Anteil, keine Wahrscheinlichkeit wie im Waldmischungsgrad LFI, die Grenzen sind also nicht direkt vergleichbar. Das 3 × 3-Mittel umfasst 3 × 3 Pixel von 30 m (90 m). Nur die Waldpixel der ETH-Karte, ohne weitere Waldmaske.",
     "td12": "<a href=\"https://arxiv.org/abs/2611.08095\" target=\"_blank\" rel=\"noopener\">ETH-Baumarten</a>, Zhou et al. 2026 (ETH Zürich, Preprint arXiv:2611.08095), 30 m, trainiert mit Stichproben des Landesforstinventars; Lizenz CC BY-NC 4.0 (nur nicht kommerzielle Nutzung)",
     "td13": "ETH-Baumarten (30 m): Dominante Baumart",
     "td14": "Kontrollkästchen für die Klasse mit dem grössten Basalflächenanteil pro 30-m-Pixel: Fichte, Tanne, Föhre, Lärche, Arve, Buche, Ahorn, Esche, Eiche, Kastanie, Andere; <i>Alle Nadelbäume</i>, <i>Alle Laubbäume</i> und <i>Alle</i> setzen sie auf einmal.",

@@ -42,7 +42,7 @@ configurations:
     beta: false
     groups:
       - title: "Layers"
-        layers: ["true", "ndvi", "evi", "ndmi", "vhi", "vhiveg", "ndvidiff", "ndvidiff2", "ndviz", "nddi", "nddichg", "analyst"]
+        layers: ["true", "ndvi", "evi", "ndmi", "vhi", "vhiveg", "ndvidiff", "ndvidiff2", "ndvidiff22", "ndvidiff23", "ndviz", "nddi", "nddichg", "analyst"]
   - key: DROUGHT2026
     name: "Drought 2026"
     beta: false
@@ -56,4 +56,4 @@ configurations:
     masks: { vegetation: "forest" }
     groups:
       - title: "Layers"
-        layers: ["true", "ndvi", "evi", "vhi", "vhidef", "vhiext", "ndvidiff", "ndvidiff2", "ndviz", "analyst", "nbr", "ndmi", "fdc"]
+        layers: ["true", "ndvi", "evi", "vhi", "vhidef", "vhiext", "ndvidiff", "ndvidiff2", "ndvidiff22", "ndvidiff23", "ndviz", "analyst", "nbr", "ndmi", "fdc"]

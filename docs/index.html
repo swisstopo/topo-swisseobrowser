@@ -254,7 +254,7 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
     <b>vegetation mask</b> hides everything else.</p>
   <ol class="steps">
     <li data-i18n="[html]t5.li1">In the layer menu, scroll down to <b>Masks</b>. The pull-down <i>Vegetation mask</i> says <i>Off</i>.</li>
-    <li data-i18n="[html]t5.li2">Choose a mask, for example <i>Land use (categories below)</i> under <i>Nutzungsflächen</i>: the agricultural land
+    <li data-i18n="[html]t5.li2">Choose a mask, for example <i>Land use</i> under <i>Nutzungsflächen</i>: the agricultural land
       use of the cantons.</li>
     <li data-i18n="t5.li3">Tick the categories you want to keep, for example arable land, permanent meadows and permanent pastures. The
       map now shows the layer only there.</li>
@@ -263,7 +263,7 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
     <figcaption data-i18n="[html]t5.cap1"><b>Fig. 5</b> NDVI near Kerzers, 13 August 2026, restricted by the Nutzungsflächen mask to arable land,
     permanent meadows and permanent pastures.</figcaption></figure>
   <p data-i18n="[html]t5.p2">The other masks keep forest (the habitat map of swissEO VHI or the swissTLM3D forest), conifer, mixed or broadleaf
-    forest (Forest Type NFI 2023, ETH tree species), single tree species (ETH) or all vegetation. They are described, with their sources, in
+    forest (Forest Type NFI 2023), single tree species (ETH) or all vegetation. They are described, with their sources, in
     <a href="#vis-veg">Vegetation masks</a>. Masks also apply to statistics, downloads and the timelapse.</p>
   <div data-i18n="[html]t5.box1" class="tip"><b>Tip:</b> for conifer, mixed or broadleaf forest, a slider with two handles sets where one class ends
     and the next begins (30 % and 85 % of broadleaf trees by default). Move a handle and let go: the map follows. For
@@ -410,17 +410,13 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
       <td data-i18n="[html]vis-veg.td9"><a href="https://doi.org/10.16904/1000001.7" target="_blank" rel="noopener">Forest Type NFI</a>, WSL (Waser et al. 2025,
       doi:10.16904/1000001.7), funded by the BAFU; 10 m, Sentinel-1 and -2 of 2021 to 2023, yearly updates planned
       from 2027</td></tr>
-    <tr><td data-i18n="vis-veg.td10">ETH tree species (30 m): Conifer forest, Mixed forest, Broadleaf forest</td>
-      <td data-i18n="[html]vis-veg.td11">The same three classes and slider (30 / 85 %) on the <b>broadleaf share of the basal area</b>: a share, not a
-      probability as in Forest Type NFI, so the limits are not directly comparable. The 3 × 3 mean covers 3 × 3 pixels of
-      30 m (90 m). Only the forest pixels of the ETH map, without a further forest mask.</td>
-      <td data-i18n="[html]vis-veg.td12" rowspan="2"><a href="https://arxiv.org/abs/2611.08095" target="_blank" rel="noopener">ETH tree species</a>, Zhou et al. 2026
-      (ETH Zürich, preprint arXiv:2611.08095), 30 m, trained on National Forest Inventory plots; licence CC BY-NC 4.0
-      (non-commercial use only)</td></tr>
     <tr><td data-i18n="vis-veg.td13">ETH tree species (30 m): Dominant tree species</td>
       <td data-i18n="[html]vis-veg.td14">Check boxes for the class with the largest basal-area share per 30 m pixel: Spruce (Fichte), Fir (Tanne), Pine
       (Föhre), Larch (Lärche), Arolla pine (Arve), Beech (Buche), Maple (Ahorn), Ash (Esche), Oak (Eiche), Chestnut
-      (Kastanie), Other (Andere); <i>All conifers</i>, <i>All broadleaves</i> and <i>All</i> set them at once.</td></tr>
+      (Kastanie), Other (Andere); <i>All conifers</i>, <i>All broadleaves</i> and <i>All</i> set them at once.</td>
+      <td data-i18n="[html]vis-veg.td12"><a href="https://arxiv.org/abs/2611.08095" target="_blank" rel="noopener">ETH tree species</a>, Zhou et al. 2026
+      (ETH Zürich, preprint arXiv:2611.08095), 30 m, trained on National Forest Inventory plots; licence CC BY-NC 4.0
+      (non-commercial use only)</td></tr>
     <tr><td data-i18n="vis-veg.td15">Nutzungsflächen (BLW): Land use</td>
       <td data-i18n="vis-veg.td16">The agricultural land use of the cantons, with check boxes for its 13 main categories: Ackerfläche (arable land),
       Dauerwiesen (permanent meadows), Dauerweiden (permanent pastures), Reben (vineyards), Obstanlagen (orchards), Übrige
@@ -561,6 +557,10 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
   <h3 data-i18n="tools-search.title" id="tools-search">Place search</h3>
   <p data-i18n="[html]tools-search.p1"><b>Go to Place</b> searches places, addresses, municipalities, districts and cantons with the location search of
     map.geo.admin.ch. A result zooms to its extent, or to its point at a scale of about 1:25,000.</p>
+  <p data-i18n="[html]tools-search.p2">It also takes <b>coordinates</b>, as map.geo.admin.ch: LV95 (<code>2600000 1200000</code>, also
+    <code>2'600'000, 1'200'000</code>), LV03 (<code>600000 200000</code>), WGS84 in decimal degrees (<code>46.95 7.44</code>) or
+    in degrees, minutes and seconds (<code>46°57'08.66" N 7°26'22.50" E</code>) and MGRS (<code>32T LT 8076 0141</code>). The
+    result shows the point in LV95; click it and the map zooms there and drops a pin.</p>
 
   <h3 data-i18n="tools-aoi.title" id="tools-aoi">Area of interest</h3>
   <p data-i18n="[html]tools-aoi.p1">The pentagon button opens three options: <b>import</b>, <b>rectangle</b> and <b>polygon</b>. A polygon is finished

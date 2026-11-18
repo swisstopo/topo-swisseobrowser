@@ -182,10 +182,10 @@
     "cap1": "<b>Fig. 5</b> NDVI near Kerzers, 13 August 2026, restricted by the Nutzungsflächen mask to arable land, permanent meadows and permanent pastures.",
     "img1": "NDVI restricted to arable land, meadows and pastures, with the category check boxes",
     "li1": "In the layer menu, scroll down to <b>Masks</b>. The pull-down <i>Vegetation mask</i> says <i>Off</i>.",
-    "li2": "Choose a mask, for example <i>Land use (categories below)</i> under <i>Nutzungsflächen</i>: the agricultural land use of the cantons.",
+    "li2": "Choose a mask, for example <i>Land use</i> under <i>Nutzungsflächen</i>: the agricultural land use of the cantons.",
     "li3": "Tick the categories you want to keep, for example arable land, permanent meadows and permanent pastures. The map now shows the layer only there.",
     "p1": "Often only part of the landscape matters: the forest for a drought assessment, the fields for a harvest. The <b>vegetation mask</b> hides everything else.",
-    "p2": "The other masks keep forest (the habitat map of swissEO VHI or the swissTLM3D forest), conifer, mixed or broadleaf forest (Forest Type NFI 2023, ETH tree species), single tree species (ETH) or all vegetation. They are described, with their sources, in <a href=\"#vis-veg\">Vegetation masks</a>. Masks also apply to statistics, downloads and the timelapse.",
+    "p2": "The other masks keep forest (the habitat map of swissEO VHI or the swissTLM3D forest), conifer, mixed or broadleaf forest (Forest Type NFI 2023), single tree species (ETH) or all vegetation. They are described, with their sources, in <a href=\"#vis-veg\">Vegetation masks</a>. Masks also apply to statistics, downloads and the timelapse.",
     "title": "<span class=\"n\">5</span>Keep only forest or farmland"
   },
   "t6": {
@@ -244,6 +244,7 @@
   },
   "tools-search": {
     "p1": "<b>Go to Place</b> searches places, addresses, municipalities, districts and cantons with the location search of map.geo.admin.ch. A result zooms to its extent, or to its point at a scale of about 1:25,000.",
+    "p2": "It also takes <b>coordinates</b>, as map.geo.admin.ch: LV95 (<code>2600000 1200000</code>, also <code>2'600'000, 1'200'000</code>), LV03 (<code>600000 200000</code>), WGS84 in decimal degrees (<code>46.95 7.44</code>) or in degrees, minutes and seconds (<code>46°57'08.66\" N 7°26'22.50\" E</code>) and MGRS (<code>32T LT 8076 0141</code>). The result shows the point in LV95; click it and the map zooms there and drops a pin.",
     "title": "Place search"
   },
   "tools-spec": {
@@ -380,8 +381,6 @@
     "p1": "The pull-down <i>Vegetation mask</i> starts with <i>All vegetation</i> for the vegetation indices (NDVI, EVI, SAVI, NDRE, MTVI2, moisture indices, NDDI) and NBR, with <i>Forest</i> for the forest layers and for every vegetation index in the <i>Forest</i> configuration, with the farmland of the Nutzungsflächen (every category but forest) in the <i>Agriculture</i> configuration, and with <i>Off</i> (\"Choose one\") for the composites and the other indices. Its entries, in this order:",
     "p2": "Good to know:",
     "td1": "Habitat Map: Forest, All vegetation",
-    "td10": "ETH tree species (30 m): Conifer forest, Mixed forest, Broadleaf forest",
-    "td11": "The same three classes and slider (30 / 85 %) on the <b>broadleaf share of the basal area</b>: a share, not a probability as in Forest Type NFI, so the limits are not directly comparable. The 3 × 3 mean covers 3 × 3 pixels of 30 m (90 m). Only the forest pixels of the ETH map, without a further forest mask.",
     "td12": "<a href=\"https://arxiv.org/abs/2611.08095\" target=\"_blank\" rel=\"noopener\">ETH tree species</a>, Zhou et al. 2026 (ETH Zürich, preprint arXiv:2611.08095), 30 m, trained on National Forest Inventory plots; licence CC BY-NC 4.0 (non-commercial use only)",
     "td13": "ETH tree species (30 m): Dominant tree species",
     "td14": "Check boxes for the class with the largest basal-area share per 30 m pixel: Spruce (Fichte), Fir (Tanne), Pine (Föhre), Larch (Lärche), Arolla pine (Arve), Beech (Buche), Maple (Ahorn), Ash (Esche), Oak (Eiche), Chestnut (Kastanie), Other (Andere); <i>All conifers</i>, <i>All broadleaves</i> and <i>All</i> set them at once.",

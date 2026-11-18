@@ -182,10 +182,10 @@
     "cap1": "<b>Fig. 5</b> NDVI presso Kerzers, 13 agosto 2026, limitato dalla maschera Nutzungsflächen a superficie coltiva, prati permanenti e pascoli permanenti.",
     "img1": "NDVI limitato a superficie coltiva, prati e pascoli, con le caselle delle categorie",
     "li1": "Nel menu del livello scorri fino a <b>Maschere</b>. Il menu a discesa <i>Maschera della vegetazione</i> indica <i>Spento</i>.",
-    "li2": "Scegli una maschera, per esempio <i>Uso del suolo (categorie sotto)</i> sotto <i>Nutzungsflächen</i>: l'uso agricolo del suolo dei Cantoni.",
+    "li2": "Scegli una maschera, per esempio <i>Uso del suolo</i> sotto <i>Nutzungsflächen</i>: l'uso agricolo del suolo dei Cantoni.",
     "li3": "Spunta le categorie che vuoi tenere, per esempio superficie coltiva, prati permanenti e pascoli permanenti. La mappa ora mostra il livello solo lì.",
     "p1": "Spesso conta solo una parte del paesaggio: il bosco per valutare una siccità, i campi per un raccolto. La <b>maschera della vegetazione</b> nasconde tutto il resto.",
-    "p2": "Le altre maschere tengono il bosco (la carta degli habitat di swissEO VHI o il bosco swissTLM3D), il bosco di conifere, misto o di latifoglie (Grado di mescolanza IFN 2023, specie arboree ETH), singole specie (ETH) o tutta la vegetazione. Sono descritte, con le loro fonti, in <a href=\"#vis-veg\">Maschere della vegetazione</a>. Le maschere valgono anche per statistiche, download e timelapse.",
+    "p2": "Le altre maschere tengono il bosco (la carta degli habitat di swissEO VHI o il bosco swissTLM3D), il bosco di conifere, misto o di latifoglie (Grado di mescolanza IFN 2023), singole specie (ETH) o tutta la vegetazione. Sono descritte, con le loro fonti, in <a href=\"#vis-veg\">Maschere della vegetazione</a>. Le maschere valgono anche per statistiche, download e timelapse.",
     "title": "<span class=\"n\">5</span>Tenere solo bosco o terreni agricoli"
   },
   "t6": {
@@ -244,7 +244,8 @@
   },
   "tools-search": {
     "p1": "<b>Vai al luogo</b> cerca luoghi, indirizzi, comuni, distretti e Cantoni con la ricerca di località di map.geo.admin.ch. Un risultato zooma sulla sua estensione, o sul suo punto a una scala di circa 1:25 000.",
-    "title": "Ricerca di luoghi"
+    "title": "Ricerca di luoghi",
+    "p2": "Accetta anche <b>coordinate</b>, come map.geo.admin.ch: LV95 (<code>2600000 1200000</code>, anche <code>2'600'000, 1'200'000</code>), LV03 (<code>600000 200000</code>), WGS84 in gradi decimali (<code>46.95 7.44</code>) o in gradi, minuti e secondi (<code>46°57'08.66\" N 7°26'22.50\" E</code>) e MGRS (<code>32T LT 8076 0141</code>). Il risultato indica il punto in LV95; un clic su di esso porta la carta lì e posa un segnaposto."
   },
   "tools-spec": {
     "p1": "La riflettanza di superficie media di tutte le dodici bande di Sentinel-2 sull'area, con ± una deviazione standard, come grafico e come CSV. Mostra la firma spettrale di ciò che si trova nella tua area: acqua, bosco, colture o suolo nudo. Anche qui si può scegliere la maschera della vegetazione.",
@@ -380,8 +381,6 @@
     "p1": "Il menu a discesa <i>Maschera della vegetazione</i> inizia con <i>Tutta la vegetazione</i> per gli indici di vegetazione (NDVI, EVI, SAVI, NDRE, MTVI2, indici di umidità, NDDI) e l'NBR, con <i>Bosco</i> per i livelli forestali e per ogni indice di vegetazione nella configurazione <i>Bosco</i>, e con <i>Spento</i> («Scegline una») per i compositi e gli altri indici. Nella configurazione <i>Agricoltura</i> ogni indice di vegetazione inizia con i terreni agricoli delle superfici di utilizzazione (tutte le categorie tranne il bosco). Le sue voci, in quest'ordine:",
     "p2": "Buono a sapersi:",
     "td1": "Carta degli habitat: bosco, tutta la vegetazione",
-    "td10": "Specie arboree ETH (30 m): bosco di conifere, bosco misto, bosco di latifoglie",
-    "td11": "Le stesse tre classi e lo stesso cursore (30 / 85 %) sulla <b>quota di latifoglie nell'area basimetrica</b>: una quota, non una probabilità come nel Grado di mescolanza IFN, quindi i limiti non sono direttamente confrontabili. La media 3 × 3 copre 3 × 3 pixel di 30 m (90 m). Solo i pixel forestali della carta ETH, senza un'ulteriore maschera forestale.",
     "td12": "<a href=\"https://arxiv.org/abs/2611.08095\" target=\"_blank\" rel=\"noopener\">Specie arboree ETH</a>, Zhou et al. 2026 (ETH Zurigo, preprint arXiv:2611.08095), 30 m, addestrato sulle aree di saggio dell'Inventario forestale nazionale; licenza CC BY-NC 4.0 (solo uso non commerciale)",
     "td13": "Specie arboree ETH (30 m): specie dominante",
     "td14": "Caselle per la classe con la maggiore quota di area basimetrica per pixel di 30 m: abete rosso (Fichte), abete bianco (Tanne), pino (Föhre), larice (Lärche), cembro (Arve), faggio (Buche), acero (Ahorn), frassino (Esche), quercia (Eiche), castagno (Kastanie), altre (Andere); <i>Tutte le conifere</i>, <i>Tutte le latifoglie</i> e <i>Tutte</i> le impostano in una volta.",
