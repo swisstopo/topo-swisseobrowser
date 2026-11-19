@@ -105,7 +105,7 @@
     "removeAll": "Alle entfernen",
     "share": "Teilen",
     "split": "Geteilt",
-    "splitNeeds2d": "Die Teilung braucht die flache Karte: 3D ausschalten",
+    "splitNeeds2d": "Die Teilung benötigt die 2D-Karte: 3D ausschalten",
     "splitPos": "Teilungsposition:",
     "zoomTo": "Zum Ort dieser Ebene zoomen"
   },
@@ -1099,7 +1099,7 @@
   },
   "status": {
     "catalogueFailed": "Katalogabfrage fehlgeschlagen: {{msg}}",
-    "compare3d": "3D vergleicht mit Deckkraft: Die Teilung benötigt die 2D Karte.",
+    "compare3d": "3D vergleicht mit Deckkraft: Die Teilung benötigt die 2D-Karte.",
     "compareMissing_one": "{{count}} verglichene Ebene hat keine Daten für ihr Datum.",
     "compareMissing_other": "{{count}} verglichene Ebenen haben keine Daten für ihr Datum.",
     "labelsFailed": "Die swisstopo-Beschriftungen konnten nicht geladen werden.",
