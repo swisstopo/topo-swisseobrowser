@@ -2561,6 +2561,28 @@ function ramp(stops) {
     }
     return stops[stops.length - 1][1];
   };
+  /* the same colour written into RGBA data d at o (alpha 255), without an array per pixel; false where f gives null.
+     The stops are sorted, so the first stop at or above v is found by halving. */
+  f.put = (v, d, o) => {
+    if (!isFinite(v)) return false;
+    let c;
+    if (v <= stops[0][0]) c = stops[0][1];
+    else {
+      let lo = 1, hi = stops.length;
+      while (lo < hi) { const mid = (lo + hi) >> 1; if (v <= stops[mid][0]) hi = mid; else lo = mid + 1; }
+      if (lo === stops.length) c = stops[stops.length - 1][1];
+      else {
+        const a = stops[lo - 1], b = stops[lo], t = (v - a[0]) / (b[0] - a[0] || 1);
+        d[o] = a[1][0] + (b[1][0] - a[1][0]) * t;
+        d[o + 1] = a[1][1] + (b[1][1] - a[1][1]) * t;
+        d[o + 2] = a[1][2] + (b[1][2] - a[1][2]) * t;
+        d[o + 3] = 255;
+        return true;
+      }
+    }
+    d[o] = c[0]; d[o + 1] = c[1]; d[o + 2] = c[2]; d[o + 3] = 255;
+    return true;
+  };
   f.stops = stops;
   return f;
 }
@@ -4182,6 +4204,52 @@ function tciDarkEdges(a, val, ez, bbox, W, H) {
 /* ============================================================
    9. Rendering
    ============================================================ */
+/* Which pixels of a tile the masks remove (1): the vegetation mask (0 = outside), clouds and cloud shadows, terrain
+   shadow and low illumination (tOut, per value 0 to 255 from a table), the custom mask. Worked out once per tile, so
+   the colour loops test one array. null when no mask is on. */
+function maskOf(n, vm, cm, s, tm, tOut, cg, cmode) {
+  if (!vm && !cm && !tm && !cg) return null;
+  const m = new Uint8Array(n);
+  if (vm) for (let k = 0; k < n; k++) if (vm[k] === 0) m[k] = 1;
+  if (cm) {
+    const c12 = !!s.cloud, c3 = !!s.shadow;
+    for (let k = 0; k < n; k++) { const v = cm[k]; if ((c12 && (v === 1 || v === 2)) || (c3 && v === 3)) m[k] = 1; }
+  }
+  if (tm) {
+    const out = new Uint8Array(256);
+    for (let v = 0; v < 256; v++) out[v] = tOut(v) ? 1 : 0;
+    for (let k = 0; k < n; k++) { const v = tm[k]; if ((v >= 0 && v < 256 && (v | 0) === v) ? out[v] : tOut(v)) m[k] = 1; }
+  }
+  if (cg) {
+    if (cmode === "in") { for (let k = 0; k < n; k++) if (!cg[k]) m[k] = 1; }
+    else for (let k = 0; k < n; k++) if (cg[k] === 1) m[k] = 1;
+  }
+  return m;
+}
+/* The colour of a band composite depends, per channel, only on that band's DN (an integer): f is evaluated once per
+   DN (65536 values, 256 for the TCI) and kept for the same settings, instead of Math.pow per pixel and channel. The
+   table holds the same numbers, stored the same way (Uint8ClampedArray, like the image), so the pixels do not change. */
+const dnTables = new Map();
+function dnTable(key, size, f, Type = Uint8ClampedArray) {
+  const k = key + "|" + size + "|" + Type.name;
+  let t = dnTables.get(k);
+  if (!t) {
+    t = new Type(size);
+    for (let dn = 0; dn < size; dn++) t[dn] = f(dn);
+    dnTables.set(k, t);
+    if (dnTables.size > 24) dnTables.delete(dnTables.keys().next().value);
+  }
+  return t;
+}
+function rgbByTable(a, L, mk, d, n) {
+  const [a0, a1, a2] = a, [L0, L1, L2] = L;
+  for (let k = 0; k < n; k++) {
+    const r = a0[k], g = a1[k], b = a2[k];
+    if ((r === 0 && g === 0 && b === 0) || (mk !== null && mk[k] === 1)) continue;
+    const q = k * 4;
+    d[q] = L0[r]; d[q + 1] = L1[g]; d[q + 2] = L2[b]; d[q + 3] = 255;
+  }
+}
 async function renderScene(rec, s, id, bbox, W, H, signal) {
   const box = sceneBox(id);
   if (box && (bbox[2] < box[0] || bbox[0] > box[2] || bbox[3] < box[1] || bbox[1] > box[3])) return null;
@@ -4201,11 +4269,22 @@ async function renderScene(rec, s, id, bbox, W, H, signal) {
   if (a.some(x => !x)) return null;
 
   const cg = cmaskOn(s) ? customMaskGrid(bbox, W, H) : null, cmode = s.cmask;
-  const masked = k => (vm && vm[k] === 0) ||
-    (cm && ((s.cloud && (cm[k] === 1 || cm[k] === 2)) || (s.shadow && cm[k] === 3))) ||
-    (tm && tOut(tm[k])) || (cg && cmaskOut(cmode, cg, k));
   const img = new ImageData(W, H), d = img.data, n = W * H;
+  const mk = maskOf(n, vm, cm, s, tm, tOut, cg, cmode), masked = k => mk !== null && mk[k] === 1;
   const put = (k, c) => { d[k*4] = c[0]; d[k*4+1] = c[1]; d[k*4+2] = c[2]; d[k*4+3] = 255; };
+  // the bands as physical values (negative reflectance set to 0) into one array that is reused for every pixel;
+  // false where a band has no data (DN 0)
+  const nb = bands.length, vals = new Array(nb).fill(0);
+  const bsc = bands.map(b => bandScale(b).scale), bof = bands.map(b => bandScale(b).offset);
+  const readVals = k => {
+    for (let i = 0; i < nb; i++) {
+      const dn = a[i][k];
+      if (dn === 0) return false;
+      const p = dn * bsc[i] + bof[i];
+      vals[i] = p > 0 ? p : 0;
+    }
+    return true;
+  };
 
   if (rec.tci) {
     // the delivered TCI; gain / gamma / RGB ranges on top (1 / 1 / [0, 1] = unchanged). The internal mask decides
@@ -4215,16 +4294,16 @@ async function renderScene(rec, s, id, bbox, W, H, signal) {
     const ez = s.edge ? await tciEdgeZone(id).catch(() => null) : null;
     const drop = ez ? tciDarkEdges(a, val, ez, bbox, W, H) : null;
     const held = drop ? new ImageData(W, H) : null;
+    const L = rg.map(r => dnTable("tci|" + s.gain + "|" + ig + "|" + r, 256, x => {
+      let v = clamp(x / 255 * s.gain, 0, 1);
+      if (ig !== 1) v = Math.pow(v, ig);
+      return 255 * clamp((v - r[0]) / ((r[1] - r[0]) || 1e-6), 0, 1);
+    }));
+    const [a0, a1, a2] = a, [L0, L1, L2] = L;
     for (let k = 0; k < n; k++) {
-      if ((val ? !val[k] : a[0][k] === 0 && a[1][k] === 0 && a[2][k] === 0) || masked(k)) continue;
-      const o = drop && drop[k] ? held.data : d;
-      for (let c = 0; c < 3; c++) {
-        let v = clamp(a[c][k] / 255 * s.gain, 0, 1);
-        if (ig !== 1) v = Math.pow(v, ig);
-        v = clamp((v - rg[c][0]) / ((rg[c][1] - rg[c][0]) || 1e-6), 0, 1);
-        o[k * 4 + c] = 255 * v;
-      }
-      o[k * 4 + 3] = 255;
+      if ((val ? !val[k] : a0[k] === 0 && a1[k] === 0 && a2[k] === 0) || (mk !== null && mk[k] === 1)) continue;
+      const o = drop && drop[k] ? held.data : d, q = k * 4;
+      o[q] = L0[a0[k]]; o[q + 1] = L1[a1[k]]; o[q + 2] = L2[a2[k]]; o[q + 3] = 255;
     }
     img.held = held;
     return img;
@@ -4233,24 +4312,20 @@ async function renderScene(rec, s, id, bbox, W, H, signal) {
   if (rec.type === "rgb" && rec.look === "hon") {
     // Copernicus Browser "Highlight Optimized Natural Color": ρ > 0.15 → cbrt(0.6 ρ), else 2.9876 ρ
     const ig = 1 / s.gamma, rg = [s.r, s.g, s.b];
-    for (let k = 0; k < n; k++) {
-      if ((a[0][k] === 0 && a[1][k] === 0 && a[2][k] === 0) || masked(k)) continue;
-      for (let c = 0; c < 3; c++) {
-        const x = toRho(a[c][k]) * s.gain;
-        let v = clamp(x > 0.15 ? Math.cbrt(0.6 * x) : 2.9876031644 * x, 0, 1);
-        if (ig !== 1) v = Math.pow(v, ig);
-        v = clamp((v - rg[c][0]) / ((rg[c][1] - rg[c][0]) || 1e-6), 0, 1);
-        d[k * 4 + c] = 255 * v;
-      }
-      d[k * 4 + 3] = 255;
-    }
+    const L = rg.map(r => dnTable("hon|" + s.gain + "|" + ig + "|" + r, 65536, dn => {
+      const x = toRho(dn) * s.gain;
+      let v = clamp(x > 0.15 ? Math.cbrt(0.6 * x) : 2.9876031644 * x, 0, 1);
+      if (ig !== 1) v = Math.pow(v, ig);
+      return 255 * clamp((v - r[0]) / ((r[1] - r[0]) || 1e-6), 0, 1);
+    }));
+    rgbByTable(a, L, mk, d, n);
     return img;
   }
 
   if (rec.type === "fnrgb") {
     for (let k = 0; k < n; k++) {
-      if (a.some(x => x[k] === 0) || masked(k)) continue;
-      const c = rec.rgb(bands.map((b, i) => physIdx(b, a[i][k])));
+      if (masked(k) || !readVals(k)) continue;
+      const c = rec.rgb(vals);
       for (let j = 0; j < 3; j++) d[k * 4 + j] = 255 * clamp(c[j], 0, 1);
       d[k * 4 + 3] = 255;
     }
@@ -4270,8 +4345,8 @@ async function renderScene(rec, s, id, bbox, W, H, signal) {
   if (rec.steps || rec.classify) {
     // Copernicus colour steps (value < threshold) or classes (value ≤ threshold)
     for (let k = 0; k < n; k++) {
-      if (a.some(x => x[k] === 0) || masked(k)) continue;
-      const v = rec.fn(bands.map((b, i) => physIdx(b, a[i][k])), s);
+      if (masked(k) || !readVals(k)) continue;
+      const v = rec.fn(vals, s);
       if (!isFinite(v)) continue;
       let c;
       if (rec.steps) c = stepColor(rec.steps, v);
@@ -4284,9 +4359,10 @@ async function renderScene(rec, s, id, bbox, W, H, signal) {
   if (rec.type === "rgb" && s.look === "optimized") {
     // Copernicus Browser "True color optimized"; Gain scales the input, Gamma and RGB ranges the output
     const ig = 1 / s.gamma, rg = [s.r, s.g, s.b], lin = [0, 0, 0];
+    const LIN = dnTable("optlin|" + s.gain, 65536, dn => optLin(toRho(dn) * s.gain), Float64Array);
     for (let k = 0; k < n; k++) {
       if ((a[0][k] === 0 && a[1][k] === 0 && a[2][k] === 0) || masked(k)) continue;
-      for (let c = 0; c < 3; c++) lin[c] = optLin(toRho(a[c][k]) * s.gain);
+      for (let c = 0; c < 3; c++) lin[c] = LIN[a[c][k]];
       const avg = (lin[0] + lin[1] + lin[2]) / 3 * (1 - OPT.sat);
       for (let c = 0; c < 3; c++) {
         let v = sRGB(clamp(avg + lin[c] * OPT.sat, 0, 1));
@@ -4302,16 +4378,11 @@ async function renderScene(rec, s, id, bbox, W, H, signal) {
   if (rec.type === "rgb") {
     const gain = BASE_GAIN * (rec.gainMul || 1) * s.gain, ig = 1 / (BASE_GAMMA * s.gamma);
     const rg = [s.r, s.g, s.b];
-    for (let k = 0; k < n; k++) {
-      if ((a[0][k] === 0 && a[1][k] === 0 && a[2][k] === 0) || masked(k)) continue;
-      for (let c = 0; c < 3; c++) {
-        let v = clamp(toRho(a[c][k]) * gain, 0, 1);
-        v = Math.pow(v, ig);
-        v = clamp((v - rg[c][0]) / ((rg[c][1] - rg[c][0]) || 1e-6), 0, 1);
-        d[k * 4 + c] = 255 * v;
-      }
-      d[k * 4 + 3] = 255;
-    }
+    const L = rg.map(r => dnTable("rgb|" + gain + "|" + ig + "|" + r, 65536, dn => {
+      const v = Math.pow(clamp(toRho(dn) * gain, 0, 1), ig);
+      return 255 * clamp((v - r[0]) / ((r[1] - r[0]) || 1e-6), 0, 1);
+    }));
+    rgbByTable(a, L, mk, d, n);
     return img;
   }
 
@@ -4320,7 +4391,8 @@ async function renderScene(rec, s, id, bbox, W, H, signal) {
     const thr = s.thr != null ? s.thr : rec.threshold, bi = rec.bg.map(b => all.indexOf(b));
     for (let k = 0; k < n; k++) {
       if (a[0][k] === 0 || a[1][k] === 0 || masked(k)) continue;
-      if (rec.fn(bands.map((b, i) => physIdx(b, a[i][k]))) > thr) { put(k, rec.snow); continue; }
+      if (!readVals(k)) continue;
+      if (rec.fn(vals) > thr) { put(k, rec.snow); continue; }
       for (let c = 0; c < 3; c++) d[k * 4 + c] = 255 * clamp(2.5 * toRho(a[bi[c]][k]), 0, 1);
       d[k * 4 + 3] = 255;
     }
@@ -4330,14 +4402,22 @@ async function renderScene(rec, s, id, bbox, W, H, signal) {
   if (rec.ramp) {
     // The user's min/max is mapped onto the ramp's native domain.
     const d0 = rec.domain[0], d1 = rec.domain[1];
-    const k2 = (d1 - d0) / ((s.max - s.min) || 1e-9);
+    const k2 = (d1 - d0) / ((s.max - s.min) || 1e-9), smin = s.min;
     const col = v => rec.ramp(d0 + (v - s.min) * k2);
+    if (rec.type === "index" && rec.ramp.put) {
+      const rp = rec.ramp.put, fn = rec.fn;
+      for (let k = 0; k < n; k++) {
+        if ((mk !== null && mk[k] === 1) || !readVals(k)) continue;
+        rp(d0 + (fn(vals, s) - smin) * k2, d, k * 4);
+      }
+      return img;
+    }
     for (let k = 0; k < n; k++) {
       if (masked(k)) continue;
       let c;
       if (rec.type === "index") {
-        if (a.some(x => x[k] === 0)) continue;
-        c = col(rec.fn(bands.map((b, i) => physIdx(b, a[i][k])), s));
+        if (!readVals(k)) continue;
+        c = col(rec.fn(vals, s));
       } else if (rec.type === "cont" && rec.cogUrl) {
         const v = a[0][k];
         if (v === rec.cogFill) continue;

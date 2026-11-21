@@ -850,6 +850,13 @@ was fetched twice. What made navigation slow was the work itself:
   in runs of columns that fall into the same COG tile. geotiff.js' `readRasters` first copied the whole window value by
   value (about 2.5 times slower), and a second pass then sampled that copy. Main-thread JavaScript over the benchmark
   of the NDVI: 11.3 s instead of 20.8 s; the last tile of a long pan after 14.5 s instead of 18.2 s.
+- **Colour loops without allocations** (`renderScene`): the masks of a tile (vegetation, clouds, terrain and
+  illumination, custom mask) are combined once into one array; an index reads its bands into one reused array and the
+  colour ramp writes straight into the image (found by halving instead of a new array per pixel); a band composite
+  and the TCI take their colour per DN from a table (`dnTable`, computed once per setting) instead of `Math.pow` per
+  pixel and channel. The pixels are exactly the same as before. NDVI: the page's own main-thread JavaScript 5.4 s
+  instead of 9.1 s, the main thread blocked 0.4 s instead of 1.5 s during a fast pan, 0.1 s instead of 1.4 s during a
+  zoom step.
 - The basemap keeps the swisstopo level nearest to the view, so its text keeps its size; after a zoom that changes
   the level its tiles are drawn again.
 
@@ -871,9 +878,9 @@ node bench.mjs --define TILE_TURNS=6              # try another value of a page 
 
 `baseline.json` was measured before the changes on a virtual desktop without a graphics card (4 vCPUs, software
 WebGL); compare only runs of the same machine, close in time (the CDN's cache makes the first run after a while slower).
-Still open: the colouring loops, now the largest cost on the main thread (`renderScene`, the colour ramp computed per
-pixel, small arrays per pixel and the garbage collection they cause); a lookup table and loops without allocations
-would reduce it.
+What remains on the main thread per tile is sampling the COG tiles into the map tile, the colour ramp per pixel and
+the garbage collection of the per-tile arrays; moving the whole tile rendering into a worker would be the next, larger
+step.
 
 ## Running it
 
