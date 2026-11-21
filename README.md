@@ -292,7 +292,8 @@ The swissEO Browser therefore always uses the physical reflectance.
   once from the coarsest B04 overview (≈ 640 m) and the calendar updates when the map moves.
   The calendar marks days with data, has month / year pull-downs and a maximum cloud-coverage slider
   (cloud cover of the whole mosaic, from its `metadata.json`, as the tile cloud cover in Copernicus). Several orbits acquired on the same day are mosaicked
-  (most recent on top).
+  (most recent on top; a pixel that is masked or without data in one scene is taken from the next). The AOI statistics,
+  time series and 32-bit exports use the same mosaic as the map.
 - **Configurations**: as the themes of the Copernicus Browser, the *Configuration* pull-down lists the
   layers for a task; each layer keeps its own data source, and the calendar shows the dates of the
   selected layer's source:
@@ -418,7 +419,8 @@ The swissEO Browser therefore always uses the physical reflectance.
     by Jonas Viehweger and Martin Puhm (Joanneum Research, EvoLand project), run in the browser. A LightGBM
     model of 150 gradient-boosted trees classifies every pixel of a single date from B02, B05, B06, B8A, B11
     and B12 into bark beetle, clear cut, salvage logged (low confidence, same colour as clear cut), wildfire
-    and windthrow; healthy forest is not drawn. Trained in Germany, Sweden and Spain (macro F1 0.83), valid
+    and windthrow; healthy forest is not drawn. On a day with two orbits, a disturbance that either orbit shows is
+    drawn and counted (a pixel classified healthy in one scene is taken from the other). Trained in Germany, Sweden and Spain (macro F1 0.83), valid
     only on forest, so the forest mask is on by default (clouds, cloud shadows and terrain shadows are masked too). The trees
     (411 kB) are loaded on first use from jsDelivr, pinned to commit `0a071cf` of sentinel-hub/custom-scripts,
     and are only accepted when the code consists of tree functions alone. **Scaling:** the trees split on
@@ -431,7 +433,7 @@ The swissEO Browser therefore always uses the physical reflectance.
     ΔNDVI below a threshold (default −0.08) followed by a 3 × 3 majority filter against edge effects.
     *Display*: the difference, or the detected change. The AOI statistics add the report of the original
     script: forest area, compared area and affected area in ha and %, with and without edge-effect removal.
-    Both dates take, per pixel, the first clear scene (as the map). For a large AOI the report first uses a coarser
+    Both dates take, per pixel, the first clear scene (as the map and the 32-bit export). For a large AOI the report first uses a coarser
     grid (up to 320 cells across, read from the COG overviews) and warns that its shares can differ strongly from a
     10 m analysis; *Compute at 10 m* then processes the AOI at the full 10 m resolution in chunks of 1024 × 1024
     cells (exact areas and shares; checked against a rasterio computation). See

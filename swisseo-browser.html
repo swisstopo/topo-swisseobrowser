@@ -2933,7 +2933,7 @@ const LAYERS = [
   { id:"barren", group:"Composites", name:"Barren Soil", type:"fnrgb", source:"s2", bands:["b11","b04","b08","b02"],
     icon:"strata", sw:"linear-gradient(135deg,#c86a78,#3f6fb0)", fg:"#1a0a0a",
     sub:"Based on the combination: BSI, B08, B11", desc:"Barren soil visualisation.",
-    formula:"BSI = 2.5 × ((B11 + B04) − (B08 + B02)) / ((B11 + B04) + (B08 + B02))\nB08 > 0.6 → white, otherwise R, G, B = 2.5 × BSI, B08, B11",
+    formula:"BSI = ((B11 + B04) − (B08 + B02)) / ((B11 + B04) + (B08 + B02))\nB08 > 0.6 → white, otherwise R, G, B = 2.5 × 2.5 × BSI, B08, B11",
     statName:"BSI", statFn:v => ((v[0] + v[1]) - (v[2] + v[3])) / ((v[0] + v[1]) + (v[2] + v[3])),
     rgb:v => { const bsi = 2.5 * ((v[0] + v[1]) - (v[2] + v[3])) / ((v[0] + v[1]) + (v[2] + v[3]));
                return v[2] > 0.6 ? [1, 1, 1] : [2.5 * bsi, v[2], v[0]]; } },
@@ -6684,11 +6684,13 @@ function aoiGrid(maxCells) {
   return { bbox, W, H, res, mask, n };
 }
 
-/* Values of a layer inside the AOI for one date (all scenes of the day, first with data wins).
-   Reads are staged so small AOIs stay cheap over long time series: one band first (does this
-   orbit reach the AOI at all?), then the masks (is anything left unmasked?), then the rest.
-   o.firstClear: a cell masked in one scene is taken from the next scene (as the map does for the two-date
-   layers) instead of staying masked. The result's isOut marks the cells outside the vegetation / custom mask. */
+/* Values of a layer inside the AOI for one date (all scenes of the day, per cell the first clear one, as the map:
+   a cell masked or without a valid value in one scene is taken from the next scene; it counts as masked only when
+   no scene of the day gives a value). Class layers follow the map too: a class it does not draw (healthy forest,
+   clear) is final only when no other scene of the day gives a drawn class, so a disturbance counts wherever one of
+   the day's orbits shows it. Reads are staged so small AOIs stay cheap over long time series: one band first (does
+   this orbit reach the AOI at all?), then the masks (is anything left unmasked?), then the rest. The result's isOut
+   marks the cells outside the vegetation / custom mask. */
 async function sampleAoi(r, scenes, grid, o, signal) {
   const { bbox, W, H, mask } = grid, n = W * H;
   const bands = r.type === "spectral" ? r.bands : (r.bands || [r.band]);
@@ -6696,7 +6698,8 @@ async function sampleAoi(r, scenes, grid, o, signal) {
   const vals = Array.from({ length: nb }, () => new Float32Array(n).fill(NaN));
   const cls = r.type === "class" || r.type === "fnclass" ? new Int16Array(n).fill(-1) : null;
   const T = r.type === "fnclass" ? await fdcModel() : null;
-  const done = new Uint8Array(n), cov = new Uint8Array(n), isOut = new Uint8Array(n), wasMasked = o.firstClear ? new Uint8Array(n) : null;
+  const done = new Uint8Array(n), cov = new Uint8Array(n), isOut = new Uint8Array(n), wasMasked = new Uint8Array(n);
+  const drawn = c => !!(r.palette && r.palette[c] && r.palette[c][1]);
   let masked = 0, shadow = 0, outside = 0;
   const soft = q => q && q.catch(e => { if (e && e.name === "AbortError") throw e; return null; });
   const rd = (id, b) => soft(readGrid(assetUrl(id, b), bbox, W, H, signal, b === "terrain" ? 255 : 0));
@@ -6760,8 +6763,7 @@ async function sampleAoi(r, scenes, grid, o, signal) {
       if (!has[k]) continue;
       if ((cm && (o.cloudCodes ? o.cloudCodes[cm[k]] : cm[k] >= 1 && cm[k] <= 3)) || (tm && tOut(tm[k])) ||
           (sm && SCL_CLOUD[sm[k]])) {
-        if (wasMasked) wasMasked[k] = 1; else { masked++; done[k] = 1; }
-        has[k] = 0;
+        wasMasked[k] = 1; has[k] = 0;
       } else left++;
     }
     if (!left) continue;
@@ -6775,25 +6777,29 @@ async function sampleAoi(r, scenes, grid, o, signal) {
       if (!has[k]) continue;
       if (r.type === "fnclass") {
         if (a.some(x => !x[k])) continue;
-        cls[k] = fdcPredict(T, fdcInput(a, k)); done[k] = 1; continue;
+        cls[k] = fdcPredict(T, fdcInput(a, k)); if (drawn(cls[k])) done[k] = 1; continue;
       }
       if (r.type === "class") {
         const v = a[0][k];
         if (r.band === "scl" && v === 0) continue;
-        cls[k] = v; done[k] = 1; continue;
+        if (cls[k] < 0 || drawn(v)) cls[k] = v;
+        if (drawn(v)) done[k] = 1; continue;
       }
       if (r.type === "terrain") {
         const v = a[0][k];
         if (v > 180 && v !== 200) continue;
         if (v === 200) { shadow++; done[k] = 1; continue; }
         vals[0][k] = v;
-      } else if (r.type === "index") { if (a.every(x => x[k])) vals[0][k] = r.fn(bands.map((b, i) => physIdx(b, a[i][k]))); }
+      } else if (r.type === "index") {
+        if (a.every(x => x[k])) vals[0][k] = r.fn(bands.map((b, i) => physIdx(b, a[i][k])));
+        if (!isFinite(vals[0][k])) continue;                  // no valid value here: the next scene may have one
+      }
       else if (r.type === "cont") vals[0][k] = phys(r.band, a[0][k]);
       else for (let i = 0; i < nb; i++) if (a[i][k]) vals[i][k] = phys(bands[i], a[i][k]);
       done[k] = 1;
     }
   }
-  if (wasMasked) for (let k = 0; k < n; k++) if (wasMasked[k] && !done[k]) masked++;
+  for (let k = 0; k < n; k++) if (wasMasked[k] && !done[k] && !(cls && cls[k] >= 0)) masked++;
   return { vals, cls, masked, shadow, covered: cov.reduce((t, v) => t + v, 0), total: Math.max(1, grid.n - outside), outside, isOut };
 }
 
@@ -7186,7 +7192,7 @@ async function diffStats(rec, r, scenes, grid, opt, ten, signal, prog) {
   const s = S(rec), ref = await resolveRef(s, state.date);
   if (!ref.scenes.length) return { html: '<div class="hint">' + t("stats.noRef", "No reference acquisition within ±20 days of {{date}}.", { date: fmtDay(ref.target) }) + "</div>" };
   // one mask (that of the selected date) for both dates; per cell the first clear scene, as on the map
-  opt = Object.assign({}, opt, { vegDate: state.date, firstClear: true });
+  opt = Object.assign({}, opt, { vegDate: state.date });
   const dr = ten ? await diffReport10(rec, r, scenes, ref, opt, signal, prog) : await diffCoarse(rec, r, scenes, ref, grid, opt, signal);
   if (!dr) return null;
   let html = '<div class="hint" style="margin:0 0 8px">' + t("stats.diffHead", "{{date}} vs. the reference around {{ref}} ({{dates}}, per cell the first clear one) · cells valid on both sides are compared (clouds and shadows masked as chosen above).",
@@ -9302,6 +9308,8 @@ async function runAnalytical(signal, prog) {
       const o = { maskClouds: s.cloud || s.shadow, maskTerrain: s.terrain, maskIllum: s.illum ? s.illumThr : null,
                   cloudCodes: { 1: s.cloud, 2: s.cloud, 3: s.shadow }, veg: s.veg,
                   cmask: cmaskOn(s) ? s.cmask : "off" };
+      // two-date layers as on the map and in the statistics: one mask (that of the selected date) for both dates
+      if (rec.type === "diff2") o.vegDate = state.date;
       const r = statRec(rec), res = await sampleAoi(r, scenes, grid, o, signal);
       let band = res.vals[0];
       if (rec.type === "diff2") {
