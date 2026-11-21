@@ -1521,7 +1521,9 @@ maplibregl.addProtocol("swisseo", async (params, ctrl) => {
   const none = async () => ({ data: lyr.empty ? await createImageBitmap(lyr.empty(N)) : null });   // nothing to draw
   if (lyr.bounds && !boxesMeet(bbox, lyr.bounds)) return none();
   lyr.pending++; pendingSoon();
+  let done = null;
   try {
+    if (lyr.queued) done = await tileTurn(bbox, ctrl.signal);
     const im = await lyr.draw(bbox, N, ctrl.signal, params.url);
     if (ctrl.signal.aborted) throw new DOMException("Tile aborted", "AbortError");
     return im ? { data: await createImageBitmap(im) } : none();
@@ -1530,19 +1532,66 @@ maplibregl.addProtocol("swisseo", async (params, ctrl) => {
     console.warn("tile", err);
     if (lyr.empty) throw err;                // terrain: MapLibre uses the parent tile, and asks again later
     return none();
-  } finally { lyr.pending--; pendingSoon(); }
+  } finally { if (done) done(); lyr.pending--; pendingSoon(); }
 });
+/* The data tiles, rendered from the COGs on the main thread, take turns: TILE_TURNS at a time, the one nearest the
+   centre of the view first. MapLibre asks for every tile of a view at once; drawn all together they share the main
+   thread, each advances at a fraction of the speed and the first is ready only with the last (measured: 9 of 9 tiles
+   at the same moment, after 3 s). A waiting tile that MapLibre aborts, because it has left the view, is dropped
+   without being started. tileTurn resolves with the function that ends the turn. */
+const TILE_TURNS = 3, turnQueue = [];
+let turnsBusy = 0;
+function tileTurn(bbox, signal) {
+  if (signal.aborted) return Promise.reject(new DOMException("Tile aborted", "AbortError"));
+  return new Promise((resolve, reject) => {
+    const e = { x: (bbox[0] + bbox[2]) / 2, y: (bbox[1] + bbox[3]) / 2, resolve, signal };
+    e.drop = () => {
+      const i = turnQueue.indexOf(e);
+      if (i >= 0) turnQueue.splice(i, 1);
+      reject(new DOMException("Tile aborted", "AbortError"));
+    };
+    signal.addEventListener("abort", e.drop, { once: true });
+    turnQueue.push(e);
+    nextTurns();
+  });
+}
+function nextTurns() {
+  if (turnsBusy >= TILE_TURNS || !turnQueue.length) return;
+  const c = toLV(map.getCenter());
+  while (turnsBusy < TILE_TURNS && turnQueue.length) {
+    let bi = 0, bd = Infinity;
+    turnQueue.forEach((e, i) => { const d = (e.x - c.x) ** 2 + (e.y - c.y) ** 2; if (d < bd) { bd = d; bi = i; } });
+    const e = turnQueue.splice(bi, 1)[0];
+    e.signal.removeEventListener("abort", e.drop);
+    turnsBusy++;
+    let ended = false;
+    e.resolve(() => { if (ended) return; ended = true; turnsBusy--; nextTurns(); });
+  }
+}
 /* A raster layer below the marker layer o.before; returns its handle { id, pending }. */
 const tileUrl = lyr => "swisseo://" + lyr.id + "/{z}/{x}/{y}?v=" + lyr.v + (lyr.query ? "&" + lyr.query : "");
 function addRaster(draw, o) {
-  const id = "r" + ++rasterSeq, lyr = { id, draw, bounds: o.bounds || null, pending: 0, v: 0, query: o.query || "", attr: o.attribution || "" };
+  const id = "r" + ++rasterSeq, lyr = { id, draw, bounds: o.bounds || null, pending: 0, v: 0, query: o.query || "", attr: o.attribution || "",
+                                        queued: !!o.queued, maxz: o.maxzoom || 14 };
   RASTERS.set(id, lyr);
-  map.addSource(id, { type: "raster", tiles: [tileUrl(lyr)], tileSize: TILE, maxzoom: 14,
+  map.addSource(id, { type: "raster", tiles: [tileUrl(lyr)], tileSize: TILE, maxzoom: lyr.maxz,
                       attribution: o.attribution || "" });
+  lyr.resampling = resamplingFor(lyr);
   map.addLayer({ id, type: "raster", source: id,
-                 paint: { "raster-opacity": o.opacity != null ? o.opacity : 1, "raster-fade-duration": 0 } }, o.before);
+                 paint: { "raster-opacity": o.opacity != null ? o.opacity : 1, "raster-fade-duration": 0, "raster-resampling": lyr.resampling } }, o.before);
   return lyr;
 }
+/* The swissEO layers are drawn down to DATA_MAXZOOM, 2.5 m/px: four tile pixels per 10 m pixel (and the 2.5 m of the
+   Nutzungsflächen mask). Closer in, MapLibre enlarges those tiles instead of asking for new ones that would only repeat
+   the same 10 m pixels; enlarged more than 1.41 times they are drawn nearest-neighbour, so the pixels stay as crisp as
+   before. Custom mask edges are then shown in 2.5 m steps. */
+const DATA_MAXZOOM = 10;
+const resamplingFor = lyr => lyr.maxz < 14 && map.getZoom() > lyr.maxz + 0.5 ? "nearest" : "linear";
+map.on("zoom", () => RASTERS.forEach(l => {
+  if (!(l.maxz < 14) || !map.getLayer(l.id)) return;              // basemaps, overlays, the 3D height models
+  const r = resamplingFor(l);
+  if (r !== l.resampling) { l.resampling = r; map.setPaintProperty(l.id, "raster-resampling", r); }
+}));
 function removeRaster(lyr) {
   if (!lyr || !RASTERS.delete(lyr.id)) return;
   if (map.getLayer(lyr.id)) map.removeLayer(lyr.id);
@@ -4355,10 +4404,11 @@ function layerAttr(cfg) {
 function makeLayer(cfg) {
   const rec = cfg.rec, o = { opacity: cfg.s.opacity / 100, before: "z-data", attribution: layerAttr(cfg) };
   if (rec.type === "wms")
-    return addRaster((bbox, N, signal) => renderWmsCanvas(cfg, bbox, N, N, signal), Object.assign(o, { bounds: CH_BOX }));
+    return addRaster((bbox, N, signal) => renderWmsCanvas(cfg, bbox, N, N, signal), Object.assign(o, { bounds: CH_BOX, maxzoom: DATA_MAXZOOM }));
   if (rec.type === "ext")
     return addRaster((bbox, N) => extTile(rec, bbox, N), o);
-  return addRaster((bbox, N, signal) => renderTile(cfg, bbox, N, N, signal), Object.assign(o, { bounds: scenesBox(cfg.scenes) }));
+  return addRaster((bbox, N, signal) => renderTile(cfg, bbox, N, N, signal),
+                   Object.assign(o, { bounds: scenesBox(cfg.scenes), maxzoom: DATA_MAXZOOM, queued: true }));
 }
 
 /* ============================================================

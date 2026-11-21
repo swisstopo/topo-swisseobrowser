@@ -346,7 +346,7 @@
   "vis-mask": {
     "cap1": "<b>Fig. 13</b> A custom mask with two polygons: the NDVI is shown only inside them.",
     "img1": "NDVI shown only inside two custom polygons",
-    "p1": "You can restrict any layer to your own polygons, for example a forest map, the parcels of a farm or a nature reserve. In the layer menu, under <i>Custom mask</i>, load a file (GeoJSON, KML/KMZ, GPX, WKT or a zipped Shapefile) or a URL. Then choose <b>Inside</b> (show the data only inside the polygons) or <b>Outside</b> (only outside). The mask applies to the map, compare, statistics, exports and the timelapse, and can be combined with a vegetation mask. A mask loaded from a URL is part of copied links; a mask from a file stays on your computer.",
+    "p1": "You can restrict any layer to your own polygons, for example a forest map, the parcels of a farm or a nature reserve. In the layer menu, under <i>Custom mask</i>, load a file (GeoJSON, KML/KMZ, GPX, WKT or a zipped Shapefile) or a URL. Then choose <b>Inside</b> (show the data only inside the polygons) or <b>Outside</b> (only outside). The mask applies to the map, compare, statistics, exports and the timelapse, and can be combined with a vegetation mask. A mask loaded from a URL is part of copied links; a mask from a file stays on your computer. On the map, zoomed in closer than 2.5 m per pixel, its edges follow 2.5 m steps (the map then enlarges the 2.5 m tiles); statistics and exports use the polygons at their own resolution.",
     "title": "Custom masks: your own geometries"
   },
   "vis-masks": {

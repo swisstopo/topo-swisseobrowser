@@ -346,7 +346,7 @@
   "vis-mask": {
     "cap1": "<b>Fig. 13</b> Una maschera personalizzata con due poligoni: l'NDVI è mostrato solo al loro interno.",
     "img1": "NDVI mostrato solo all'interno di due poligoni personalizzati",
-    "p1": "Puoi limitare qualsiasi livello ai tuoi poligoni, per esempio una carta forestale, le particelle di un'azienda o una riserva naturale. Nel menu del livello, sotto <i>Maschera personalizzata</i>, carica un file (GeoJSON, KML/KMZ, GPX, WKT o uno Shapefile compresso) o un URL. Poi scegli <b>Dentro</b> (mostrare i dati solo all'interno dei poligoni) o <b>Fuori</b> (solo all'esterno). La maschera vale per mappa, confronto, statistiche, esportazioni e timelapse e si può combinare con una maschera della vegetazione. Una maschera caricata da un URL fa parte dei link copiati; una maschera da un file resta sul tuo computer.",
+    "p1": "Puoi limitare qualsiasi livello ai tuoi poligoni, per esempio una carta forestale, le particelle di un'azienda o una riserva naturale. Nel menu del livello, sotto <i>Maschera personalizzata</i>, carica un file (GeoJSON, KML/KMZ, GPX, WKT o uno Shapefile compresso) o un URL. Poi scegli <b>Dentro</b> (mostrare i dati solo all'interno dei poligoni) o <b>Fuori</b> (solo all'esterno). La maschera vale per mappa, confronto, statistiche, esportazioni e timelapse e si può combinare con una maschera della vegetazione. Una maschera caricata da un URL fa parte dei link copiati; una maschera da un file resta sul tuo computer. Sulla carta, ingrandendo oltre 2,5 m per pixel, i suoi bordi seguono passi di 2,5 m (la carta ingrandisce allora le tessere di 2,5 m); le statistiche e le esportazioni usano i poligoni alla loro risoluzione.",
     "title": "Maschere personalizzate: le tue geometrie"
   },
   "vis-masks": {

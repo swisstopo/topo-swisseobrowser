@@ -596,7 +596,8 @@ The swissEO Browser therefore always uses the physical reflectance.
   fast as geotiff.js, off the main thread), decoded tiles are kept in a cache (up to 120 tiles), the map
   uses 512 px tiles like the COGs and keeps loading while panning, and a scene whose orbit misses a tile,
   or that the more recent scene already covers, is not read. Measured for the TCI of 2026-10-12: all tiles
-  of a view in 1.0 to 1.5 s instead of 1.7 to 2.7 s.
+  of a view in 1.0 to 1.5 s instead of 1.7 to 2.7 s. The tiles take turns, nearest the centre first, and closer than
+  2.5 m/px the map enlarges the existing tiles instead of computing new ones ([Map performance](#map-performance)).
 - **Loading indicator**: at the bottom left, above the attribution, the number of tiles still rendering (or the basemap
   or terrain still loading) and of requests in flight; after 6 s of continuous loading it says that the connection is slow.
 - **Pixel inspector**: the LV95 position, band values (DN and physical value), index value, SCL, cloud
@@ -817,6 +818,48 @@ Firefox on a laptop:
 | Vertex editing of the AOI | 2,000 vertices | one edit handle per vertex; above this the area is shown without handles |
 | Custom mask | 1,000,000 vertices | 20,000 polygons: 3 ms per 256 px tile at 10 m, 70–90 ms per tile when the whole country is in view |
 | Area in a copied link | about 270 vertices | the geometry is written into the link only below 8000 characters; URL-loaded areas and masks are shared as their URL |
+
+### Map performance
+
+Every tile of a swissEO layer is computed in the browser: the COG tiles are fetched (HTTP range requests), unpacked
+(DEFLATE, geotiff.js), resampled and coloured, on the page's main thread. MapLibre decides which tiles a view needs and
+cancels those that leave it; measured over pans and zooms, no tile arrived after it had left the view and no byte range
+was fetched twice. What made navigation slow was the work itself:
+
+- **Tiles take turns** (`TILE_TURNS` in the page): MapLibre asks for every tile of a view at once, and rendered all
+  together on one thread each advanced slowly and the first was ready only with the last. Now a few at a time are
+  rendered, the one nearest the centre of the view first, and a waiting tile that leaves the view is dropped without
+  being started. Measured (median of three runs, 3 against unlimited): the first NDVI tile of the view after 2.3 s
+  instead of 3.3 s, the first new True color tile of a fast pan after 0.8 s instead of 1.5 s and its last after 6.0 s
+  instead of 8.0 s, the longest block of the main thread at start 0.24 to 0.28 s instead of 0.37 to 0.43 s. Six at a
+  time finished pans a little sooner but showed the first tiles later; four was not better than either.
+- **Down to 2.5 m/px** (`DATA_MAXZOOM`, zoom 10): closer in, the map enlarges the 2.5 m tiles (nearest neighbour beyond
+  1.41 times, so the 10 m pixels stay crisp) instead of computing new tiles that would only repeat them. Zooming in
+  past 2.5 m/px costs no tile work at all (before: 18 to 22 new tiles per two zoom steps, 1.9 to 3.5 s). Custom mask
+  edges then follow 2.5 m steps on the map; statistics and exports are not affected.
+- The basemap keeps the swisstopo level nearest to the view, so its text keeps its size; after a zoom that changes
+  the level its tiles are drawn again.
+
+[`tools/bench/`](tools/bench/bench.mjs) measures it: it serves the repository, instruments the page on the way (the
+files are not changed) and goes through a fixed sequence on the Seeland, 13 August 2026 (load, small, large, fast and
+long pans, zooms in, deep and out, rapid zooming), for True color and NDVI. Per step it reports the tiles requested,
+when the first, middle and last tile were ready, aborted tiles, tiles delivered out of view, COG requests and MB,
+re-fetched ranges, decoded COG tiles (and those decoded again), the main thread's long tasks and a CPU profile.
+
+```
+cd tools/bench && npm ci && npx playwright install chromium
+node bench.mjs --compare baseline.json            # against the state before these changes
+node bench.mjs --runs 3 --out after.json          # median of three runs
+node bench.mjs --throttle                         # a 20 Mbit/s, 40 ms connection
+node bench.mjs --heap 20                          # JS heap after 20 date changes
+node bench.mjs --gpu --headed                     # the graphics card instead of software WebGL
+node bench.mjs --define TILE_TURNS=6              # try another value of a page constant
+```
+
+`baseline.json` was measured before the changes on a virtual desktop without a graphics card (4 vCPUs, software
+WebGL); compare only runs of the same machine, close in time (the CDN's cache makes the first run after a while slower).
+Still open: the DEFLATE decoding on the main thread, and the decoded-tile cache, which is emptied as a whole at 120
+tiles (a zoom step of the NDVI decodes 123 tiles again that it had decoded before).
 
 ## Running it
 
@@ -1046,7 +1089,8 @@ works under a Content-Security-Policy without `'unsafe-eval'` (it needs `worker-
   links.
 - **Which alerts matter**: the dependency manifests are `tools/vendor/package.json` (the libraries in
   `lib/`, which reach users; `esbuild` there is only a build tool that produces `lib/` on a developer
-  machine) and `tools/screenshots/package.json` (Playwright, run locally for the help screenshots). The
+  machine) and `tools/screenshots/package.json` and `tools/bench/package.json` (Playwright, run locally for the
+  help screenshots and the performance benchmark). The
   root `package.json` of the upstream Copernicus Browser has been removed, and GitHub closes the alerts
   that pointed at it.
 - **Vendored libraries are reproducible**: [`.github/workflows/vendor-check.yml`](.github/workflows/vendor-check.yml)

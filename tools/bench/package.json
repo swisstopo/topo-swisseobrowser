@@ -1,0 +1,12 @@
+{
+  "name": "swisseo-browser-bench",
+  "private": true,
+  "description": "Measures how fast the map loads and renders its tiles while panning and zooming (node bench.mjs). Not part of the site.",
+  "type": "module",
+  "scripts": {
+    "bench": "node bench.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.65.0"
+  }
+}

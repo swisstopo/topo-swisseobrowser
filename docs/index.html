@@ -457,7 +457,9 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
     reserve. In the layer menu, under <i>Custom mask</i>, load a file (GeoJSON, KML/KMZ, GPX, WKT or a zipped Shapefile)
     or a URL. Then choose <b>Inside</b> (show the data only inside the polygons) or <b>Outside</b> (only outside). The mask
     applies to the map, compare, statistics, exports and the timelapse, and can be combined with a vegetation mask. A
-    mask loaded from a URL is part of copied links; a mask from a file stays on your computer.</p>
+    mask loaded from a URL is part of copied links; a mask from a file stays on your computer. On the map, zoomed in closer
+    than 2.5 m per pixel, its edges follow 2.5 m steps (the map then enlarges the 2.5 m tiles); statistics and exports use
+    the polygons at their own resolution.</p>
   <figure><img data-i18n="[alt]vis-mask.img1" src="img/custom-mask.jpg" alt="NDVI shown only inside two custom polygons" width="1400" height="900">
     <figcaption data-i18n="[html]vis-mask.cap1"><b>Fig. 13</b> A custom mask with two polygons: the NDVI is shown only inside them.</figcaption></figure>
 

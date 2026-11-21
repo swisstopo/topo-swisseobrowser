@@ -106,3 +106,6 @@
   headless Chromium (Playwright, `--use-angle=swiftshader`) renders it, clicks and drags included; the map object
   is module-scoped, so test through permalinks and the UI.
 - Check data reads against an independent rasterio / GDAL read of the same COG where possible.
+- After a change to the tile pipeline (the `swisseo` protocol, `renderTile` / `renderScene`, `readGridBands`, the
+  basemap tiles), measure it: `cd tools/bench && node bench.mjs --compare baseline.json` (pan and zoom scenarios,
+  tile times, requests, decodes, long tasks; README, *Map performance*). Compare runs of the same machine only.

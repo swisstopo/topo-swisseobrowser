@@ -346,7 +346,7 @@
   "vis-mask": {
     "cap1": "<b>Abb. 13</b> Eine eigene Maske mit zwei Polygonen: Der NDVI wird nur innerhalb davon gezeigt.",
     "img1": "NDVI nur innerhalb von zwei eigenen Polygonen",
-    "p1": "Sie können jede Ebene auf Ihre eigenen Polygone beschränken, zum Beispiel eine Waldkarte, die Parzellen eines Betriebs oder ein Naturschutzgebiet. Laden Sie im Ebenenmenü unter <i>Eigene Maske</i> eine Datei (GeoJSON, KML/KMZ, GPX, WKT oder ein gezipptes Shapefile) oder eine URL. Wählen Sie dann <b>Innen</b> (die Daten nur innerhalb der Polygone zeigen) oder <b>Aussen</b> (nur ausserhalb). Die Maske gilt für Karte, Vergleich, Statistik, Exporte und Zeitraffer und lässt sich mit einer Vegetationsmaske kombinieren. Eine von einer URL geladene Maske ist Teil kopierter Links; eine Maske aus einer Datei bleibt auf Ihrem Computer.",
+    "p1": "Sie können jede Ebene auf Ihre eigenen Polygone beschränken, zum Beispiel eine Waldkarte, die Parzellen eines Betriebs oder ein Naturschutzgebiet. Laden Sie im Ebenenmenü unter <i>Eigene Maske</i> eine Datei (GeoJSON, KML/KMZ, GPX, WKT oder ein gezipptes Shapefile) oder eine URL. Wählen Sie dann <b>Innen</b> (die Daten nur innerhalb der Polygone zeigen) oder <b>Aussen</b> (nur ausserhalb). Die Maske gilt für Karte, Vergleich, Statistik, Exporte und Zeitraffer und lässt sich mit einer Vegetationsmaske kombinieren. Eine von einer URL geladene Maske ist Teil kopierter Links; eine Maske aus einer Datei bleibt auf Ihrem Computer. Zoomen Sie näher als 2,5 m pro Pixel heran, folgen ihre Ränder auf der Karte Stufen von 2,5 m (die Karte vergrössert dann die 2,5-m-Kacheln); Statistik und Exporte verwenden die Polygone in ihrer eigenen Auflösung.",
     "title": "Eigene Masken: Ihre eigenen Geometrien"
   },
   "vis-masks": {
