@@ -38,6 +38,9 @@ STR = r'"((?:[^"\\\n]|\\.)*)"'                      # a JavaScript double-quoted
 # different address per language (/de/satellitenbild-..., /fr/image-satellite-...).
 PROTECTED = re.compile(r"\b(?:B0?\d{1,2}A?|NDVI\w*|NDWI|NDMI|NDSI|NBR|NDDI|EVI|SAVI|BSI|VHI|AOT|SCL|TCI|"
                        r"COG|STAC|WMS|WMTS|LV95|swissEO|Sentinel-2)\b|https?://[^/\s)\]\"'<>]+")
+# the same site under its address in each language (MeteoSwiss: meteoschweiz, meteosuisse, meteosvizzera)
+SAME_SITE = re.compile(r"//www\.meteo(?:schweiz|suisse|svizzera)\.admin\.ch")
+protected = lambda text: set(SAME_SITE.sub("//www.meteoswiss.admin.ch", m) for m in PROTECTED.findall(text))
 
 errors, warnings = [], []
 
@@ -317,7 +320,7 @@ def validate(ns, en):
                     path, k, " ".join(tags(v)) or "none", " ".join(tags(ref)) or "none"), path)
             if lng == "de" and "ß" in v:
                 err("{}: '{}' contains ß; Swiss German writes ss".format(path, k), path)
-            missing = sorted(set(PROTECTED.findall(ref)) - set(PROTECTED.findall(v)))
+            missing = sorted(protected(ref) - protected(v))
             if missing:
                 wrn("{}: '{}' lacks {} of the English (not translated by rule)".format(
                     path, k, ", ".join(missing)), path)

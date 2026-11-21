@@ -110,6 +110,10 @@ def load():
                 if lid not in listed:
                     fail("the configuration '{}' uses the layer '{}', which is not in "
                          "catalog/layers.yaml".format(c["key"], lid), "catalog/configurations.yaml")
+    for c in configs:
+        if not any(g.get("layers") for g in c.get("groups") or []) and not c.get("highlights"):
+            fail("the configuration '{}' has neither layers nor highlights".format(c["key"]),
+                 "catalog/configurations.yaml")
     check_masks(layers, configs, page)
     used = {lid for c in configs for g in c.get("groups", []) for lid in g.get("layers", [])}
     for lid in sorted(set(listed) - used):
@@ -199,7 +203,7 @@ def published(layers, configs, env):
             keep = [lid for lid in g.get("layers", []) if lid in verified]
             if keep:
                 groups.append({"title": g.get("title", ""), "layers": keep})
-        if not groups:
+        if not groups and not c.get("highlights"):
             print("::warning file=catalog/configurations.yaml::the configuration '{}' has no "
                   "verified layer and is not offered in production".format(c["key"]))
             continue
@@ -224,7 +228,9 @@ def configs_block(configs, layers):
         if (c.get("masks") or {}).get("vegetation"):
             head += ", veg: " + json.dumps(c["masks"]["vegetation"])
         lines.append(head + ", groups: [")
-        groups = c.get("groups", [])
+        groups = c.get("groups") or []
+        if not groups:                    # only highlights
+            lines[-1] = head + ", groups: [] },"
         for i, g in enumerate(groups):
             ids = ", ".join(json.dumps(x) for x in g["layers"])
             # close the ids array, the [title, ids] pair and, on the last group, the groups array

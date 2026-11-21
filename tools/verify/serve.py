@@ -20,7 +20,7 @@ PAGE = "swisseo-browser.html"
 HOOK = os.path.join(os.path.dirname(__file__), "hook.js")
 
 # identifiers of the page exposed to the test (only those declared at the top level of the page are used)
-NAMES = ["LAYER", "SOURCES", "defaults", "resolveScenes", "resolveRef", "renderTile", "sampleAoi", "statRec", "readGrid",
+NAMES = ["LAYER", "SOURCES", "creditText", "layerAttr", "defaults", "resolveScenes", "resolveRef", "renderTile", "sampleAoi", "statRec", "readGrid",
          "readGridBands", "readPoint", "winDiff", "windowItems", "vhiSeason", "readVegMask", "assetUrl", "prodUrl", "vhiUrl",
          "vegUrl", "vegParse", "habitatOf", "fdcModel", "fdcPredict", "fdcInput", "cloudOf", "loadMonth", "coversNow",
          "sceneBox", "MISSING_RGB", "CHANGE_RGB", "NOCHANGE_RGB", "SHADOW_RGB", "FDC_PALETTE", "BASE_GAIN", "BASE_GAMMA",

@@ -208,10 +208,11 @@ The swissEO Browser therefore always uses the physical reflectance.
     buttons (in 3D also the 3D settings, sun shading and sun time);
   - bottom right: the zoom buttons and, on one line, the mouse position (LV95 easting and northing, `E 2'661'150 N 1'187'175`)
     and the scale bar; bottom left: the attribution and the loading indicator. The attribution names the data on the
-    map ([#12](https://github.com/swisstopo/topo-swisseobrowser/issues/12)): swisstopo, the office of a vegetation mask
-    from outside swisstopo (*Nutzungsflächen © BLW*, *Forest Type NFI © WSL / BAFU*, *ETH tree species © Zhou et al. 2026,
-    CC BY-NC 4.0*) and the domain of a WMS /
-    WMTS layer; MapLibre is credited in the Info tab and below.
+    map ([#12](https://github.com/swisstopo/topo-swisseobrowser/issues/12)), each provider once: *© swisstopo* (the
+    swissEO products, the basemaps, the labels and the 3D terrain), *MeteoSwiss* while a swissEO VHI layer is shown
+    (*© swisstopo, MeteoSwiss*), the office of a vegetation mask from outside swisstopo (*Nutzungsflächen © BLW*,
+    *Forest Type NFI © WSL / BAFU*, *ETH tree species © Zhou et al. 2026, CC BY-NC 4.0*) and the domain of a WMS /
+    WMTS layer. Image downloads carry the same credits in their caption. MapLibre is credited in the Info tab and below.
 - **Help and tutorial** ([`docs/index.html`](docs/index.html), opened by the (i) button in a new tab): an *About the
   swissEO Browser* overview with a beginner tutorial (Part A: window, place search, date, layers, vegetation mask, pixel
   inspector, area of interest and statistics, 3D, download, sharing) and all functions in the order of the
@@ -297,17 +298,17 @@ The swissEO Browser therefore always uses the physical reflectance.
 - **Configurations**: as the themes of the Copernicus Browser, the *Configuration* pull-down lists the
   layers for a task; each layer keeps its own data source, and the calendar shows the dates of the
   selected layer's source:
-  - *Default*: composites (true color, false color, urban, SWIR, agriculture, geology, Barren Soil), indices (NDVI,
+  - *Default*: composites (true color, false color, urban, Highlight Optimized Natural Color, SWIR, agriculture, geology,
+    Barren Soil), indices (NDVI,
     NDWI, moisture index, NDSI, NBR, AOT, SAVI, **swissEO VHI** forest and vegetation, **swissEO NDVIdiff**),
     masks & quality (scene classification, cloud mask, terrain);
   - *Agriculture* ([#52](https://github.com/swisstopo/topo-swisseobrowser/issues/52)): true color (TCI) and the
     indices Agroscope recommends for crops, NDVI, EVI, **NDRE** (red edge, B05 and B08) and **MTVI2** (B03, B04,
     B08), masked by default to the farmland of the BLW Nutzungsflächen (every category but forest,
     `lnf:a.dw.dp.r.o.dk.g.s.h.u.so.v`);
-  - *Drought*: true color (TCI), NDVI, EVI, moisture index, swissEO VHI forest / vegetation, swissEO NDVIdiff,
+  - *Drought*: true color (TCI), NDVI, EVI, moisture index, Moisture Stress, swissEO VHI forest / vegetation, swissEO NDVIdiff,
     **swissEO NDVIdiff v200 BETA**, **swissEO NDVIdiff v200_MVC BETA**, **swissEO NDVIdiff v200_Median BETA**, swissEO NDVIz, NDDI, NDDI change vs. the previous year and the NDVI difference to a reference date;
-  - *Drought 2026*: like the Copernicus Browser *Drought and Floods* theme, with true color, moisture index,
-    NDWI, Moisture Stress, NDVI, SWIR, urban and Highlight Optimized Natural Color, plus **highlights**;
+  - *Drought 2026*: only the **highlights** (no layer list); each story opens the true color of its two dates;
   - *Forest*: true color (TCI), NDVI, EVI, swissEO VHI forest, **VHI cumulative deficit**, **VHI days in extreme
     stress**, swissEO NDVIdiff, swissEO NDVIdiff v200 BETA, swissEO NDVIdiff v200_MVC BETA and _Median BETA, swissEO NDVIz, NDVI difference to a reference date, Normalized Burn
     Ratio, moisture index and the **Forest Disturbance Classification**.
@@ -343,7 +344,23 @@ The swissEO Browser therefore always uses the physical reflectance.
   √[(2 × ρ(B08) + 1)² − (6 × ρ(B08) − 5 × √ρ(B04)) − 0.5] (Haboudane et al. 2004); both on the reflectance ρ with
   negative values set to 0, references and typical values in the layer description.
   VHI: forest and vegetation (WMS), and the season sums VHI cumulative deficit and VHI days in extreme stress
-  (from the daily forest COGs). Layers are listed with the Copernicus Browser preview thumbnails as icons.
+  (from the daily forest COGs). Layers are listed with a small raster preview as icon (the same in every configuration):
+  the Copernicus Browser thumbnails, and for the swissEO-specific layers previews rendered by the page from swissEO data
+  (`public/previews/swisseo-<id>.png`, 50 × 50 px, see *Layer previews*).
+- **Layer previews** (`swisseo-<id>.png`, 50 × 50 px). Rendered by the page from swissEO data over 512 × 512 px with the
+  layer's default settings in the configuration that offers it, pixels without data in light grey, then reduced:
+  - Forest east of Brugg (2'664'200 / 1'262'700, 2.56 km, 2026-08-08): swissEO NDVIz, VHI cumulative deficit, VHI days
+    in extreme stress, Forest Disturbance Classification.
+  - Open land in the Seetal (2'662'000 / 1'236'300, 2.56 km, 2026-07-04): NDRE, NDDI, NDDI change; MTVI2 likewise, with
+    an artificial lake (MTVI2 colours of water) so that it differs from NDRE.
+  - Cloud mask: 20 km around Aarau (2'642'720 / 1'250'160), 2026-08-30. Terrain: Aletsch (2'645'000 / 1'143'000,
+    2.56 km), 2026-08-13.
+  - swissEO VHI forest, swissEO VHI vegetation and swissEO NDVIdiff v200_MVC: cut from views of the map.
+
+  Drawn from the colour legend (artificial rasters, each with its own pattern, as real data made them look alike):
+  swissEO NDVIdiff (stable forest with spots of loss), v200 (a regional gradient of loss) and v200_Median (bands) on the
+  NDVIdiff colour range; Aerosol optical thickness (a haze plume over 0…0.6); NDVI difference to a reference date as
+  *Detected change* (forest grey, change red).
 - **Drought and forest layers**
   - *swissEO NDVIdiff* and *swissEO NDVIz* are read from their COGs with the colour ranges of the content
     information sheets (missing data grey). There are only three products per year (end of July, August,
@@ -717,8 +734,8 @@ Today:
 
 | Layers | Clouds, cloud shadows, terrain shadows | Vegetation mask |
 | --- | --- | --- |
-| True color, False color, False color (urban), SWIR, Aerosol optical thickness | off | off |
-| Agriculture, Geology 12, 8, 2, Highlight Optimized Natural Color, Barren Soil, NDWI, NDSI | on | off |
+| True color, False color, False color (urban), SWIR, Highlight Optimized Natural Color, Aerosol optical thickness | off | off |
+| Agriculture, Geology 12, 8, 2, Barren Soil, NDWI, NDSI | on | off |
 | NDVI, Moisture index, EVI, SAVI, NDRE, MTVI2, Moisture Stress, NDDI, NDDI change, NBR | on | *All vegetation* (*Forest* in the Forest configuration, the Nutzungsflächen without forest in Agriculture) |
 | Forest Disturbance Classification, NDVI difference to a reference date | on | *Forest* |
 | Terrain / solar incidence | clouds and cloud shadows (not the terrain mask, which it shows) | off |
@@ -772,30 +789,30 @@ the copy next to the page when it is served from the repository, otherwise (for 
 the README of `main` on GitHub.
 
 <!-- verification:start -->
-- [x] `true`: True color *(Default, Agriculture, Drought, Drought 2026, Forest)*
+- [x] `true`: True color *(Default, Agriculture, Drought, Forest)*
 - [x] `nir`: False color *(Default)*
-- [ ] `urban`: False color (urban) *(Default, Drought 2026)*
-- [x] `swir`: SWIR *(Default, Drought 2026)*
+- [x] `urban`: False color (urban) *(Default)*
+- [x] `swir`: SWIR *(Default)*
 - [ ] `agri`: Agriculture *(Default)*
 - [ ] `geo`: Geology 12, 8, 2 *(Default)*
-- [x] `ndvi`: NDVI *(Default, Agriculture, Drought, Drought 2026, Forest)*
-- [ ] `ndwi`: NDWI *(Default, Drought 2026)*
-- [ ] `ndmi`: Moisture index *(Default, Drought, Drought 2026, Forest)*
-- [ ] `ndsi`: NDSI *(Default)*
-- [ ] `nbr`: Normalized Burn Ratio (NBR) *(Default, Forest)*
+- [x] `ndvi`: NDVI *(Default, Agriculture, Drought, Forest)*
+- [x] `ndwi`: NDWI *(Default)*
+- [x] `ndmi`: Moisture index *(Default, Drought, Forest)*
+- [x] `ndsi`: NDSI *(Default)*
+- [x] `nbr`: Normalized Burn Ratio (NBR) *(Default, Forest)*
 - [ ] `aot`: Aerosol optical thickness *(Default)*
 - [x] `scl`: Scene classification map *(Default)*
 - [x] `cloud`: Cloud mask *(Default)*
 - [x] `terrain`: Terrain / solar incidence *(Default)*
 - [x] `vhi`: swissEO VHI forest *(Default, Drought, Forest)*
 - [x] `vhiveg`: swissEO VHI vegetation *(Default, Drought)*
-- [ ] `evi`: EVI *(Agriculture, Drought, Forest)*
-- [ ] `savi`: SAVI *(Default)*
+- [x] `evi`: EVI *(Agriculture, Drought, Forest)*
+- [x] `savi`: SAVI *(Default)*
 - [ ] `ndre`: NDRE *(Agriculture)*
 - [ ] `mtvi2`: MTVI2 *(Agriculture)*
-- [ ] `barren`: Barren Soil *(Default)*
-- [ ] `mstress`: Moisture Stress *(Drought 2026)*
-- [ ] `hon`: Highlight Optimized Natural Color *(Drought 2026)*
+- [x] `barren`: Barren Soil *(Default)*
+- [ ] `mstress`: Moisture Stress *(Drought)*
+- [x] `hon`: Highlight Optimized Natural Color *(Default)*
 - [x] `ndvidiff`: swissEO NDVIdiff *(Default, Drought, Forest)*
 - [x] `ndviz`: swissEO NDVIz *(Drought, Forest)*
 - [ ] `ndvidiff2`: swissEO NDVIdiff v200 BETA *(Drought, Forest)*
@@ -804,7 +821,7 @@ the README of `main` on GitHub.
 - [ ] `fdc`: Forest Disturbance Classification *(Forest)*
 - [ ] `nddi`: NDDI *(Drought)*
 - [ ] `nddichg`: NDDI change vs. previous year *(Drought)*
-- [ ] `analyst`: NDVI difference to a reference date *(Drought, Forest)*
+- [x] `analyst`: NDVI difference to a reference date *(Drought, Forest)*
 - [ ] `ndvidiff22`: swissEO NDVIdiff v200_MVC BETA *(Drought, Forest)*
 - [ ] `ndvidiff23`: swissEO NDVIdiff v200_Median BETA *(Drought, Forest)*
 <!-- verification:end -->
@@ -1240,4 +1257,5 @@ Example:
   (12 August 2026), shortened and translated; the images are swissEO S2-SR TCI.
 - Please note that AI (Claude Code with the Opus 5.5 model, medium effort) was used extensively to prepare this website, adapting it from the Copernicus Browser. The indices were edited and tested manually in QGIS or with rasterio and GDAL. Not for operational use.
 - The repository keeps the upstream MIT license ([LICENSE.md](LICENSE.md)): the layer titles and
-  descriptions in `COP_META` and the thumbnails in `public/previews/` come from the Copernicus Browser.
+  descriptions in `COP_META` and the thumbnails in `public/previews/` come from the Copernicus Browser (except the
+  `swisseo-*.png` previews, rendered from swissEO data).

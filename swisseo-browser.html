@@ -748,11 +748,12 @@ table.kv td:first-child{color:var(--muted)}
           </div></div>
         <div class="card"><h4 data-i18n="info.terms">Terms</h4>
           <div data-i18n="[html]info.swisstopoOpenGovernmentData" style="color:var(--muted);font-size:11.5px">© swisstopo,
-            <a href="https://www.swisstopo.admin.ch/ogd-conditions" target="_blank">open government data</a>.
-            The swissEO products contain modified Copernicus Sentinel data. 3D terrain:
-            <a href="https://www.swisstopo.admin.ch/en/height-model-swissalti3d" target="_blank" rel="noopener">swissALTI3D</a>,
+            <a href="https://www.swisstopo.admin.ch/ogd-conditions" target="_blank">open government data</a>: the swissEO
+            products, the 3D terrain (<a href="https://www.swisstopo.admin.ch/en/height-model-swissalti3d" target="_blank" rel="noopener">swissALTI3D</a>,
             <a href="https://www.geocat.ch/datahub/dataset/f7f058e9-288b-4c55-8f4e-6360880dbb59" target="_blank" rel="noopener">swissALTIRegio</a>,
-            swissSURFACE3D © swisstopo. Labels © swisstopo.
+            swissSURFACE3D), the basemaps and the labels; swissEO VHI together with
+            <a href="https://www.meteoswiss.admin.ch" target="_blank" rel="noopener">MeteoSwiss</a>. The swissEO products contain
+            modified Copernicus Sentinel data.
             <a href="https://doi.org/10.16904/1000001.7" target="_blank" rel="noopener">Forest Type NFI</a>
             © WSL (Waser et al. 2025, funded by the BAFU). <a href="https://arxiv.org/abs/2611.08095" target="_blank" rel="noopener">ETH tree
             species</a> © Zhou et al. 2026 (ETH Zürich), licensed CC BY-NC 4.0: for non-commercial use only. <a href="https://www.geocat.ch/datahub/dataset/ae183bc4-5c91-467e-89bc-85f390340efb" target="_blank" rel="noopener">Nutzungsflächen</a>
@@ -1359,7 +1360,41 @@ const setCursor = c => { map.getCanvas().style.cursor = c; };
    buttons and, below them on one line, the mouse position (LV95 easting / northing) and the scale bar. */
 /* The attribution names the data on the map (issue #12): swisstopo, the masks of other offices, the domain of a WMS / WMTS
    layer; MapLibre is credited in the Info tab. */
-map.addControl(new maplibregl.AttributionControl({ compact: false }), "bottom-left");
+const ATTR = '&copy; <a href="https://www.swisstopo.admin.ch">swisstopo</a>';
+/* The attribution of a map source is a list of credits separated by ATTR_SEP; the attribution bar (attribControl) shows
+   every credit once, swisstopo first: © swisstopo, MeteoSwiss, … The swissEO VHI products are made with MeteoSwiss. */
+const ATTR_SEP = "|", ATTR_METEO = '<a href="https://www.meteoswiss.admin.ch" target="_blank" rel="noopener">MeteoSwiss</a>';
+const creditList = attrs => {
+  const out = [];
+  attrs.forEach(a => (a || "").split(ATTR_SEP).forEach(c => { if (c && !out.includes(c)) out.push(c); }));
+  return out.sort((a, b) => (b === ATTR) - (a === ATTR)).join(", ");
+};
+/* MapLibre's own control would repeat a provider for every source (and the 3D terrain): this one lists each credit once,
+   for the sources of the layers on the map and the terrain. */
+function attribControl() {
+  let box, inner, raf = 0;
+  const update = () => {
+    raf = 0;
+    const st = map.getStyle();
+    if (!st) return;
+    const used = new Set(st.layers.filter(l => l.source && !(l.layout && l.layout.visibility === "none")).map(l => l.source));
+    if (st.terrain && st.terrain.source) used.add(st.terrain.source);
+    const html = creditList([...used].map(id => st.sources[id] && st.sources[id].attribution));
+    if (inner.innerHTML !== html) inner.innerHTML = html;
+    box.hidden = !html;
+  };
+  const soon = () => { if (!raf) raf = requestAnimationFrame(update); };
+  return { onAdd(m) {
+    box = el("div", "maplibregl-ctrl maplibregl-ctrl-attrib");
+    inner = el("div", "maplibregl-ctrl-attrib-inner");
+    box.append(inner);
+    m.on("styledata", soon); m.on("terrain", soon);
+    m.on("sourcedata", e => { if (e.sourceDataType === "metadata") soon(); });
+    soon();
+    return box;
+  }, onRemove() {} };
+}
+map.addControl(attribControl(), "bottom-left");
 const fmtCH = v => Math.round(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g, "'");      // 2'661'150 as on map.geo.admin.ch
 const control = (cls, build) => ({ onAdd(m) { const d = el("div", "maplibregl-ctrl " + cls); build(d, m); return d; }, onRemove() {} });
 map.addControl(control("coords-ctl", (d, m) => {
@@ -1504,7 +1539,6 @@ fitLV(CH_BOX);
 /* ============================================================
    2. Raster layers and basemaps
    ============================================================ */
-const ATTR = '&copy; <a href="https://www.swisstopo.admin.ch">swisstopo</a>';
 
 /* Every raster tile of the map is drawn by this page, through the swisseo:// protocol: the swisstopo WMTS tiles are
    composed into the tiles of the quad tree, the swissEO layers are rendered from the COGs, WMS and WMTS layers are
@@ -1741,7 +1775,6 @@ async function setLabels(on) {
    beyond). */
 const ALTI = "https://data.geo.admin.ch/ch.swisstopo.swissaltiregio/swissaltiregio/swissaltiregio_2056_5728.tif";
 const ALTI_BOX = [2385000, 974000, 2935000, 1404000];
-const ATTR_ALTI = '&copy; <a href="https://www.swisstopo.admin.ch/en/height-model-swissaltiregio">swisstopo swissALTIRegio</a>';
 function terrarium(h, N) {                                     // heights in m -> Terrarium RGB; no data and outside: 0 m
   const im = new ImageData(N, N), d = im.data;
   for (let k = 0; k < N * N; k++) {
@@ -1753,7 +1786,6 @@ function terrarium(h, N) {                                     // heights in m -
 /* The surface model: swissSURFACE3D (with buildings and trees) resampled to 10 m by swissEO, one COG in LV95 on the
    swissEO bucket (Switzerland plus 10 km, no data −9999); beyond it and in its gaps the heights of swissALTIRegio. */
 const DSM = "https://s3-topo-satromo-prod.s3.eu-central-1.amazonaws.com/data/DSM/DSM_10m_EPSG2056_CH_clipped_10km_extended_9999_cog.tif";
-const ATTR_DSM = '&copy; <a href="https://www.swisstopo.admin.ch/en/height-model-swisssurface3d">swisstopo swissSURFACE3D</a> (10 m)';
 /* swissALTI3D, swisstopo's terrain model of Switzerland and Liechtenstein at 0.5 m (the default in 3D, #18, as in the
    former repository davidoesch/swisseobrowser): one COG per km² and release in the STAC collection
    ch.swisstopo.swissalti3d, LV95 with LN02 heights (as swissALTIRegio), each as 0.5 m and 2 m asset; the 0.5 m COGs
@@ -1763,7 +1795,6 @@ const ATTR_DSM = '&copy; <a href="https://www.swisstopo.admin.ch/en/height-model
    beyond Switzerland or in gaps from swissALTIRegio. The items are looked up in the STAC API once per block of
    4 × 4 km; at most ALTI3D_OPEN COGs are kept open (their header and cached blocks). */
 const ALTI3D_ITEMS = "https://data.geo.admin.ch/api/stac/v0.9/collections/ch.swisstopo.swissalti3d/items";
-const ATTR_ALTI3D = '&copy; <a href="https://www.swisstopo.admin.ch/en/height-model-swissalti3d">swisstopo swissALTI3D</a>';
 const alti3dKm = new Map(), alti3dBlocks = new Map(), alti3dOpen = [], ALTI3D_OPEN = 48;
 function alti3dBlock(bx, by) {                 // the latest release of each km² in the block, by "E-N" (km, lower left)
   const key = bx + "-" + by;
@@ -1828,11 +1859,11 @@ const DEMS = {
   /* From zoom 10 on, the terrain tiles have 320 px: 4, 2, 1 and 0.5 m per pixel, the pixels of swissALTI3D's levels
      (256 px would give 5, 2.5, 1.25 and 0.625 m: reading the nearest pixel then doubles every fourth row and column, and
      the sun shading shows the steps as ripples). Up to zoom 9, 256 px: 20 and 10 m, on swissALTIRegio's 10 m grid. */
-  alti3d: { name: "swissALTI3D: terrain (0.5 m near, swissALTIRegio far and beyond Switzerland)", attribution: ATTR_ALTI3D + ", " + ATTR_ALTI,
+  alti3d: { name: "swissALTI3D: terrain (0.5 m near, swissALTIRegio far and beyond Switzerland)", attribution: ATTR,
             maxzoom: 13, size: z => z >= 10 ? 320 : 256, draw: drawAlti3d },
-  alti: { name: "swissALTIRegio: terrain (10 m)", attribution: ATTR_ALTI,
+  alti: { name: "swissALTIRegio: terrain (10 m)", attribution: ATTR,
           draw: async (bbox, N, signal) => terrarium(await readGrid(ALTI, bbox, N, N, signal, 0), N) },
-  dsm:  { name: "swissSURFACE3D 10 m: surface with buildings and trees", attribution: ATTR_DSM,
+  dsm:  { name: "swissSURFACE3D 10 m: surface with buildings and trees", attribution: ATTR,
           draw: async (bbox, N, signal) => {
             const d = await readGrid(DSM, bbox, N, N, signal, -9999);
             let gap = !d;
@@ -3071,34 +3102,38 @@ const COP_META = {
     cop: "# Normalized Burn Ratio (NBR)\n\nNormalized Burn Ratio is frequently used to estimate burn severity. It uses near-infrared (NIR) and shortwave-infrared (SWIR) wavelengths. Healthy vegetation has a high reflectance in the near-infrared portion of the spectrum, and a low short-wave infrared reflectance. On the other hand, burned areas have a high shortwave infrared reflectance but low reflectance in the near infrared Darker pixels indicate burned areas.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/custom-scripts/sentinel-2/nbr/)." },
   scl: { name: "Scene classification map", sub: "Classification of Sentinel-2 data as result of ESA's Scene classification algorithm.", thumb: "DEFAULT-THEME-a91f72-SCENE-CLASSIFICATION.png",
     cop: "# Scene classification\n\n\n\nScene classification was developed to distinguish between cloudy pixels, clear pixels and water pixels of Sentinel-2 data and is a result of ESA's Scene classification algorithm. Twelve different classifications are provided including classes of clouds, vegetation, soils/desert, water and snow. It does not constitute a land cover classification map in a strict sense.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/sentinel-2/scene-classification/)." },
-  aot: { more: "https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-s2-sr" }, cloud: { more: "https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-s2-sr" }, terrain: { more: "https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-s2-sr" },
-  vhi: { more: "https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-vhi" }, vhiveg: { more: "https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-vhi" },
+  aot: { thumb: "swisseo-aot.png", more: "https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-s2-sr" }, cloud: { more: "https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-s2-sr" }, terrain: { more: "https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-s2-sr" },
+  vhi: { thumb: "swisseo-vhi.png", more: "https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-vhi" }, vhiveg: { more: "https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-vhi" },
   evi: { thumb: "AGRICULTURE-3f9be2-4_EVI.png", cop: "# Enhanced Vegetation Index (EVI)\n\nThe enhanced vegetation index (EVI) is an 'optimized' vegetation index as it corrects for soil background signals and atmospheric influences. It is very useful in areas of dense canopy cover. The range of values for EVI is -1 to 1, with healthy vegetation generally around 0.20 to 0.80.\n\n\n\n\n\nMore infos [here](https://custom-scripts.sentinel-hub.com/sentinel-2/evi/) and [here.](https://en.wikipedia.org/wiki/Enhanced_vegetation_index)" },
-  ndre: { cop: "# Normalized Difference Red Edge (NDRE)\n\nThe NDRE replaces the red band of the NDVI with the red edge (B05, 705 nm), where the reflectance of leaves rises steeply and depends on their chlorophyll content. It therefore reflects the chlorophyll and nitrogen status of a crop and keeps rising in dense canopies where the NDVI saturates, which makes it useful later in the season. Typical values: bare soil around 0–0.1, crops about 0.2–0.6. One of the indices Agroscope recommends for crop monitoring, together with NDVI, EVI and MTVI2.\n\nInput: swissEO S2-SR reflectance ρ = DN × 0.0001 − 0.1 of B08 (10 m) and B05 (20 m), negative ρ set to 0.\n\nReferences: Gitelson & Merzlyak 1994, [doi:10.1016/1011-1344(93)06963-4](https://doi.org/10.1016/1011-1344%2893%2906963-4); [Awesome Spectral Indices](https://github.com/awesome-spectral-indices/awesome-spectral-indices) (NDREI, Montero et al. 2023); [Index DataBase](https://www.indexdatabase.de/db/i-single.php?id=223)." },
-  mtvi2: { cop: "# Modified Triangular Vegetation Index 2 (MTVI2)\n\nThe MTVI2 (Haboudane et al. 2004) was designed to estimate the green leaf area index (LAI) of crops while staying insensitive to the leaf chlorophyll content, with a soil adjustment in the denominator. It responds to canopy density over a wider range than the NDVI. Values reach about −1 to 1; vegetated fields are mostly between 0.2 and 0.8. One of the indices Agroscope recommends for crop monitoring, together with NDVI, EVI and NDRE.\n\nInput: swissEO S2-SR reflectance ρ = DN × 0.0001 − 0.1 of B03 (green), B04 (red) and B08 (NIR), all 10 m, negative ρ set to 0 (so √ρ(B04) is defined). The formula needs reflectance, not DN.\n\nReferences: Haboudane et al. 2004, Remote Sensing of Environment 90, 337–352, [doi:10.1016/j.rse.2003.12.013](https://doi.org/10.1016/j.rse.2003.12.013); [Awesome Spectral Indices](https://github.com/awesome-spectral-indices/awesome-spectral-indices) (Montero et al. 2023); [Index DataBase](https://www.indexdatabase.de/db/i-single.php?id=47)." },
+  ndre: { thumb: "swisseo-ndre.png", cop: "# Normalized Difference Red Edge (NDRE)\n\nThe NDRE replaces the red band of the NDVI with the red edge (B05, 705 nm), where the reflectance of leaves rises steeply and depends on their chlorophyll content. It therefore reflects the chlorophyll and nitrogen status of a crop and keeps rising in dense canopies where the NDVI saturates, which makes it useful later in the season. Typical values: bare soil around 0–0.1, crops about 0.2–0.6. One of the indices Agroscope recommends for crop monitoring, together with NDVI, EVI and MTVI2.\n\nInput: swissEO S2-SR reflectance ρ = DN × 0.0001 − 0.1 of B08 (10 m) and B05 (20 m), negative ρ set to 0.\n\nReferences: Gitelson & Merzlyak 1994, [doi:10.1016/1011-1344(93)06963-4](https://doi.org/10.1016/1011-1344%2893%2906963-4); [Awesome Spectral Indices](https://github.com/awesome-spectral-indices/awesome-spectral-indices) (NDREI, Montero et al. 2023); [Index DataBase](https://www.indexdatabase.de/db/i-single.php?id=223)." },
+  mtvi2: { thumb: "swisseo-mtvi2.png", cop: "# Modified Triangular Vegetation Index 2 (MTVI2)\n\nThe MTVI2 (Haboudane et al. 2004) was designed to estimate the green leaf area index (LAI) of crops while staying insensitive to the leaf chlorophyll content, with a soil adjustment in the denominator. It responds to canopy density over a wider range than the NDVI. Values reach about −1 to 1; vegetated fields are mostly between 0.2 and 0.8. One of the indices Agroscope recommends for crop monitoring, together with NDVI, EVI and NDRE.\n\nInput: swissEO S2-SR reflectance ρ = DN × 0.0001 − 0.1 of B03 (green), B04 (red) and B08 (NIR), all 10 m, negative ρ set to 0 (so √ρ(B04) is defined). The formula needs reflectance, not DN.\n\nReferences: Haboudane et al. 2004, Remote Sensing of Environment 90, 337–352, [doi:10.1016/j.rse.2003.12.013](https://doi.org/10.1016/j.rse.2003.12.013); [Awesome Spectral Indices](https://github.com/awesome-spectral-indices/awesome-spectral-indices) (Montero et al. 2023); [Index DataBase](https://www.indexdatabase.de/db/i-single.php?id=47)." },
   savi: { thumb: "AGRICULTURE-3f9be2-SAVI.png", cop: "# Soil Adjusted Vegetation Index (SAVI)\n\n The Soil Adjusted Vegetation Index is similar to Normalized Difference Vegetation Index (NDVI) but is used in areas where vegetative cover is low (< 40%). The index is a transformation technique that minimizes soil brightness influences from spectral vegetation indices involving red and near-infrared (NIR) wavelengths. The index is helpful when analysing young crops, arid regions with sparse vegetation and exposed soil surfaces.\n\n\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/sentinel-2/savi/) and [here.](https://eos.com/blog/6-spectral-indexes-on-top-of-ndvi-to-make-your-vegetation-analysis-complete/)" },
   barren: { thumb: "AGRICULTURE-3f9be2-8_BARREN-SOIL.png", cop: "# Barren Soil Visualization\n\nThe Barren Soil Visualization can be useful for soil mapping, to investigate the location of landslides or the extent of erosion in non-vegetated areas. This visualization shows all vegetation in green and the barren ground in red. Water appears black.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/sentinel-2/barren_soil/) and [here.](https://medium.com/sentinel-hub/create-useful-and-beautiful-satellite-images-with-custom-scripts-8ef0e6a474c6)" },
   mstress: { thumb: "AGRICULTURE-3f9be2-9_MOISTURE-STRESS.png", cop: "# NDMI for Moisture Stress\n\nThe Normalized Difference Moisture Index (NDMI) for moisture stress can be used to detect irrigation. For all the index values above 0, knowing the land use and land cover, it is possible to determine whether irrigation has taken place. Knowing the type of crop grown (e.g. citrus crops), it is possible to identify whether irrigation is being effective or not during the crucial growing summer season, as well as find out if some parts of the farm are being under or over-irrigated.\n\n\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/sentinel-2/ndmi_special/#)" },
   hon: { thumb: "FLOODING-8184c6-HIGHLIGHT-OPTIMIZED-NATURAL-COLOR.png", cop: "# Highlight Optimized Natural Color\n\nThis script aims to display the Earth in beautiful natural color images. It uses highlight optimization to avoid burnt out pixels and to even out the exposure.\n\n\n\nMore info [here.](https://sentinel-hub.github.io/custom-scripts/sentinel-2/highlight_optimized_natural_color/#)" },
-  ndvidiff: { more: "https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-ndvidiff",
+  ndvidiff: { thumb: "swisseo-ndvidiff.png", more: "https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-ndvidiff",
     cop: "# swissEO NDVIdiff\n\nThe NDVI changes show the difference between the vegetation's state of the current year compared to the previous year as observed by satellites, for the forest areas of Switzerland at 10 m. Negative values (red) mean less vital vegetation than a year ago, positive values (green) more. The product is published for the end of July, August and September; the product nearest to the selected date is shown. Grey: missing data.\n\nMore info [here](https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-ndvidiff) and in the [content information](https://www.swisstopo.admin.ch/dam/en/sd-web/bODfHY8ioFyS/swissEO_NDVIdiff_AdditionalContentInfo.pdf)." },
-  ndviz: { more: "https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-ndviz",
+  ndviz: { thumb: "swisseo-ndviz.png", more: "https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-ndviz",
     cop: "# swissEO NDVIz\n\nThe NDVI anomalies show the current vegetation vitality as observed by satellites, as a z-score relative to the long-term behaviour, for the forest areas of Switzerland at 10 m. Negative values (brown) mean lower vitality than usual, positive values (green) higher. The product is published for the end of July, August and September; the product nearest to the selected date is shown. Grey: missing data.\n\nMore info [here](https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-ndviz) and in the [content information](https://www.swisstopo.admin.ch/dam/en/sd-web/mZTj7kABmTrD/swissEO_NDVIz_AdditionalContentInfo.pdf)." },
-  ndvidiff2: { more: "https://github.com/swisstopo/topo-satromo-v2/blob/dev-20261006/main_functions/test_reprocess_ndvidiff_csde.py",
+  ndvidiff2: { thumb: "swisseo-ndvidiff2.png", more: "https://github.com/swisstopo/topo-satromo-v2/blob/dev-20261006/main_functions/test_reprocess_ndvidiff_csde.py",
     cop: "# swissEO NDVIdiff v200 BETA\n\n**Beta version, not an official product.** Year-on-year NDVI change for the forest areas of Switzerland at 10 m, computed from **cloud-free two-month mosaics** of swissEO S2-SR v200 instead of single acquisitions. Three overlapping windows per year: June/July, July/August and August/September, each named after its end date (31 July, 31 August, 30 September); the window nearest to the selected date is shown.\n\n**Mosaic** ([main_cloudfree_mosaic_csde.py](https://github.com/swisstopo/topo-satromo-v2/blob/dev-20261006/main_functions/main_cloudfree_mosaic_csde.py)): for every pixel and band (B02, B03, B04, B08) all observations of the window are used; observations flagged by the cloud mask (1, 2, 3), outside the scene footprint or in terrain shadow (200) are discarded, and the **first quartile** of the remaining values is taken, following the Sentinel-2 quarterly mosaic algorithm of the Copernicus Data Space Ecosystem, more robust to cloud and haze residues than the first cloud-free value or the mean.\n\n**NDVI difference** ([test_reprocess_ndvidiff_csde.py](https://github.com/swisstopo/topo-satromo-v2/blob/dev-20261006/main_functions/test_reprocess_ndvidiff_csde.py)): NDVI = (NIR − Red) / (NIR + Red) from the reflectance of the mosaic (ρ = DN × 0.0001 − 0.1), minus the NDVI of the same window one year earlier; Int16, value / 1000, no data 32701. Negative values (red) mean less vital vegetation than a year ago, positive values (green) more.\n\nThe COGs are published as examples on cms.geo.admin.ch, not in the STAC catalogue." },
-  nddi: { cop: "# Normalized Difference Drought Index (NDDI)\n\nThe NDDI (Gu et al. 2007) combines vegetation greenness (NDVI) and vegetation water content (NDWI): NDDI = (NDVI − NDWI) / (NDVI + NDWI). Vegetation under drought stress has less water and less green, which raises the NDDI (red). By default the NDWI is computed from NIR and SWIR (B08, B11), as in the original paper; values are clipped to −1…1.\n\nThe openEO drought notebook uses the Awesome Spectral Indices formula with an NDWI from green and NIR (B03, B08), selectable as *Green*. With it NDVI + NDWI is close to zero over vegetation, and almost every pixel ends up at −1 or +1 (99.8 % in a test over Aarau, independent of the reflectance offset), so the map is saturated.\n\nMore info [here](https://doi.org/10.1029/2006GL029127) and in the [openEO notebook](https://github.com/Open-EO/openeo-community-examples/blob/main/python/50_thematic-notebooks/drought-nddi/drought-nddi.ipynb)." },
-  nddichg: { cop: "# NDDI change vs. previous year\n\nDifference between the NDDI of the selected date and the NDDI one year earlier, as in the openEO drought notebook, which compares a drought year with a baseline year. Positive values (red) mean drier conditions than a year ago, negative values (blue) wetter. The NDWI is computed from NIR and SWIR (Gu et al. 2007) by default; the notebook's green NDWI is selectable but saturates. The reference uses the acquisitions within ±20 days of the same day one year earlier (or of a reference date you choose), clearest first; each pixel takes the first one with clear data. Unlike the notebook, which averages May–July, single dates are compared, so clouds and cloud shadows are masked on both sides by default.\n\nMore info [here](https://github.com/Open-EO/openeo-community-examples/blob/main/python/50_thematic-notebooks/drought-nddi/drought-nddi.ipynb)." },
-  vhidef: { more: "https://waldtrockenheit-dashboard.vercel.app/vhi.html",
+  nddi: { thumb: "swisseo-nddi.png", cop: "# Normalized Difference Drought Index (NDDI)\n\nThe NDDI (Gu et al. 2007) combines vegetation greenness (NDVI) and vegetation water content (NDWI): NDDI = (NDVI − NDWI) / (NDVI + NDWI). Vegetation under drought stress has less water and less green, which raises the NDDI (red). By default the NDWI is computed from NIR and SWIR (B08, B11), as in the original paper; values are clipped to −1…1.\n\nThe openEO drought notebook uses the Awesome Spectral Indices formula with an NDWI from green and NIR (B03, B08), selectable as *Green*. With it NDVI + NDWI is close to zero over vegetation, and almost every pixel ends up at −1 or +1 (99.8 % in a test over Aarau, independent of the reflectance offset), so the map is saturated.\n\nMore info [here](https://doi.org/10.1029/2006GL029127) and in the [openEO notebook](https://github.com/Open-EO/openeo-community-examples/blob/main/python/50_thematic-notebooks/drought-nddi/drought-nddi.ipynb)." },
+  nddichg: { thumb: "swisseo-nddichg.png", cop: "# NDDI change vs. previous year\n\nDifference between the NDDI of the selected date and the NDDI one year earlier, as in the openEO drought notebook, which compares a drought year with a baseline year. Positive values (red) mean drier conditions than a year ago, negative values (blue) wetter. The NDWI is computed from NIR and SWIR (Gu et al. 2007) by default; the notebook's green NDWI is selectable but saturates. The reference uses the acquisitions within ±20 days of the same day one year earlier (or of a reference date you choose), clearest first; each pixel takes the first one with clear data. Unlike the notebook, which averages May–July, single dates are compared, so clouds and cloud shadows are masked on both sides by default.\n\nMore info [here](https://github.com/Open-EO/openeo-community-examples/blob/main/python/50_thematic-notebooks/drought-nddi/drought-nddi.ipynb)." },
+  vhidef: { thumb: "swisseo-vhidef.png", more: "https://waldtrockenheit-dashboard.vercel.app/vhi.html",
     cop: "# VHI cumulative deficit\n\nThe cumulative forest health deficit of the [Waldtrockenheit dashboard](https://waldtrockenheit-dashboard.vercel.app/vhi.html), computed **per pixel** instead of per warning region. For every day from 1 April to the selected day (at most 31 October), the daily swissEO VHI forest map contributes 40 − VHI where the VHI is below 40, the threshold for *stressed*; a VHI of 40 or more adds nothing. A very low VHI therefore raises the sum strongly, and the sum can only grow during the season.\n\nOnly days with a VHI value count. In long periods without satellite images the VHI is missing once its 7-day window has passed, so those days add nothing and the deficit can be underestimated; the pixel inspector and the statistics show the number of days with data. Only pixels inside the VHI forest mask count (non-forest stays transparent). The dashboard rates each region against its 2018 to 2025 climatology; per pixel this would need eight seasons of daily maps, so the colours use a fixed scale here (adjustable).\n\nThe sums are computed in the browser from the daily COGs (about 30 per month), so the first view of a season takes a while; the sums are kept for the session, and stepping forward through the dates (or a timelapse) only reads the days in between.\n\nMore info [here](https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-vhi)." },
-  vhiext: { more: "https://waldtrockenheit-dashboard.vercel.app/vhi.html",
+  vhiext: { thumb: "swisseo-vhiext.png", more: "https://waldtrockenheit-dashboard.vercel.app/vhi.html",
     cop: "# VHI days in extreme stress\n\nThe number of days in extreme stress of the [Waldtrockenheit dashboard](https://waldtrockenheit-dashboard.vercel.app/vhi.html), computed **per pixel**: the days from 1 April to the selected day (at most 31 October) on which the daily swissEO VHI forest map is below 10 (*extremely stressed*). As in the dashboard the days are counted in total, not consecutively, because a counter of consecutive days would reset at every short cool or wet spell without the forest actually recovering. Classes as in the dashboard: 0, 1 to 5, 6 to 15, 16 to 30 and more than 30 days.\n\nDays without a VHI value do not count (see *VHI cumulative deficit*).\n\nMore info [here](https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-vhi)." },
-  fdc: { more: "https://custom-scripts.sentinel-hub.com/sentinel-2/forest_disturbance_classification/",
+  fdc: { thumb: "swisseo-fdc.png", more: "https://custom-scripts.sentinel-hub.com/sentinel-2/forest_disturbance_classification/",
     cop: "# Forest Disturbance Classification\n\nA LightGBM classification of forest disturbances by Jonas Viehweger and Martin Puhm (Joanneum Research, EvoLand project), published as a Sentinel Hub custom script. From a single date it assigns every pixel to *bark beetle* (brown), *clear cut* (grey), *salvage logged* (grey too, low confidence), *wildfire* (dark brown) or *windthrow* (blue); *healthy* forest is not drawn. It was trained on samples from Germany, Sweden and Spain (macro F1 0.83), works best on recent, large disturbances and is only valid on forest, so the forest mask is on by default. Expect classification errors and validate the results.\n\n**Input scaling:** the trees split on Sentinel Hub L2A digital numbers in the convention DN = 10000 × reflectance (data before processing baseline 04.00, e.g. the script's 2019 example). swissEO stores DN = (ρ + 0.1) × 10000, so the script receives DN − 1000, clamped at 0. The Copernicus Browser feeds recent scenes without removing the offset (see the README on harmonizeValues), so its result can differ there. The 150 trees are loaded unchanged from the script on first use.\n\nMore info [here](https://custom-scripts.sentinel-hub.com/sentinel-2/forest_disturbance_classification/)." },
-  ndvidiff22: { more: "https://doi.org/10.1080/01431168608948945",
+  ndvidiff22: { thumb: "swisseo-ndvidiff22.png", more: "https://doi.org/10.1080/01431168608948945",
     cop: "# swissEO NDVIdiff v200_MVC BETA\n\n**Beta version, a test computed on the fly, not an official product.** Year-on-year NDVI change from a **maximum value composite (MVC)**: per pixel the highest NDVI of the window, the classic approach of [Holben (1986)](https://doi.org/10.1080/01431168608948945). Clouds, haze and shadows lower the NDVI, so the maximum tends to pick the clearest observation; with more clear observations in one year than in the other the maximum tends to be higher there.\n\nThe window ends on the selected date and is chosen in the layer menu: **7, 16, 30 or 60 days** (30 by default; any day can be selected, not only days with an acquisition). Every swissEO S2-SR v200 acquisition of the window whose cloud cover passes the cloud filter is read; per pixel, observations flagged by the cloud mask (1, 2, 3, as chosen in the masks), in terrain shadow (200) or outside the scene footprint are left out. NDVI = (NIR − Red) / (NIR + Red) of the reflectance (ρ = DN × 0.0001 − 0.1, negative ρ set to 0). The same is computed for the same calendar window one year earlier, and the map shows the difference. With the forest mask (default) a pixel counts only if it is forest in the habitat map of the date and in that of the date one year earlier. The pixel inspector gives both composites and the number of clear observations in each window.\n\nComputed in your browser from all acquisitions of both windows, so a 60-day window can take a while to draw. Short windows leave gaps after cloudy spells." },
-  ndvidiff23: { more: "https://doi.org/10.1080/01431168608948945",
+  ndvidiff23: { thumb: "swisseo-ndvidiff23.png", more: "https://doi.org/10.1080/01431168608948945",
     cop: "# swissEO NDVIdiff v200_Median BETA\n\n**Beta version, a test computed on the fly, not an official product.** Year-on-year NDVI change from a **median composite**: per pixel the median NDVI of the clear observations of the window (an even count takes the mean of the two middle values). Less sensitive than the maximum value composite to undetected clouds, to bright outliers and to a different number of observations in the two years.\n\nThe window ends on the selected date and is chosen in the layer menu: **7, 16, 30 or 60 days** (30 by default; any day can be selected, not only days with an acquisition). Every swissEO S2-SR v200 acquisition of the window whose cloud cover passes the cloud filter is read; per pixel, observations flagged by the cloud mask (1, 2, 3, as chosen in the masks), in terrain shadow (200) or outside the scene footprint are left out. NDVI = (NIR − Red) / (NIR + Red) of the reflectance (ρ = DN × 0.0001 − 0.1, negative ρ set to 0). The same is computed for the same calendar window one year earlier, and the map shows the difference. With the forest mask (default) a pixel counts only if it is forest in the habitat map of the date and in that of the date one year earlier. The pixel inspector gives both composites and the number of clear observations in each window.\n\nComputed in your browser from all acquisitions of both windows, so a 60-day window can take a while to draw. Short windows leave gaps after cloudy spells." },
-  analyst: { cop: "# NDVI difference to a reference date\n\nMethod of the NDVI Analyst by Raffael Bienz (Canton of Aargau): the NDVI difference between two dates (later minus earlier), using swissEO S2-SR reflectance with negative values set to 0, masked to forest. Changes are pixels with an NDVI drop below the threshold (default −0.08); a 3 × 3 majority filter removes edge effects. *Detected change* shows the binary result. The statistics of an area of interest report the forest area and the affected area in ha and %, with and without edge-effect removal, like the original script.\n\nMore info [here](https://github.com/RaffiBienz/ndvi_analyst)." }
+  analyst: { thumb: "swisseo-analyst.png", cop: "# NDVI difference to a reference date\n\nMethod of the NDVI Analyst by Raffael Bienz (Canton of Aargau): the NDVI difference between two dates (later minus earlier), using swissEO S2-SR reflectance with negative values set to 0, masked to forest. Changes are pixels with an NDVI drop below the threshold (default −0.08); a 3 × 3 majority filter removes edge effects. *Detected change* shows the binary result. The statistics of an area of interest report the forest area and the affected area in ha and %, with and without edge-effect removal, like the original script.\n\nMore info [here](https://github.com/RaffiBienz/ndvi_analyst)." },
+  /* the layers without a Copernicus thumbnail: raster previews rendered from swissEO data (README, Layer previews) */
+  cloud: { thumb: "swisseo-cloud.png" },
+  terrain: { thumb: "swisseo-terrain.png" },
+  vhiveg: { thumb: "swisseo-vhiveg.png" },
 };
 Object.keys(COP_META).forEach(id => Object.assign(LAYER[id], COP_META[id]));
 ["vhi", "vhiveg"].forEach(id => Object.assign(LAYER[id], {      // VHI: WMS for display, COG for statistics
@@ -3158,15 +3193,14 @@ const HIGHLIGHTS = {
 /* catalog:configs:start */
 const CONFIGS = {
   DEFAULT: { name: "Default", beta: false, groups: [
-    ["Composites", ["true", "nir", "urban", "swir", "agri", "geo", "barren"]],
+    ["Composites", ["true", "nir", "urban", "hon", "swir", "agri", "geo", "barren"]],
     ["Indices", ["ndvi", "ndwi", "ndmi", "ndsi", "nbr", "aot", "savi", "vhi", "vhiveg", "ndvidiff"]],
     ["Masks & quality", ["scl", "cloud", "terrain"]]] },
   AGRICULTURE: { name: "Agriculture", beta: false, veg: "lnf:a.dw.dp.r.o.dk.g.s.h.u.so.v", groups: [
     ["Layers", ["true", "ndvi", "evi", "ndre", "mtvi2"]]] },
   DROUGHT: { name: "Drought", beta: false, groups: [
-    ["Layers", ["true", "ndvi", "evi", "ndmi", "vhi", "vhiveg", "ndvidiff", "ndvidiff2", "ndvidiff22", "ndvidiff23", "ndviz", "nddi", "nddichg", "analyst"]]] },
-  DROUGHT2026: { name: "Drought 2026", beta: false, highlights: HIGHLIGHTS.drought2026, groups: [
-    ["Layers", ["true", "ndmi", "ndwi", "mstress", "ndvi", "swir", "urban", "hon"]]] },
+    ["Layers", ["true", "ndvi", "evi", "ndmi", "mstress", "vhi", "vhiveg", "ndvidiff", "ndvidiff2", "ndvidiff22", "ndvidiff23", "ndviz", "nddi", "nddichg", "analyst"]]] },
+  DROUGHT2026: { name: "Drought 2026", beta: false, highlights: HIGHLIGHTS.drought2026, groups: [] },
   FOREST: { name: "Forest", beta: false, veg: "forest", groups: [
     ["Layers", ["true", "ndvi", "evi", "vhi", "vhidef", "vhiext", "ndvidiff", "ndvidiff2", "ndvidiff22", "ndvidiff23", "ndviz", "analyst", "nbr", "ndmi", "fdc"]]] },
 };
@@ -3185,7 +3219,6 @@ const MASK_DEFAULTS = {
   "mtvi2": { cloud: true, shadow: true, terrain: true, veg: "vegetation" },
   "barren": { cloud: true, shadow: true, terrain: true },
   "mstress": { cloud: true, shadow: true, terrain: true, veg: "vegetation" },
-  "hon": { cloud: true, shadow: true, terrain: true },
   "fdc": { cloud: true, shadow: true, terrain: true, veg: "forest" },
   "nddi": { cloud: true, shadow: true, terrain: true, veg: "vegetation" },
   "nddichg": { cloud: true, shadow: true, terrain: true, veg: "vegetation" },
@@ -3194,13 +3227,16 @@ const MASK_DEFAULTS = {
   "ndvidiff23": { cloud: true, shadow: true, terrain: true, veg: "forest" },
 };
 /* catalog:configs:end */
-const cfgLayers = id => CONFIGS[id].groups.flatMap(g => g[1]);
+/* The layers of a configuration: those of its groups, then those its highlights open (a configuration with
+   highlights only, as Drought 2026, keeps its stories' layer, so links and the pull-down stay in it). */
+const groupLayers = id => CONFIGS[id].groups.flatMap(g => g[1]);
+const cfgLayers = id => [...new Set(groupLayers(id).concat((CONFIGS[id].highlights || []).map(h => h.layer)))];
 
 /* Which layers this build offers. The configurations are the only place a layer is offered, and the
    production build is generated without the ones that are not verified yet (tools/build-catalog.py),
    so the set follows from CONFIGS and can never drift from it. Integration and a local copy carry
    every layer. A link that names a layer which is not offered here falls back and says so. */
-const PUBLISHED = new Set(Object.keys(CONFIGS).flatMap(cfgLayers));
+const PUBLISHED = new Set(Object.keys(CONFIGS).flatMap(groupLayers));
 const isPublished = rec => !!rec && (rec.ext || PUBLISHED.has(rec.id));
 
 /* Reasons a link could not be opened as it asked, shown once under the header after the boot. */
@@ -4621,14 +4657,21 @@ async function renderTile(cfg, bbox, W, H, signal) {
 
 /* One map layer for a resolved configuration {rec, s, scenes}: the 512 px tiles (the tile size of the COGs) are
    rendered from the COGs, drawn by the WMS (one GetMap per scene, the first scene on top) or by an external service. */
-/* Attribution of a layer: swisstopo, plus the office of a vegetation mask from outside swisstopo; for a WMS / WMTS layer
-   the domain of its service. */
+/* Attribution of a layer, as credits (ATTR_SEP): swisstopo, MeteoSwiss for the swissEO VHI products, the office of a
+   vegetation mask from outside swisstopo; for a WMS / WMTS layer the domain of its service. */
 function layerAttr(cfg) {
   if (cfg.rec.type === "ext") return escA(hostOf(cfg.rec.ext.u));
   const p = cfg.rec.source === "s2" ? vegParse(cfg.s.veg) : null;
-  return ATTR + (!p ? "" : p.kind === "lnf" ? ', Nutzungsflächen &copy; <a href="https://www.blw.admin.ch" target="_blank" rel="noopener">BLW</a>'
-    : p.kind === "lfi" ? ', Forest Type NFI &copy; <a href="https://doi.org/10.16904/1000001.7" target="_blank" rel="noopener">WSL / BAFU</a>'
-    : p.kind === "eth" || p.kind === "ethsp" ? ", " + t("mask.ethSpecies", "ETH tree species") + ' &copy; <a href="' + META_ETH + '" target="_blank" rel="noopener">Zhou et al. 2026</a>, CC BY-NC 4.0' : "");
+  return [ATTR].concat(cfg.rec.source === "vhi" ? [ATTR_METEO] : [],
+    !p ? [] : p.kind === "lnf" ? ['Nutzungsflächen &copy; <a href="https://www.blw.admin.ch" target="_blank" rel="noopener">BLW</a>']
+    : p.kind === "lfi" ? ['Forest Type NFI &copy; <a href="https://doi.org/10.16904/1000001.7" target="_blank" rel="noopener">WSL / BAFU</a>']
+    : p.kind === "eth" || p.kind === "ethsp" ? [t("mask.ethSpecies", "ETH tree species") + ' &copy; <a href="' + META_ETH + '" target="_blank" rel="noopener">Zhou et al. 2026</a>, CC BY-NC 4.0'] : []).join(ATTR_SEP);
+}
+/* The credits of exported layers as plain text, for the caption of an image: © swisstopo, MeteoSwiss, … */
+function creditText(cfgs) {
+  const d = document.createElement("div");
+  d.innerHTML = creditList(cfgs.map(layerAttr));
+  return d.textContent || "© swisstopo";
 }
 function makeLayer(cfg) {
   const rec = cfg.rec, o = { opacity: cfg.s.opacity / 100, before: "z-data", attribution: layerAttr(cfg) };
@@ -8940,7 +8983,7 @@ function drawLegendBox(ctx, rec, s, x, y, title) {
 const capHeight = desc => desc ? 62 : 46;
 
 /* overlay: the credit of the overlay drawn, if any */
-function drawCaption(ctx, W, H, desc, overlay) {
+function drawCaption(ctx, W, H, desc) {
   const h = capHeight(desc);
   ctx.save();
   ctx.fillStyle = "rgba(255,255,255,.93)";
@@ -8963,7 +9006,9 @@ function drawCaption(ctx, W, H, desc, overlay) {
           (ids.length && currentRec.source === "s2" && currentRec.type !== "wincomp" ? " · " + ids.map(timeOf).join(", ") : "") +
           (currentRec.source === "s2" && vegOn(S(currentRec).veg) ? " · " + vegName(S(currentRec).veg, state.date, true) : "");
   }
-  sub += "  |  " + t("export.credit", "© swisstopo · contains modified Copernicus Sentinel data") + (overlay || "");
+  // the providers of the layers shown, each once (swisstopo covers the basemap and the labels too)
+  const cfgs = compareMode ? compare.map(it => ({ rec: LAYER[it.layerId], s: it.s })) : layerOff ? [] : [{ rec: currentRec, s: S(currentRec) }];
+  sub += "  |  " + t("export.credit", "{{credits}} · contains modified Copernicus Sentinel data", { credits: creditText(cfgs) });
   ctx.font = "700 13px " + FONT;
   ctx.fillStyle = "#003F6B";
   ctx.fillText(title, 14, H - h + 21);
@@ -8995,7 +9040,7 @@ function decorate(cv, o, mpp, k) {
   }
   if (o.caption) {
     if (mpp) drawScaleBar(ctx, W, H, mpp * k, capHeight(o.desc));
-    drawCaption(ctx, W, H, o.desc, o.overlayCredit);
+    drawCaption(ctx, W, H, o.desc);
   }
   ctx.restore();
 }
@@ -9013,11 +9058,11 @@ async function buildExportCanvas(o) {
 
   // Same paint order as the map: basemap, product layer(s), then the labels on top.
   const data = (compareMode ? cmpLayers : [current, xp.preview]).filter(Boolean).map(l => l.id);
-  if (o.overlay && labelIds.length) o.overlayCredit = " · " + t("export.labelsCredit", "labels © swisstopo");
+  const withLabels = !!(o.overlay && labelIds.length);
   if (terrainOn) {
     // 3D: the view as seen, in one image (alone, a layer would show the edges of the terrain tiles where it has no
     // data); the area of interest clips all of it
-    const ids = ["ground"].concat(baseMapLayer ? [baseMapLayer.id] : [], data, o.overlayCredit ? labelIds : []);
+    const ids = ["ground"].concat(baseMapLayer ? [baseMapLayer.id] : [], data, withLabels ? labelIds : []);
     ctx.save();
     if (clipAoi) { pathRings(ctx, rings); ctx.clip("evenodd"); }
     ctx.drawImage(snapshot(ids, W, H), 0, 0);
@@ -9029,7 +9074,7 @@ async function buildExportCanvas(o) {
     if (data.length) ctx.drawImage(snapshot(data, W, H), 0, 0);
     ctx.restore();
     // the labels as on the map
-    if (o.overlayCredit) ctx.drawImage(snapshot(labelIds, W, H), 0, 0);
+    if (withLabels) ctx.drawImage(snapshot(labelIds, W, H), 0, 0);
   }
   if (rings.length && o.aoiLine) strokeAoi(ctx, rings, 1);
 
@@ -9884,7 +9929,7 @@ async function tlFrame(it, area, W, H, o, signal) {
     ctx.fillText(layerText(rec, "name") + (rec.sub ? ": " + layerText(rec, "sub") : ""), 14, Hk - h + 21);
     ctx.font = "11px " + FONT; ctx.fillStyle = "#555";
     ctx.fillText(SOURCES[rec.source].name + (rec.source === "s2" && vegOn(s.veg) ? " · " + vegName(s.veg, state.date, true) : "") +
-      "  |  " + t("export.credit", "© swisstopo · contains modified Copernicus Sentinel data"), 14, Hk - h + 37);
+      "  |  " + t("export.credit", "{{credits}} · contains modified Copernicus Sentinel data", { credits: creditText([{ rec, s }]) }), 14, Hk - h + 37);
   }
   ctx.restore();
   return cv;

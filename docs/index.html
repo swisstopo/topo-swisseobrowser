@@ -337,10 +337,10 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
   <p data-i18n="[html]vis-layers.p1">A <b>configuration</b> (called <i>theme</i> in the Copernicus Browser) is a list of layers for a topic:</p>
   <table>
     <tr><th data-i18n="vis-layers.th1">Configuration</th><th data-i18n="vis-layers.th2">Layers</th></tr>
-    <tr><td data-i18n="vis-layers.td1">Default</td><td data-i18n="vis-layers.td2">composites (true color, false color, urban, SWIR, agriculture, geology, Barren Soil), indices (NDVI, NDWI, moisture index, NDSI, NBR, AOT, SAVI), swissEO VHI forest and vegetation, swissEO NDVIdiff, scene classification, cloud mask, terrain</td></tr>
+    <tr><td data-i18n="vis-layers.td1">Default</td><td data-i18n="vis-layers.td2">composites (true color, false color, urban, Highlight Optimized Natural Color, SWIR, agriculture, geology, Barren Soil), indices (NDVI, NDWI, moisture index, NDSI, NBR, AOT, SAVI), swissEO VHI forest and vegetation, swissEO NDVIdiff, scene classification, cloud mask, terrain</td></tr>
     <tr><td data-i18n="vis-layers.td3">Agriculture</td><td data-i18n="vis-layers.td4">true color, NDVI, EVI, NDRE, MTVI2 (the indices Agroscope recommends for crops), on the farmland of the Nutzungsflächen</td></tr>
-    <tr><td data-i18n="vis-layers.td5">Drought</td><td data-i18n="vis-layers.td6">true color, NDVI, EVI, moisture index, swissEO VHI, swissEO NDVIdiff and NDVIz, NDDI and NDDI change, NDVI difference to a reference date</td></tr>
-    <tr><td data-i18n="vis-layers.td7">Drought 2026</td><td data-i18n="[html]vis-layers.td8">true color, moisture index, NDWI, Moisture Stress, NDVI, SWIR, urban, Highlight Optimized Natural Color, plus the <a href="#vis-hl">highlights</a></td></tr>
+    <tr><td data-i18n="vis-layers.td5">Drought</td><td data-i18n="vis-layers.td6">true color, NDVI, EVI, moisture index, Moisture Stress, swissEO VHI, swissEO NDVIdiff and NDVIz, NDDI and NDDI change, NDVI difference to a reference date</td></tr>
+    <tr><td data-i18n="vis-layers.td7">Drought 2026</td><td data-i18n="[html]vis-layers.td8">only the <a href="#vis-hl">highlights</a>; each story opens the true color of its two dates</td></tr>
     <tr><td data-i18n="vis-layers.td9">Forest</td><td data-i18n="vis-layers.td10">true color, NDVI, EVI, swissEO VHI forest, VHI cumulative deficit, VHI days in extreme stress, swissEO NDVIdiff and NDVIz, NDVI difference to a reference date, NBR, moisture index, Forest Disturbance Classification</td></tr>
   </table>
   <p data-i18n="vis-layers.p2">The true color is the image delivered with each swissEO mosaic. All other layers are computed from the bands in
@@ -685,7 +685,7 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
       mask and true color image, since 2017: all Sentinel-2 layers</td>
       <td data-i18n="[html]data.td3"><a href="https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-s2-sr" target="_blank" rel="noopener">swisstopo</a>, data.geo.admin.ch</td></tr>
     <tr><td data-i18n="data.td4">swissEO VHI</td><td data-i18n="data.td5">Daily Vegetation Health Index for forest and all vegetation, relative to 1991–2020; VHI season layers</td>
-      <td data-i18n="[html]data.td6"><a href="https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-vhi" target="_blank" rel="noopener">swisstopo</a></td></tr>
+      <td data-i18n="[html]data.td6"><a href="https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-vhi" target="_blank" rel="noopener">swisstopo</a>, <a href="https://www.meteoswiss.admin.ch" target="_blank" rel="noopener">MeteoSwiss</a></td></tr>
     <tr><td data-i18n="data.td7">swissEO NDVIdiff and NDVIz</td><td data-i18n="data.td8">NDVI change compared with the previous year, and NDVI anomaly, for the
       forest, at the end of July, August and September</td>
       <td data-i18n="[html]data.td9"><a href="https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-ndvidiff" target="_blank" rel="noopener">NDVIdiff</a>,
@@ -740,7 +740,7 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
 
   <footer>
     <p data-i18n="[html]footer.p1">swissEO Browser, a prototype of <a href="https://www.swisstopo.admin.ch" target="_blank" rel="noopener">swisstopo</a>.
-      Data © swisstopo (open government data); swissEO S2-SR and swissEO VHI contain modified Copernicus Sentinel data.
+      Data © swisstopo (open government data), swissEO VHI together with MeteoSwiss; swissEO S2-SR and swissEO VHI contain modified Copernicus Sentinel data.
       Forest Type NFI © WSL (Waser et al. 2025, funded by the BAFU); ETH tree species © Zhou et al. 2026 (ETH Zürich),
       CC BY-NC 4.0, non-commercial use only; Nutzungsflächen © BLW and the cantons.
       User interface modelled on the Copernicus Browser of the Copernicus Data Space Ecosystem; this project is not

@@ -13,7 +13,9 @@
     return btoa(s);
   };
   // settings of a layer: the defaults of the Default configuration, or every mask off
+  // masks may also be { cfg: "FOREST", s: { mode: "change" } }: the defaults of that configuration with settings on top
   const settingsFor = (rec, masks) => {
+    if (masks && typeof masks === "object") return Object.assign(T.defaults(rec, masks.cfg || "DEFAULT"), masks.s || {});
     const s = T.defaults(rec, "DEFAULT");
     if (masks === "off") Object.assign(s, { cloud: false, shadow: false, terrain: false, illum: false, veg: "off" });
     return s;
