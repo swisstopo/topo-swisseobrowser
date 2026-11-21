@@ -2434,31 +2434,99 @@ async function readGridBands(url, bbox, W, H, signal, fill, nb) {
   const samples = Array.from({ length: nb }, (_, i) => i), win = [x0, y0, x1, y1];
   // YCbCr JPEG (TCI): the native decoder delivers RGB already, geotiff.js needs readRGB. The level's internal
   // mask marks the valid pixels.
-  const [raws, mk] = await Promise.all([
-    lv.ycbcr && !NATIVE_JPEG ? lv.im.readRGB({ window: win, interleave: false, signal })
-      : lv.im.readRasters({ window: win, samples, signal, pool: poolFor(lv.im) }),
-    lv.mask ? lv.mask.readRasters({ window: win, samples: [0], signal, pool: poolFor(lv.mask) }).then(r => r[0]) : null]);
-  if (mk) for (let k = 0; k < mk.length; k++) if (!mk[k]) for (const b of samples) raws[b][k] = 0;
-  const sw = x1 - x0, sh = y1 - y0;
+  const [src, msk] = await Promise.all([
+    lv.ycbcr && !NATIVE_JPEG ? lv.im.readRGB({ window: win, interleave: false, signal }).then(r => windowGrid(win, r, samples))
+      : windowTiles(lv.im, win, samples, signal),
+    lv.mask ? windowTiles(lv.mask, win, [0], signal) : null]);
+  // the nearest source pixel of every output column and row (level pixels), -1 outside the window
   const cols = new Int32Array(W), rows = new Int32Array(H);
-  for (let i = 0; i < W; i++) { const sc = Math.floor((bbox[0] + (i + 0.5) * target - p.ox) / lv.rx) - x0; cols[i] = sc >= 0 && sc < sw ? sc : -1; }
-  for (let j = 0; j < H; j++) { const sr = Math.floor((p.oy - (bbox[3] - (j + 0.5) * targetY)) / lv.ry) - y0; rows[j] = sr >= 0 && sr < sh ? sr * sw : -1; }
+  for (let i = 0; i < W; i++) { const sc = Math.floor((bbox[0] + (i + 0.5) * target - p.ox) / lv.rx); cols[i] = sc >= x0 && sc < x1 ? sc : -1; }
+  for (let j = 0; j < H; j++) { const sr = Math.floor((p.oy - (bbox[3] - (j + 0.5) * targetY)) / lv.ry); rows[j] = sr >= y0 && sr < y1 ? sr : -1; }
   const outs = samples.map(() => { const o = new Float32Array(W * H); if (fill) o.fill(fill); return o; });
-  // with an internal mask the validity is returned too, so that a black pixel (0, 0, 0) is not taken for no data
-  const valid = mk ? new Uint8Array(W * H) : null;
+  // with an internal mask the validity is returned too, so that a black pixel (0, 0, 0) is not taken for no data;
+  // a masked pixel is 0 in every band
+  const valid = msk ? new Uint8Array(W * H) : null, mrow = msk ? new Uint8Array(W) : null;
+  const S = gridIndex(src, cols, rows), M = msk ? gridIndex(msk, cols, rows) : null;
+  // the columns inside the window are one run (cols grows with i)
+  let iA = 0, iB = W;
+  while (iA < W && cols[iA] < 0) iA++;
+  while (iB > iA && cols[iB - 1] < 0) iB--;
   for (let j = 0; j < H; j++) {
-    const rb = rows[j];
-    if (rb < 0) continue;
-    for (let i = 0; i < W; i++) {
-      const sc = cols[i];
-      if (sc < 0) continue;
-      const si = rb + sc, k = j * W + i;
-      for (let b = 0; b < nb; b++) outs[b][k] = raws[b][si];
-      if (valid) valid[k] = mk[si] ? 1 : 0;
+    if (rows[j] < 0) continue;
+    const k0 = j * W;
+    for (let b = 0; b < nb; b++) sampleRow(src.planes[b], S, j, iA, iB, outs[b], k0);
+    if (M) {
+      maskRow(msk.planes[0], M, j, iA, iB, mrow);
+      for (let i = iA; i < iB; i++) if (mrow[i]) valid[k0 + i] = 1; else for (let b = 0; b < nb; b++) outs[b][k0 + i] = 0;
     }
   }
   outs.valid = valid;
   return outs;
+}
+/* One output row of one sample, in runs of columns that fall into the same tile: the tile is looked up once per run,
+   and the inner loop only reads and writes (measured: about 2.5 times as fast as geotiff.js assembling the window value
+   by value and a second pass sampling it). maskRow is the same for a mask (its own call site, so that each loop sees
+   few array types). */
+function sampleRow(pl, X, j, iA, iB, out, k0) {
+  const rt = X.rt[j], ro = X.ro[j], st = pl.stride, off = pl.off, ct = X.ct, co = X.co, arrs = pl.arrs;
+  let i = iA;
+  while (i < iB) {
+    const c = ct[i], a = arrs[rt + c];
+    for (; i < iB && ct[i] === c; i++) out[k0 + i] = a[(ro + co[i]) * st + off];
+  }
+}
+function maskRow(pl, X, j, iA, iB, out) {
+  const rt = X.rt[j], ro = X.ro[j], st = pl.stride, off = pl.off, ct = X.ct, co = X.co, arrs = pl.arrs;
+  let i = iA;
+  while (i < iB) {
+    const c = ct[i], a = arrs[rt + c];
+    for (; i < iB && ct[i] === c; i++) out[i] = a[(ro + co[i]) * st + off] ? 1 : 0;
+  }
+}
+
+/* One read of a COG window, as tiles: the decoded tiles themselves (geotiff.js' getTileOrStrip, through the decode
+   workers and the tile store), so readGridBands samples them straight into its output. geotiff.js' readRasters
+   would first copy the whole window value by value (DataView reads), which was the largest remaining cost on the main
+   thread. Tiled, little-endian, 8 to 64 bit integers or floats; anything else (1-bit internal masks, for example) is
+   read with readRasters as before, as one tile covering the window. planes[b]: per tile the array, the step between
+   pixels and the offset of sample b (interleaved samples share the array). */
+const TYPED = { "1/8": Uint8Array, "1/16": Uint16Array, "1/32": Uint32Array, "2/8": Int8Array, "2/16": Int16Array,
+                "2/32": Int32Array, "3/32": Float32Array, "3/64": Float64Array };
+const typedOf = im => {
+  if (!("seTyped" in im)) {
+    const fd = im.fileDirectory, bps = Array.from(fd.BitsPerSample || [8]), sf = Array.from(fd.SampleFormat || [1]);
+    const same = bps.every(b => b === bps[0]) && sf.every(f => f === sf[0]);
+    im.seTyped = im.isTiled && im.littleEndian && same && TYPED[sf[0] + "/" + bps[0]] || null;
+  }
+  return im.seTyped;
+};
+const decoders = new WeakMap();
+const decoderOf = im => { if (!decoders.has(im)) decoders.set(im, GeoTIFF.getDecoder(im.fileDirectory)); return decoders.get(im); };
+const windowGrid = (win, arrays, samples) => ({ gx: win[0], gy: win[1], tw: win[2] - win[0], nx: 1, th: win[3] - win[1],
+  planes: samples.map((s, i) => ({ arrs: [arrays[i]], stride: 1, off: 0 })) });
+async function windowTiles(im, win, samples, signal) {
+  const T = typedOf(im);
+  const asWindow = () => im.readRasters({ window: win, samples, signal, pool: poolFor(im) }).then(r => windowGrid(win, r, samples));
+  if (!T) return asWindow();
+  const tw = im.getTileWidth(), th = im.getTileHeight(), spp = im.getSamplesPerPixel(), planar = im.planarConfiguration === 2;
+  const tx0 = Math.floor(win[0] / tw), tx1 = Math.floor((win[2] - 1) / tw), ty0 = Math.floor(win[1] / th), ty1 = Math.floor((win[3] - 1) / th);
+  const nx = tx1 - tx0 + 1, dec = poolFor(im) || await decoderOf(im), need = tw * th * (planar ? 1 : spp);
+  const view = d => d instanceof ArrayBuffer ? new T(d) : new T(d.buffer, d.byteOffset, d.byteLength / T.BYTES_PER_ELEMENT);
+  const got = await Promise.all((planar ? samples : [0]).map(s => {
+    const jobs = [];
+    for (let ty = ty0; ty <= ty1; ty++) for (let tx = tx0; tx <= tx1; tx++) jobs.push(im.getTileOrStrip(tx, ty, s, dec, signal).then(t => view(t.data)));
+    return Promise.all(jobs);
+  }));
+  if (got.some(g => g.some(a => a.length < need))) return asWindow();         // not full tiles: read it as a window
+  return { gx: tx0 * tw, gy: ty0 * th, tw, th, nx,
+           planes: samples.map((s, i) => planar ? { arrs: got[i], stride: 1, off: 0 } : { arrs: got[0], stride: spp, off: s }) };
+}
+/* per output column the tile column and the pixel in it, per row the first tile of its tile row and the row offset */
+function gridIndex(g, cols, rows) {
+  const ct = new Int32Array(cols.length), co = new Int32Array(cols.length), rt = new Int32Array(rows.length), ro = new Int32Array(rows.length);
+  for (let i = 0; i < cols.length; i++) if (cols[i] >= 0) { const x = cols[i] - g.gx; ct[i] = Math.floor(x / g.tw); co[i] = x - ct[i] * g.tw; }
+  for (let j = 0; j < rows.length; j++) if (rows[j] >= 0) { const y = rows[j] - g.gy, r = Math.floor(y / g.th); rt[j] = r * g.nx; ro[j] = (y - r * g.th) * g.tw; }
+  return { ct, co, rt, ro };
 }
 const readTile = (url, bbox, S, signal, fill) => readGrid(url, bbox, S, S, signal, fill);
 
