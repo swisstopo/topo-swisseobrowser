@@ -1800,10 +1800,7 @@ function alti3dUsed(urls) {
   while (alti3dOpen.length > ALTI3D_OPEN) {
     const u = alti3dOpen.shift(), pr = pyrCache.get(u);
     pyrCache.delete(u);
-    if (pr) pr.then(py => py.levels.forEach(l => [l.im, l.mask].forEach(im => {
-      const i = cachedImages.indexOf(im);
-      if (i >= 0) cachedImages.splice(i, 1);
-    }))).catch(() => {});
+    if (pr) pr.then(py => py.levels.forEach(l => [l.im, l.mask].forEach(im => { if (im) dropTiles(im); }))).catch(() => {});
   }
 }
 async function drawAlti3d(bbox, N, signal) {
@@ -2283,16 +2280,101 @@ const jpegReady = (async () => {
   } catch (e) { /* geotiff.js keeps its own decoder */ }
 })();
 
-/* Decoded tiles are cached (geotiff.js keeps them per image when image.tiles is an object), so neighbouring map
-   tiles and overzoom views decode each COG tile once. The cache is emptied when it holds more than 120 tiles
-   (about 100 MB at most). */
-const cachedImages = [];
-let cacheChecks = 0;
-function trimTileCache() {
-  if (++cacheChecks % 20) return;
-  let n = 0;
-  cachedImages.forEach(im => { n += Object.keys(im.tiles || {}).length; });
-  if (n > 120) cachedImages.forEach(im => { im.tiles = {}; });
+/* Decoded COG tiles are kept, so neighbouring map tiles, the next zoom step and a pan back decode each COG tile once.
+   geotiff.js keeps a tile's promise in image.tiles[index] when image.tiles is an object; here that object is a proxy
+   that sees every read and write, and all images share one store of TILE_CACHE_MB, the least recently used tile
+   leaving first. (Before, every cache was emptied once 120 tiles were held: a zoom step of the NDVI then decoded
+   again the 123 tiles it had just used.) A 512 px tile is 0.25 to 0.75 MB decoded. */
+const TILE_CACHE_MB = 160;
+const tileLru = new Map();                 // "store/index" -> { o: the store's object, i: index, bytes }
+let tileBytes = 0, tileStores = 0;
+const storeIds = new WeakMap();
+function tileStore() {
+  const id = ++tileStores, store = new Proxy({}, {
+    get(o, i) {
+      const v = o[i];
+      if (v !== undefined && typeof i === "string") {
+        const k = id + "/" + i, e = tileLru.get(k);
+        if (e) { tileLru.delete(k); tileLru.set(k, e); }          // used again: the most recent
+      }
+      return v;
+    },
+    set(o, i, v) {
+      const k = id + "/" + i, old = tileLru.get(k);
+      if (old) { tileBytes -= old.bytes; tileLru.delete(k); }
+      const e = { o, i, bytes: 0 };
+      o[i] = v;
+      tileLru.set(k, e);
+      Promise.resolve(v).then(d => {
+        if (tileLru.get(k) !== e) return;                          // already left the store
+        e.bytes = (d && d.byteLength) || 0;
+        tileBytes += e.bytes;
+        trimTiles();
+      }, () => { if (tileLru.get(k) === e) { tileLru.delete(k); delete o[i]; } });   // a failed decode is not kept
+      return true;
+    }
+  });
+  storeIds.set(store, id);
+  return store;
+}
+function trimTiles() {
+  for (const [k, e] of tileLru) {
+    if (tileBytes <= TILE_CACHE_MB * 1e6) break;
+    tileLru.delete(k); delete e.o[e.i]; tileBytes -= e.bytes;
+  }
+}
+/* The COG tiles are decoded in Web Workers, off the main thread: inflating DEFLATE and undoing the predictor was the
+   largest single cost of a tile on the main thread (about 40 %). The workers run geotiff.js' own decoder script,
+   lib/geotiff-decoder-worker-<version>.js (extracted by tools/vendor). geotiff.js' Pool waits forever for a worker that
+   does not answer, so this small pool gives a worker DECODE_TIMEOUT ms and then decodes on the main thread; a worker
+   that fails is not used again. Only the simple codecs go to the workers; JPEG (the TCI) stays with the browser's own
+   decoder (NativeJpeg). Opened as a file, the browser starts no worker from a file: there everything is decoded on the
+   main thread, as before. */
+const DECODE_WORKERS = Math.max(1, Math.min(4, (navigator.hardwareConcurrency || 2) - 1)), DECODE_TIMEOUT = 20000;
+const POOLED = new Set([1, 5, 8, 32773, 32946]);       // none, LZW, Deflate, PackBits, Deflate (Adobe)
+const decodePool = (() => {
+  if (location.protocol === "file:" || !window.Worker) return null;
+  const local = (fd, buffer) => GeoTIFF.getDecoder(fd).then(d => d.decode(fd, buffer));
+  // what the decoders read of a file directory; the full one carries the tile offsets of every level
+  const slim = new WeakMap(), slimOf = fd => {
+    if (!slim.has(fd)) slim.set(fd, Object.fromEntries(["Compression", "Predictor", "TileWidth", "TileLength", "ImageWidth",
+      "ImageLength", "RowsPerStrip", "BitsPerSample", "SampleFormat", "SamplesPerPixel", "PlanarConfiguration"]
+      .filter(k => fd[k] !== undefined).map(k => [k, fd[k]]).concat(fd.StripOffsets ? [["StripOffsets", [0]]] : [])));
+    return slim.get(fd);
+  };
+  const workers = [];
+  let seq = 0;
+  try {
+    for (let i = 0; i < DECODE_WORKERS; i++) {
+      const w = { worker: new Worker(libUrl("geotiff-decoder-worker-2.1.3.js")), jobs: new Map(), ok: true };
+      const fail = w.fail = () => { w.ok = false; w.jobs.forEach(j => j.fallback()); w.jobs.clear(); w.worker.terminate(); };
+      w.worker.onmessage = e => { const j = w.jobs.get(e.data.id); if (j) { w.jobs.delete(e.data.id); j.done(e.data.decoded); } };
+      w.worker.onerror = e => { e.preventDefault(); fail(); };
+      w.worker.onmessageerror = fail;
+      workers.push(w);
+    }
+  } catch (e) { workers.forEach(w => w.worker.terminate()); return null; }
+  return {
+    decode(fd, buffer) {
+      const ok = workers.filter(w => w.ok);
+      if (!ok.length) return local(fd, buffer);
+      const w = ok.reduce((a, b) => b.jobs.size < a.jobs.size ? b : a), id = ++seq;
+      return new Promise(resolve => {
+        const j = {};
+        const timer = setTimeout(() => { if (w.jobs.has(id)) w.fail(); }, DECODE_TIMEOUT);     // a worker that hangs
+        j.done = d => { clearTimeout(timer); resolve(d); };
+        j.fallback = () => { clearTimeout(timer); resolve(local(fd, buffer)); };
+        w.jobs.set(id, j);
+        w.worker.postMessage({ fileDirectory: slimOf(fd), buffer, id });    // copied, so the fallback still has it
+      });
+    }
+  };
+})();
+const poolFor = im => decodePool && POOLED.has(im.fileDirectory.Compression) ? decodePool : undefined;
+/* the decoded tiles of an image that is closed (swissALTI3D files beyond ALTI3D_OPEN) */
+function dropTiles(im) {
+  const id = im.tiles && storeIds.get(im.tiles), pre = id + "/";
+  if (id) for (const [k, e] of tileLru) if (k.startsWith(pre)) { tileLru.delete(k); tileBytes -= e.bytes; }
 }
 function pyramid(url) {
   if (!pyrCache.has(url)) {
@@ -2308,8 +2390,7 @@ function pyramid(url) {
       for (let i = 0; i < n; i++) {
         const im = i === 0 ? full : await tiff.getImage(i);
         const w = im.getWidth(), h = im.getHeight(), fd = im.fileDirectory;
-        im.tiles = {};
-        cachedImages.push(im);
+        im.tiles = tileStore();
         // GDAL internal masks (e.g. in the JPEG-compressed TCI) are separate IFDs: keep them per level
         // as validity masks instead of treating them as overviews.
         if (((fd.NewSubfileType || 0) & 4) || fd.PhotometricInterpretation === 4) { masks.push({ im, w, h }); continue; }
@@ -2354,9 +2435,9 @@ async function readGridBands(url, bbox, W, H, signal, fill, nb) {
   // YCbCr JPEG (TCI): the native decoder delivers RGB already, geotiff.js needs readRGB. The level's internal
   // mask marks the valid pixels.
   const [raws, mk] = await Promise.all([
-    lv.ycbcr && !NATIVE_JPEG ? lv.im.readRGB({ window: win, interleave: false, signal }) : lv.im.readRasters({ window: win, samples, signal }),
-    lv.mask ? lv.mask.readRasters({ window: win, samples: [0], signal }).then(r => r[0]) : null]);
-  trimTileCache();
+    lv.ycbcr && !NATIVE_JPEG ? lv.im.readRGB({ window: win, interleave: false, signal })
+      : lv.im.readRasters({ window: win, samples, signal, pool: poolFor(lv.im) }),
+    lv.mask ? lv.mask.readRasters({ window: win, samples: [0], signal, pool: poolFor(lv.mask) }).then(r => r[0]) : null]);
   if (mk) for (let k = 0; k < mk.length; k++) if (!mk[k]) for (const b of samples) raws[b][k] = 0;
   const sw = x1 - x0, sh = y1 - y0;
   const cols = new Int32Array(W), rows = new Int32Array(H);

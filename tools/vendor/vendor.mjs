@@ -81,6 +81,20 @@ for (const [pkg, from, name] of copies) {
   console.log("copied  " + f);
 }
 
+/* geotiff.js decodes COG tiles in Web Workers with its own decoder worker, which the package ships only as a string
+   (dist-module/worker/decoder.js, and inlined in the browser bundle, from where it would be started from a blob URL).
+   It is written out as a classic script, so the page starts the worker from lib/ like any other file. */
+{
+  const src = fs.readFileSync(mod("geotiff/dist-module/worker/decoder.js"), "utf8");
+  const m = /const source = ("(?:[^"\\]|\\.)*");/.exec(src);
+  if (!m) throw new Error("geotiff: the decoder worker source was not found in dist-module/worker/decoder.js");
+  const f = `geotiff-decoder-worker-${V("geotiff")}.js`;
+  fs.writeFileSync(path.join(lib, f), `/* geotiff@${V("geotiff")} (${meta("geotiff").license}), its decoder worker, extracted by tools/vendor */\n` +
+                   JSON.parse(m[1]) + "\n");
+  made.push([f, "geotiff (decoder worker)", V("geotiff"), meta("geotiff").license]);
+  console.log("extracted " + f);
+}
+
 for (const [pkg, stub, name] of bundles) {
   const f = name(V(pkg));
   await build({
@@ -145,6 +159,24 @@ for (const [pkg, , name, check] of bundles) {
       i18next.t("missing", { defaultValue: "English" }) !== "English")
     throw new Error("i18next: translation, plurals or defaultValue do not work");
   console.log("i18next: translation, plurals and fallback OK");
+}
+{
+  /* the decoder worker, run in a stand-in worker scope: a DEFLATE tile with a horizontal predictor (as the swissEO
+     bands) must come back decoded */
+  const { deflateSync } = await import("node:zlib");
+  const src = fs.readFileSync(path.join(lib, `geotiff-decoder-worker-${V("geotiff")}.js`), "utf8");
+  const scope = { listeners: [], addEventListener(t, f) { if (t === "message") this.listeners.push(f); } };
+  const answer = new Promise(res => { scope.postMessage = d => res(d); });
+  new Function("self", "globalThis", src)(scope, scope);
+  if (!scope.listeners.length) throw new Error("geotiff decoder worker: no message listener");
+  const W = 4, H = 2, v = new Uint16Array([10, 20, 30, 40, 5, 5, 5, 5]), diff = new Uint16Array(v);
+  for (let y = 0; y < H; y++) for (let x = W - 1; x > 0; x--) diff[y * W + x] = v[y * W + x] - v[y * W + x - 1];
+  const buf = deflateSync(Buffer.from(diff.buffer));
+  scope.listeners.forEach(f => f({ data: { id: 7, buffer: buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.length),
+    fileDirectory: { Compression: 8, Predictor: 2, TileWidth: W, TileLength: H, BitsPerSample: [16], PlanarConfiguration: 1 } } }));
+  const out = await Promise.race([answer, new Promise((_, rej) => setTimeout(() => rej(new Error("geotiff decoder worker: no answer")), 5000))]);
+  if (out.id !== 7 || new Uint16Array(out.decoded).join() !== v.join()) throw new Error("geotiff decoder worker: wrong result");
+  console.log("geotiff decoder worker: DEFLATE with predictor OK");
 }
 console.log("self-test OK");
 

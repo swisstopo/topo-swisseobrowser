@@ -36,7 +36,9 @@
   never add a CDN `<script>`. A new or bumped library goes into `tools/vendor/package.json` (and `vendor.mjs`
   if it needs copying or bundling), into the `LIB_CDN` map of the page (the `file://` fallback), and into the
   README SBOM table; `tools/check-dist.sh` holds the expected CDN-hostname counts of the page and fails the
-  deploys when they drift. GitHub Actions in the workflows are pinned to commit SHAs.
+  deploys when they drift. GitHub Actions in the workflows are pinned to commit SHAs. geotiff.js' decoder worker
+  (`lib/geotiff-decoder-worker-<version>.js`, the page's `decodePool`) is extracted from the package by `vendor.mjs`
+  and self-tested there; after a geotiff.js bump, rename it in the page too.
 - **Releases**: the production deploy creates a GitHub release per merge into `main` (`tools/release.sh`: semver,
   minor by default, labels `release: patch` / `major` / `none` on the PR, notes from the commit subjects, so write
   subjects a reader of the release notes understands). The first release is v1.0.0.

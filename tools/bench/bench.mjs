@@ -30,6 +30,9 @@ const ONLY = arg("scenarios", null) ? String(arg("scenarios")).split(",") : null
 const HEAP = arg("heap", null) === null ? 0 : arg("heap") === true ? 20 : +arg("heap");
 const THROTTLE = !!arg("throttle", false), GPU = !!arg("gpu", false), HEADED = !!arg("headed", false);
 const OUT = arg("out", null), CMP = arg("compare", null);
+// --page other.html: serve that file as swisseo-browser.html, e.g. the last commit's page
+// (git show HEAD:swisseo-browser.html > old.html) to compare it with the working copy without switching branches
+const PAGE = arg("page", null) ? path.resolve(String(arg("page"))) : null;
 const VIEW = "zoom=19.5&center=2582000,1208000&fromTime=2026-08-13T00%3A00%3A00.000Z&toTime=2026-08-13T23%3A59%3A59.999Z&themeId=DEFAULT";
 
 /* ---- the instrumentation, added to the served page ---- */
@@ -61,7 +64,7 @@ const srv = createServer((req, res) => {
   const f = path.join(ROOT, decodeURIComponent(new URL(req.url, "http://x").pathname));
   if (!f.startsWith(ROOT) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { res.writeHead(404); res.end(); return; }
   let body = fs.readFileSync(f);
-  if (path.basename(f) === "swisseo-browser.html") body = instrument(body.toString("utf8"));
+  if (path.basename(f) === "swisseo-browser.html") body = instrument((PAGE ? fs.readFileSync(PAGE) : body).toString("utf8"));
   res.writeHead(200, { "content-type": MIME[path.extname(f)] || "application/octet-stream" });
   res.end(body);
 });
@@ -92,21 +95,30 @@ const INIT = () => {
     } catch (e) { t.out = (e && e.name) || "err"; throw e; }
     finally { t.end = performance.now(); }
   };
-  // decoded COG tiles (geotiff.js decoders: DEFLATE bands and masks; the TCI's JPEG is counted as jpegDecodes): a tile
-  // is told apart by its image and a hash of its compressed bytes, so a tile decoded a second time counts as "again"
-  window.__countDecodes = G => {
-    const P = G.BaseDecoder.prototype, dec = P.decode, ids = new WeakMap(), seen = new Set();
-    let nid = 0;
-    P.decode = function (fd, buffer) {
-      if (!ids.has(fd)) ids.set(fd, ++nid);
-      let h = buffer.byteLength;
-      const u = new Uint8Array(buffer, 0, Math.min(256, buffer.byteLength));
-      for (let i = 0; i < u.length; i++) h = (h * 31 + u[i]) | 0;
-      const k = ids.get(fd) + "/" + h, d = B.dec[B.phase] || (B.dec[B.phase] = { n: 0, again: 0 });
-      d.n++; if (seen.has(k)) d.again++; seen.add(k);
-      return dec.call(this, fd, buffer);
-    };
+  // decoded COG tiles (geotiff.js decoders on the main thread, and the decode requests posted to the page's decode
+  // workers; the TCI's JPEG is counted as jpegDecodes): a tile is told apart by its file directory and a hash of its
+  // compressed bytes, so a tile decoded a second time counts as "again" (identical all-empty tiles count as well)
+  const ids = new WeakMap(), seen = new Set();
+  let nid = 0;
+  const countDecode = (fd, buffer) => {
+    if (!ids.has(fd)) ids.set(fd, ++nid);
+    let h = buffer.byteLength;
+    const u = new Uint8Array(buffer, 0, Math.min(256, buffer.byteLength));
+    for (let i = 0; i < u.length; i++) h = (h * 31 + u[i]) | 0;
+    const k = ids.get(fd) + "/" + h, d = B.dec[B.phase] || (B.dec[B.phase] = { n: 0, again: 0 });
+    d.n++; if (seen.has(k)) d.again++; seen.add(k);
   };
+  window.__countDecodes = G => {
+    const P = G.BaseDecoder.prototype, dec = P.decode;
+    P.decode = function (fd, buffer) { countDecode(fd, buffer); return dec.call(this, fd, buffer); };
+  };
+  if (window.Worker) {
+    const post = Worker.prototype.postMessage;
+    Worker.prototype.postMessage = function (msg, ...rest) {
+      if (msg && msg.fileDirectory && msg.buffer instanceof ArrayBuffer) countDecode(msg.fileDirectory, msg.buffer);
+      return post.call(this, msg, ...rest);
+    };
+  }
   const f0 = window.fetch.bind(window);
   window.fetch = async (input, init = {}) => {
     const url = typeof input === "string" ? input : input.url, h = init.headers || {};
@@ -260,14 +272,14 @@ srv.close();
 let commit = "";
 try { commit = execSync("git rev-parse --short HEAD", { cwd: ROOT }).toString().trim() + (execSync("git status --porcelain swisseo-browser.html", { cwd: ROOT }).toString().trim() ? "+changes" : ""); } catch (e) {}
 const report = { meta: { date: new Date().toISOString(), commit, runs: RUNS, throttle: THROTTLE, renderer, cpus: (await import("node:os")).cpus().length,
-                         defines: Object.fromEntries(DEFINES) }, results };
+                         defines: Object.fromEntries(DEFINES), page: PAGE ? path.basename(PAGE) : "working copy" }, results };
 
 /* ---- the table ---- */
 const old = CMP ? JSON.parse(fs.readFileSync(path.resolve(CMP), "utf8")).results : null;
 const v = x => x == null ? "-" : String(x);
 const pair = (a, b) => b === undefined ? v(a) : v(b) + "→" + v(a);
 console.log("commit " + commit + " · " + renderer + " · " + report.meta.cpus + " CPUs" + (THROTTLE ? " · 20 Mbit/s, 40 ms" : "") +
-  (DEFINES.length ? " · " + DEFINES.map(d => d.join("=")).join(", ") : "") + (RUNS > 1 ? " · median of " + RUNS : "") + (CMP ? " · before→after against " + CMP : ""));
+  (DEFINES.length ? " · " + DEFINES.map(d => d.join("=")).join(", ") : "") + (PAGE ? " · page " + path.basename(PAGE) : "") + (RUNS > 1 ? " · median of " + RUNS : "") + (CMP ? " · before→after against " + CMP : ""));
 for (const [layer, r] of Object.entries(results)) {
   console.log("\n== " + layer);
   console.log(["scenario", "zoom", "data tiles", "first/half/last ms", "aborted (work ms)", "out of view", "basemap tiles", "COG req", "MB", "refetched", "decodes (again)", "long tasks sum/max ms"].join(" | "));

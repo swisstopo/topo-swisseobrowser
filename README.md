@@ -593,7 +593,8 @@ The swissEO Browser therefore always uses the physical reflectance.
     the video is recorded in real time, so 500 frames at 8 fps take about a minute. VHI layers work too
     (via the WMS; the VHI season layers from the COGs, which shows how the deficit builds up over a season).
 - **Fast loading of the COGs**: JPEG tiles (the TCI) are decoded by the browser itself (about twice as
-  fast as geotiff.js, off the main thread), decoded tiles are kept in a cache (up to 120 tiles), the map
+  fast as geotiff.js, off the main thread), the DEFLATE tiles of the bands and masks are decoded in Web Workers, decoded
+  tiles are kept (up to 160 MB, the least recently used leaving first), the map
   uses 512 px tiles like the COGs and keeps loading while panning, and a scene whose orbit misses a tile,
   or that the more recent scene already covers, is not read. Measured for the TCI of 2026-10-12: all tiles
   of a view in 1.0 to 1.5 s instead of 1.7 to 2.7 s. The tiles take turns, nearest the centre first, and closer than
@@ -822,7 +823,7 @@ Firefox on a laptop:
 ### Map performance
 
 Every tile of a swissEO layer is computed in the browser: the COG tiles are fetched (HTTP range requests), unpacked
-(DEFLATE, geotiff.js), resampled and coloured, on the page's main thread. MapLibre decides which tiles a view needs and
+(DEFLATE, geotiff.js, in Web Workers), resampled and coloured (on the page's main thread). MapLibre decides which tiles a view needs and
 cancels those that leave it; measured over pans and zooms, no tile arrived after it had left the view and no byte range
 was fetched twice. What made navigation slow was the work itself:
 
@@ -837,6 +838,14 @@ was fetched twice. What made navigation slow was the work itself:
   1.41 times, so the 10 m pixels stay crisp) instead of computing new tiles that would only repeat them. Zooming in
   past 2.5 m/px costs no tile work at all (before: 18 to 22 new tiles per two zoom steps, 1.9 to 3.5 s). Custom mask
   edges then follow 2.5 m steps on the map; statistics and exports are not affected.
+- **Decoded tiles are kept** (`TILE_CACHE_MB`, 160 MB): all COG images share one store, the least recently used tile
+  leaving first. Before, every cache was emptied once 120 tiles were held, and a zoom step of the NDVI decoded again
+  the 123 tiles it had just decoded; now it decodes none.
+- **Decoding in Web Workers** (`DECODE_WORKERS`, one less than the processor cores, at most 4): inflating DEFLATE and
+  undoing the predictor was about 40 % of a tile's time on the main thread. The workers run geotiff.js' own decoder
+  script, `lib/geotiff-decoder-worker-2.1.3.js` (extracted by `tools/vendor`); a worker that does not answer within
+  20 s is replaced by decoding on the main thread. JPEG (the TCI) stays with the browser's own decoder. Opened as a
+  file (`file://`) everything is decoded on the main thread, as the browser starts no worker from a file there.
 - The basemap keeps the swisstopo level nearest to the view, so its text keeps its size; after a zoom that changes
   the level its tiles are drawn again.
 
@@ -858,8 +867,8 @@ node bench.mjs --define TILE_TURNS=6              # try another value of a page 
 
 `baseline.json` was measured before the changes on a virtual desktop without a graphics card (4 vCPUs, software
 WebGL); compare only runs of the same machine, close in time (the CDN's cache makes the first run after a while slower).
-Still open: the DEFLATE decoding on the main thread, and the decoded-tile cache, which is emptied as a whole at 120
-tiles (a zoom step of the NDVI decodes 123 tiles again that it had decoded before).
+Still open: the colouring loops (a lookup table instead of a colour computed per pixel, no small arrays per pixel)
+and the resampling into intermediate arrays, the largest remaining costs on the main thread.
 
 ## Running it
 
@@ -1061,7 +1070,7 @@ works under a Content-Security-Policy without `'unsafe-eval'` (it needs `worker-
 | --- | --- | --- | --- | --- |
 | [MapLibre GL JS](https://github.com/maplibre/maplibre-gl-js) | 6.17.0 | BSD-3-Clause | npm `maplibre-gl` | map and its workers |
 | [proj4js](https://github.com/proj4js/proj4js) | 2.22.0 | MIT | npm `proj4` | LV95 coordinates, also in the workers |
-| [geotiff.js](https://github.com/geotiffjs/geotiff.js) | 2.1.3 | MIT | npm `geotiff` | reading the COGs (held at 2.x, see [`dependabot.yml`](.github/dependabot.yml)) |
+| [geotiff.js](https://github.com/geotiffjs/geotiff.js) | 2.1.3 | MIT | npm `geotiff` | reading the COGs (held at 2.x, see [`dependabot.yml`](.github/dependabot.yml)); its decoder worker, extracted from the package, as `lib/geotiff-decoder-worker-2.1.3.js` |
 | [pbf](https://github.com/mapbox/pbf) | 5.1.2 | BSD-3-Clause | npm `pbf` | label tiles (workers) |
 | [vector-tile](https://github.com/mapbox/vector-tile-js) | 3.0.0 | BSD-3-Clause | npm `@mapbox/vector-tile` | label tiles (workers) |
 | [vt-pbf](https://github.com/maplibre/vt-pbf) | 4.3.3 | MIT | npm `@maplibre/vt-pbf` | label tiles (workers) |
