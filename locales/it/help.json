@@ -314,7 +314,7 @@
     "title": "Confrontare visualizzazioni"
   },
   "vis-date": {
-    "p1": "Un link senza data si apre sul giorno più recente con dati. Le frecce e il calendario propongono solo i giorni le cui immagini <b>raggiungono davvero la vista della mappa</b>, quindi cambiano quando sposti la mappa. Il cursore delle nubi nel calendario nasconde i giorni il cui mosaico è più nuvoloso della percentuale scelta. Per i prodotti swissEO con poche date all'anno (NDVIdiff, NDVIz) viene mostrato il prodotto più vicino alla data scelta, e il testo sotto la data indica quale.",
+    "p1": "Un link senza data si apre sul giorno più recente con dati. Le frecce e il calendario propongono solo i giorni le cui immagini <b>raggiungono davvero la vista della mappa</b>, quindi cambiano quando sposti la mappa. Il cursore delle nubi nel calendario nasconde i giorni il cui mosaico è più nuvoloso della percentuale scelta. Per i prodotti swissEO con poche date all'anno (NDVIdiff, NDVIz) viene mostrato il prodotto più vicino alla data scelta, e il testo sotto la data indica quale. Quando il livello mostra un giorno diverso da quello scelto (anche il giorno swissEO VHI più vicino), la data diventa grigia, nel menu e nel riquadro della data in alto a sinistra della carta, e il riquadro indica sotto il giorno dei dati.",
     "title": "Data e filtro delle nubi"
   },
   "vis-hl": {

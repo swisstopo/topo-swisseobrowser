@@ -352,6 +352,10 @@ body.is3d .maplibregl-ctrl-bottom-right .zoom-ctl{margin-right:34px}
 #scenebadge{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--border);box-shadow:var(--shadow);height:36px;
   border-radius:4px;padding:0 10px;font-size:12px;max-width:420px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #scenebadge b{color:var(--blue);overflow:hidden;text-overflow:ellipsis} #scenebadge span{color:var(--muted)}
+/* the selected date grey when the map shows another day (or none), the day of the data below it (issue #56) */
+#scenebadge .bdd{display:flex;flex-direction:column;justify-content:center;min-width:0;line-height:1.2}
+#scenebadge b.nodata{color:#AFAFAF}
+#badgeDay{color:var(--blue);font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis}
 @media (max-width:700px){#mapTL{max-width:calc(100% - 166px)} #scenebadge{max-width:100%}}
 /* place search (geo.admin.ch SearchServer, type=locations), left of the basemap switcher */
 #placeSearch{position:absolute;right:104px;top:10px;z-index:950;width:260px;height:36px;background:#fff;
@@ -778,7 +782,7 @@ table.kv td:first-child{color:var(--muted)}
       </div>
       <div id="mapTL">
         <button data-i18n="[title]map.openTheMenu" id="btnOpenSide" title="Open the menu"></button>
-        <div id="scenebadge"><span data-i18n="map.date">Date</span><b id="badgeTxt">…</b></div>
+        <div id="scenebadge"><span data-i18n="map.date">Date</span><div class="bdd"><b id="badgeTxt">…</b><small id="badgeDay" hidden></small></div></div>
         <button data-i18n="[title]map.copyLinkALink;[aria-label]map.copyLink" class="mapbtn" id="btnLink" title="Copy link: a link to exactly this view" aria-label="Copy link"></button>
       </div>
       <a data-i18n="[title]map.helpAndTutorialAbout;[aria-label]map.helpAndTutorial" class="mapbtn" id="btnHelp" href="docs/index.html" target="_blank" rel="noopener"
@@ -4866,7 +4870,7 @@ function selectLayer(rec) {
     lastLayer[configId] = rec.id;
     if (rec.id !== "true") expanded.add(rec.id);
     renderLayerList();
-    if (srcChanged) { $("#dateTxt").classList.remove("nodata"); updateCcBadge(); renderCal(); }
+    if (srcChanged) { dateGrey(false); updateCcBadge(); renderCal(); }
     setCompareMode(false, true);
     return;
   }
@@ -4882,7 +4886,7 @@ function selectLayer(rec) {
   lastLayer[configId] = rec.id;
   if (rec.id !== "true") expanded.add(rec.id);       // choosing a layer opens its menu; True color's stays closed
   renderLayerList();
-  if (srcChanged) { $("#dateTxt").classList.remove("nodata"); updateCcBadge(); renderCal(); }
+  if (srcChanged) { dateGrey(false); updateCcBadge(); renderCal(); }
   applyLayer();
   writeUrlSoon();
 }
@@ -4913,16 +4917,35 @@ async function setDate(d) {
   await applyLayer();
 }
 
+/* The selected date in grey, in the menu and in the date box of the map: no data on that day, or the layer shows
+   another day (the nearest VHI day or NDVIdiff / NDVIz product, named below the date in the box). */
+function dateGrey(on) {
+  $("#dateTxt").classList.toggle("nodata", on);
+  $("#badgeTxt").classList.toggle("nodata", on && !compareMode);
+}
+function badgeDay(txt) {
+  const e = $("#badgeDay");
+  e.textContent = txt || "";
+  e.hidden = !txt;
+}
+/* The day a VHI or sparse-product layer shows when it is not the selected one, else null. */
+function otherDay(rec, scenes) {
+  if (!scenes.length || !(rec.source === "vhi" || (SOURCES[rec.source] && SOURCES[rec.source].sparse))) return null;
+  const day = scenes[0].slice(0, 10);
+  return day === state.date ? null : day;
+}
+
 function updateDateGrey() {
   const src = currentRec.source, d = state.date;
-  if (currentRec.type === "wincomp") { $("#dateTxt").classList.remove("nodata"); return; }    // any day ends a window
+  if (currentRec.type === "wincomp") { dateGrey(false); return; }    // any day ends a window
+  if (currentCfg && currentCfg.rec === currentRec && currentCfg.date === d && otherDay(currentRec, currentCfg.scenes)) { dateGrey(true); return; }
   const p = monthCache.get(src + "|" + d.slice(0, 7));
   if (!p) return;
   p.then(fs => {
     if (d !== state.date || src !== currentRec.source) return;
     const on = fs.filter(f => f.id.startsWith(d)), vb = viewBox();
     const ok = src === "s2" ? on.some(f => knownPass(f, state.cc) && coversNow(f.id, vb) !== false) : on.length > 0;
-    $("#dateTxt").classList.toggle("nodata", !ok);
+    dateGrey(!ok);
     if (src === "s2") prefetchFootprints(on);
   }).catch(() => {});
 }
@@ -4939,6 +4962,7 @@ function updateDateInfo(rec, scenes) {
         { from: fmtDay(r.from), to: fmtDay(r.to), n: tn("dateInfo.acquisitions", "{{count}} acquisition", "{{count}} acquisitions", r.ids.length) });
     }).catch(() => {});
     $("#badgeTxt").textContent = fmtDay(state.date) + " · " + tn("dateInfo.daysWindow", "{{count}}-day window", "{{count}}-day window", days);
+    badgeDay(null);
     return;
   }
   if (!scenes.length) txt = t("dateInfo.noData", "No data on this date.");
@@ -4974,6 +4998,9 @@ function updateDateInfo(rec, scenes) {
   }
   $("#badgeTxt").textContent = fmtDay(state.date) + (scenes.length && rec.source === "s2"
     ? " · " + tn("dateInfo.acquisitions", "{{count}} acquisition", "{{count}} acquisitions", scenes.length) : "");
+  const other = otherDay(rec, scenes);
+  badgeDay(other && t("map.dataDay", "{{name}} {{day}}", { name: SOURCES[rec.source].name, day: fmtDay(other) }));
+  if (other) dateGrey(true);
 }
 I18N.onChange(() => { if (currentCfg && currentCfg.rec === currentRec) updateDateInfo(currentRec, currentCfg.scenes); renderCal(); });
 
@@ -5830,6 +5857,8 @@ async function rebuildCompare() {
   if (tok !== applyToken || !compareMode) return;
   setStatus("");
   $("#badgeTxt").textContent = t("compare.badge", "Compare · {{n}} layers", { n: compare.length });
+  $("#badgeTxt").classList.remove("nodata");
+  badgeDay(null);
   cmpLayers = cfgs.map(() => null);
   for (let i = cfgs.length - 1; i >= 0; i--) {         // the last first: the first in the list is drawn on top
     if (!cfgs[i].scenes.length) continue;

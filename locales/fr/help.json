@@ -314,7 +314,7 @@
     "title": "Comparer des visualisations"
   },
   "vis-date": {
-    "p1": "Un lien sans date s'ouvre sur le jour le plus récent avec des données. Les flèches et le calendrier ne proposent que les jours dont les images <b>atteignent réellement la vue de la carte</b> : ils changent donc quand vous déplacez la carte. Le curseur des nuages du calendrier masque les jours dont la mosaïque est plus nuageuse que le pourcentage choisi. Pour les produits swissEO avec seulement quelques dates par an (NDVIdiff, NDVIz), le produit le plus proche de la date choisie est affiché, et le texte sous la date indique lequel.",
+    "p1": "Un lien sans date s'ouvre sur le jour le plus récent avec des données. Les flèches et le calendrier ne proposent que les jours dont les images <b>atteignent réellement la vue de la carte</b> : ils changent donc quand vous déplacez la carte. Le curseur des nuages du calendrier masque les jours dont la mosaïque est plus nuageuse que le pourcentage choisi. Pour les produits swissEO avec seulement quelques dates par an (NDVIdiff, NDVIz), le produit le plus proche de la date choisie est affiché, et le texte sous la date indique lequel. Chaque fois que la couche montre un autre jour que celui choisi (aussi le jour swissEO VHI le plus proche), la date devient grise, dans le menu et dans le champ de date en haut à gauche de la carte, et ce champ indique en dessous le jour des données.",
     "title": "Date et filtre de nuages"
   },
   "vis-hl": {

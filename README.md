@@ -291,6 +291,9 @@ The swissEO Browser therefore always uses the physical reflectance.
   ‹ › and the grey "no data" date only consider acquisitions that **reach the map view**: the swath edge
   runs diagonally through each mosaic, so the data footprint of every relative orbit (`ORBIT_NR`) is read
   once from the coarsest B04 overview (≈ 640 m) and the calendar updates when the map moves.
+  When a layer shows another day than the selected one (the nearest swissEO VHI day, the NDVIdiff / NDVIz product
+  nearest to the date), the date is grey in the menu and in the date box at the top left of the map, and the box
+  names the day of the data below it (*swissEO VHI v100 11.11.2026*; issue #56).
   The calendar marks days with data, has month / year pull-downs and a maximum cloud-coverage slider
   (cloud cover of the whole mosaic, from its `metadata.json`, as the tile cloud cover in Copernicus). Several orbits acquired on the same day are mosaicked
   (most recent on top; a pixel that is masked or without data in one scene is taken from the next). The AOI statistics,

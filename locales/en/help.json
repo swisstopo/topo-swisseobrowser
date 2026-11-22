@@ -314,7 +314,7 @@
     "title": "Comparing visualizations"
   },
   "vis-date": {
-    "p1": "A link without a date opens on the latest day with data. The arrows and the calendar only offer days whose images actually <b>reach the map view</b>, so they update when you move the map. The cloud slider in the calendar hides days whose mosaic is cloudier than the chosen percentage. For the swissEO products with only a few dates per year (NDVIdiff, NDVIz) the product nearest to the selected date is shown, and the text below the date says which one.",
+    "p1": "A link without a date opens on the latest day with data. The arrows and the calendar only offer days whose images actually <b>reach the map view</b>, so they update when you move the map. The cloud slider in the calendar hides days whose mosaic is cloudier than the chosen percentage. For the swissEO products with only a few dates per year (NDVIdiff, NDVIz) the product nearest to the selected date is shown, and the text below the date says which one. Whenever the layer shows another day than the selected one (also the nearest swissEO VHI day), the date turns grey, in the menu and in the date box at the top left of the map, and the box names the day of the data below it.",
     "title": "Date and cloud filter"
   },
   "vis-hl": {

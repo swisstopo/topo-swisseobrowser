@@ -886,6 +886,7 @@
     "copyLinkALink": "Copia link: un link esattamente a questa vista",
     "createATimelapseOf": "Creare un timelapse di quest'area",
     "createAnAreaOf": "Creare un'area di interesse",
+    "dataDay": "{{name}} {{day}}",
     "date": "Data",
     "downloadTheAreaOf": "Scaricare l'area di interesse come GeoJSON",
     "downloadTheCurrentView": "Scaricare la vista attuale come PNG",

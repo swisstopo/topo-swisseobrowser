@@ -314,7 +314,7 @@
     "title": "Visualisierungen vergleichen"
   },
   "vis-date": {
-    "p1": "Ein Link ohne Datum öffnet den neuesten Tag mit Daten. Die Pfeile und der Kalender bieten nur Tage an, deren Bilder die <b>Kartenansicht tatsächlich erreichen</b>, sie ändern sich also, wenn Sie die Karte verschieben. Der Wolkenregler im Kalender blendet Tage aus, deren Mosaik bewölkter ist als der gewählte Prozentsatz. Für die swissEO-Produkte mit nur wenigen Daten pro Jahr (NDVIdiff, NDVIz) wird das Produkt gezeigt, das dem gewählten Datum am nächsten liegt, und der Text unter dem Datum sagt, welches.",
+    "p1": "Ein Link ohne Datum öffnet den neuesten Tag mit Daten. Die Pfeile und der Kalender bieten nur Tage an, deren Bilder die <b>Kartenansicht tatsächlich erreichen</b>, sie ändern sich also, wenn Sie die Karte verschieben. Der Wolkenregler im Kalender blendet Tage aus, deren Mosaik bewölkter ist als der gewählte Prozentsatz. Für die swissEO-Produkte mit nur wenigen Daten pro Jahr (NDVIdiff, NDVIz) wird das Produkt gezeigt, das dem gewählten Datum am nächsten liegt, und der Text unter dem Datum sagt, welches. Zeigt die Ebene einen anderen Tag als den gewählten (auch den nächsten Tag von swissEO VHI), wird das Datum grau, im Menü und im Datumsfeld oben links auf der Karte, und das Feld nennt darunter den Tag der Daten.",
     "title": "Datum und Wolkenfilter"
   },
   "vis-hl": {
