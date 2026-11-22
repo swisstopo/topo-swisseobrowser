@@ -1112,7 +1112,7 @@ works under a Content-Security-Policy without `'unsafe-eval'` (it needs `worker-
 | [shpjs](https://github.com/calvinmetcalf/shapefile-js) | 6.2.0 | MIT | npm `shpjs` | Shapefile import |
 | [mgrs](https://github.com/proj4js/mgrs) | 2.2.0 | MIT | npm `mgrs` | MGRS grid references |
 | [gifenc](https://github.com/mattdesl/gifenc) | 1.0.3 | MIT | npm `gifenc` | timelapse GIF export |
-| [i18next](https://github.com/i18next/i18next) | 26.5.11 | MIT | npm `i18next` | languages of the page and the help page |
+| [i18next](https://github.com/i18next/i18next) | 27.1.3 | MIT | npm `i18next` | languages of the page and the help page |
 | [Forest Disturbance Classification](https://github.com/sentinel-hub/custom-scripts) | commit `0a071cf` | CC BY-SA 4.0 | sentinel-hub/custom-scripts (Joanneum Research, EvoLand) | `fdc` layer model, 150 decision trees converted to a module |
 | [WMS / WMTS provider list](https://github.com/geoadmin/web-mapviewer) | commit `3e5a2900` | BSD-3-Clause | geoadmin/web-mapviewer | WMS / WMTS panel suggestions |
 

@@ -6,7 +6,7 @@ runs code on the site (the pinned CDN URLs remain only as the fallback when the 
 local file). Versions are pinned in `tools/vendor/package.json`; licences are listed in the SBOM
 table of the repository README.
 
-- `i18next-26.5.11.min.js`: i18next 26.5.11
+- `i18next-27.1.3.min.js`: i18next 27.1.3
 - `maplibre-gl-6.17.0.css`: maplibre-gl 6.17.0
 - `maplibre-gl-6.17.0.mjs`: maplibre-gl 6.17.0
 - `maplibre-gl-worker-6.17.0.mjs`: maplibre-gl 6.17.0
