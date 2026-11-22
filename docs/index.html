@@ -161,9 +161,8 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
 <main>
 <div class="card" id="about">
   <h1 data-i18n="about.title">About the swissEO Browser</h1>
-  <p data-i18n="[html]about.p1" class="lead">The swissEO Browser is a web viewer for the <b>swissEO</b> satellite products of swisstopo: the
-    Sentinel-2 surface reflectance mosaics (swissEO S2-SR) and the products derived from them, such as the Vegetation
-    Health Index (VHI) and the NDVI change maps. You can look at the images, compare dates, compute vegetation and water
+  <p data-i18n="[html]about.p1" class="lead">The swissEO Browser is a specialist application for the <b>swissEO</b> satellite products of
+    swisstopo and the products derived from them, which federal and cantonal specialist offices produce and maintain. You can look at the images, compare dates, compute vegetation and water
     indices, restrict them to forest or farmland, get statistics and time series for your own areas, look at them on the
     terrain in 3D, and download images and data.</p>
   <p data-i18n="[html]about.p2">Its user interface copies the <a href="https://browser.dataspace.copernicus.eu/" target="_blank" rel="noopener">Copernicus Browser</a>
@@ -172,12 +171,6 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
     <b>Everything is calculated on the fly in your web browser</b>, directly from the swissEO Cloud Optimized GeoTIFFs
     (COGs) on data.geo.admin.ch. Nothing is precomputed: when you change a layer, a date or a setting, your browser reads
     the needed pixels and computes the result.</p>
-  <div data-i18n="[html]about.box1" class="warn"><b>Not for operational use.</b> This is an experimental beta prototype. Values, renderings and
-    statistics are computed in the browser, are not validated and may be wrong or incomplete. Layers that have not yet
-    been checked in depth carry the label <span class="beta" style="margin:0">BETA</span>. For authoritative data use the
-    swisstopo products and services directly.<br>Please note that AI (Claude Code with the Opus 5.5 model, medium effort)
-    was used extensively to prepare this website, adapting it from the Copernicus Browser. The indices were edited and
-    tested manually in QGIS or with rasterio and GDAL.</div>
   <p data-i18n="[html]about.p3">This help has two parts. <a href="#t1">Part A</a> is a short tutorial for your first visit: it takes about
     fifteen minutes. <a href="#vis">Part B</a> describes every function in the order of the
     <a href="https://documentation.dataspace.copernicus.eu/Applications/Browser.html" target="_blank" rel="noopener">Copernicus Browser documentation</a>.
@@ -356,7 +349,8 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
     year (NDVIdiff, NDVIz) the product nearest to the selected date is shown, and the text below the date says which one.</p>
 
   <h3 data-i18n="vis-menu.title" id="vis-menu">Modifying a visualization</h3>
-  <p data-i18n="vis-menu.p1">The chevron on the active layer opens its menu:</p>
+  <p data-i18n="vis-menu.p1">Choosing a layer opens its menu (except True color, whose menu stays closed); the chevron on the
+    active layer opens and closes it:</p>
   <ul>
     <li data-i18n="[html]vis-menu.li1"><b>Description</b> and a <i>More info</i> link; the <span class="key">&lt;/&gt;</span> button shows the formula and the scaling used.</li>
     <li data-i18n="[html]vis-menu.li2"><b>Legend</b> with an adjustable colour scale (min / max) and <i>Reset colour scale</i>.</li>

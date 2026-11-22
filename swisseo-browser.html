@@ -3129,7 +3129,7 @@ const COP_META = {
     cop: "# swissEO NDVIdiff v200_MVC BETA\n\n**Beta version, a test computed on the fly, not an official product.** Year-on-year NDVI change from a **maximum value composite (MVC)**: per pixel the highest NDVI of the window, the classic approach of [Holben (1986)](https://doi.org/10.1080/01431168608948945). Clouds, haze and shadows lower the NDVI, so the maximum tends to pick the clearest observation; with more clear observations in one year than in the other the maximum tends to be higher there.\n\nThe window ends on the selected date and is chosen in the layer menu: **7, 16, 30 or 60 days** (30 by default; any day can be selected, not only days with an acquisition). Every swissEO S2-SR v200 acquisition of the window whose cloud cover passes the cloud filter is read; per pixel, observations flagged by the cloud mask (1, 2, 3, as chosen in the masks), in terrain shadow (200) or outside the scene footprint are left out. NDVI = (NIR − Red) / (NIR + Red) of the reflectance (ρ = DN × 0.0001 − 0.1, negative ρ set to 0). The same is computed for the same calendar window one year earlier, and the map shows the difference. With the forest mask (default) a pixel counts only if it is forest in the habitat map of the date and in that of the date one year earlier. The pixel inspector gives both composites and the number of clear observations in each window.\n\nComputed in your browser from all acquisitions of both windows, so a 60-day window can take a while to draw. Short windows leave gaps after cloudy spells." },
   ndvidiff23: { thumb: "swisseo-ndvidiff23.png", more: "https://doi.org/10.1080/01431168608948945",
     cop: "# swissEO NDVIdiff v200_Median BETA\n\n**Beta version, a test computed on the fly, not an official product.** Year-on-year NDVI change from a **median composite**: per pixel the median NDVI of the clear observations of the window (an even count takes the mean of the two middle values). Less sensitive than the maximum value composite to undetected clouds, to bright outliers and to a different number of observations in the two years.\n\nThe window ends on the selected date and is chosen in the layer menu: **7, 16, 30 or 60 days** (30 by default; any day can be selected, not only days with an acquisition). Every swissEO S2-SR v200 acquisition of the window whose cloud cover passes the cloud filter is read; per pixel, observations flagged by the cloud mask (1, 2, 3, as chosen in the masks), in terrain shadow (200) or outside the scene footprint are left out. NDVI = (NIR − Red) / (NIR + Red) of the reflectance (ρ = DN × 0.0001 − 0.1, negative ρ set to 0). The same is computed for the same calendar window one year earlier, and the map shows the difference. With the forest mask (default) a pixel counts only if it is forest in the habitat map of the date and in that of the date one year earlier. The pixel inspector gives both composites and the number of clear observations in each window.\n\nComputed in your browser from all acquisitions of both windows, so a 60-day window can take a while to draw. Short windows leave gaps after cloudy spells." },
-  analyst: { thumb: "swisseo-analyst.png", cop: "# NDVI difference to a reference date\n\nMethod of the NDVI Analyst by Raffael Bienz (Canton of Aargau): the NDVI difference between two dates (later minus earlier), using swissEO S2-SR reflectance with negative values set to 0, masked to forest. Changes are pixels with an NDVI drop below the threshold (default −0.08); a 3 × 3 majority filter removes edge effects. *Detected change* shows the binary result. The statistics of an area of interest report the forest area and the affected area in ha and %, with and without edge-effect removal, like the original script.\n\nMore info [here](https://github.com/RaffiBienz/ndvi_analyst)." },
+  analyst: { thumb: "swisseo-analyst.png", cop: "# NDVI difference to a reference date\n\nMethod of the NDVI Analyst by Raffael Bienz (Canton of Aargau): the NDVI difference between two dates (later minus earlier), using swissEO S2-SR reflectance with negative values set to 0, masked to the swissTLM3D forest. Changes are pixels with an NDVI drop below the threshold (default −0.08); a 3 × 3 majority filter removes edge effects. *Detected change* shows the binary result. The statistics of an area of interest report the forest area and the affected area in ha and %, with and without edge-effect removal, like the original script.\n\nMore info [here](https://github.com/RaffiBienz/ndvi_analyst)." },
   /* the layers without a Copernicus thumbnail: raster previews rendered from swissEO data (README, Layer previews) */
   cloud: { thumb: "swisseo-cloud.png" },
   terrain: { thumb: "swisseo-terrain.png" },
@@ -3222,7 +3222,7 @@ const MASK_DEFAULTS = {
   "fdc": { cloud: true, shadow: true, terrain: true, veg: "forest" },
   "nddi": { cloud: true, shadow: true, terrain: true, veg: "vegetation" },
   "nddichg": { cloud: true, shadow: true, terrain: true, veg: "vegetation" },
-  "analyst": { cloud: true, shadow: true, terrain: true, veg: "forest" },
+  "analyst": { cloud: true, shadow: true, terrain: true, veg: "tlm" },
   "ndvidiff22": { cloud: true, shadow: true, terrain: true, veg: "forest" },
   "ndvidiff23": { cloud: true, shadow: true, terrain: true, veg: "forest" },
 };
@@ -3724,12 +3724,13 @@ function optLin(a) {
 const sRGB = c => c <= 0.0031308 ? 12.92 * c : 1.055 * Math.pow(c, 1 / 2.4) - 0.055;
 
 /* The masks a layer starts with come from the catalogue (MASK_DEFAULTS, catalog/layers.yaml). A configuration
-   with its own vegetation mask (CONFIGS[..].veg, e.g. the forest in Forest) replaces the layer's, unless the
-   layer has none. Links carry only what differs from these defaults, read with the configuration of the link. */
+   with its own vegetation mask (CONFIGS[..].veg, e.g. the forest in Forest) replaces the layer's where that is
+   the habitat map (forest or vegetation); a layer without one or with a specific mask (tlm for analyst) keeps it.
+   Links carry only what differs from these defaults, read with the configuration of the link. */
 const maskDefaults = rec => Object.hasOwn(MASK_DEFAULTS, rec.id) ? MASK_DEFAULTS[rec.id] : {};
 function vegDefault(rec, cfg) {
   const own = maskDefaults(rec).veg || "off", c = Object.hasOwn(CONFIGS, cfg) ? CONFIGS[cfg] : null;
-  const v = own !== "off" && c && c.veg ? c.veg : own;
+  const v = (own === "forest" || own === "vegetation") && c && c.veg ? c.veg : own;
   return vegOn(v) ? vegStr(vegParse(v)) : "off";
 }
 function defaults(rec, cfg = configId) {
@@ -4863,7 +4864,7 @@ function selectLayer(rec) {
     compare = [];
     currentRec = rec;
     lastLayer[configId] = rec.id;
-    expanded.add(rec.id);
+    if (rec.id !== "true") expanded.add(rec.id);
     renderLayerList();
     if (srcChanged) { $("#dateTxt").classList.remove("nodata"); updateCcBadge(); renderCal(); }
     setCompareMode(false, true);
@@ -4879,7 +4880,7 @@ function selectLayer(rec) {
   layerOff = false;
   currentRec = rec;
   lastLayer[configId] = rec.id;
-  expanded.add(rec.id);
+  if (rec.id !== "true") expanded.add(rec.id);       // choosing a layer opens its menu; True color's stays closed
   renderLayerList();
   if (srcChanged) { $("#dateTxt").classList.remove("nodata"); updateCcBadge(); renderCal(); }
   applyLayer();

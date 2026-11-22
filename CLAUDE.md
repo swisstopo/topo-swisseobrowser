@@ -8,8 +8,8 @@
 - UI and documentation texts are in English. Highlight stories have at most ten lines and credit their
   source.
 - Keep the "Not for operational use" notice and the AI note ("Please note that AI (Claude Code with the Opus 5.5 model,
-  medium effort) was used extensively to prepare this website ...") in the README and the help page; do
-  not add other mentions of Claude to the page or the documentation. In the application itself the warning is the red
+  medium effort) was used extensively to prepare this website ...") in the README (the help page no longer has
+  them, at the user's request); do not add other mentions of Claude to the page or the documentation. In the application itself the warning is the red
   integration bar, and the Info tab only links to the README and the help page (issue #39): it holds four short cards
   (Feedback, Selected date, How this works, Terms) and no explanations of its own, so nothing is written twice.
 

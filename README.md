@@ -464,7 +464,8 @@ The swissEO Browser therefore always uses the physical reflectance.
 - **Layer list**: clicking a layer shows it (check mark). Clicking the active layer again hides it, so
   only the background map is shown (no check mark, a hint above the list); one more click shows it again.
   The layer menu (legend, masks, effects) opens and closes with the chevron; on start it is closed unless
-  the link opens it.
+  the link opens it. Choosing a layer opens its menu, except True color, whose menu stays closed until the
+  chevron opens it.
 - **Layer pull-down**
   - the Copernicus Browser title, description and "More info" link (Sentinel Hub custom-scripts page;
     swisstopo product page for True color L2A and the swissEO-specific layers); `</>` shows the formula
@@ -727,7 +728,7 @@ layer menu, and a link carries only what differs from these defaults:
   `vegetationMask` URL parameter, e.g. `tlm` or `lfi-broad:30.85`.
 - A layer without `masks` starts without any.
 - A configuration can set its own vegetation mask, `masks: { vegetation: "forest" }` in
-  `catalog/configurations.yaml` (Forest; Agriculture has the Nutzungsflächen without forest): it replaces the layer's vegetation mask wherever that is not `off`. Switching
+  `catalog/configurations.yaml` (Forest; Agriculture has the Nutzungsflächen without forest): it replaces the layer's vegetation mask wherever that is the habitat map (`forest` or `vegetation`); a layer that starts with `off` or a specific mask, such as `tlm` for *NDVI difference to a reference date*, keeps it in every configuration. Switching
   the configuration changes a vegetation mask the user has not touched and keeps one they chose.
 
 Today:
@@ -737,7 +738,8 @@ Today:
 | True color, False color, False color (urban), SWIR, Highlight Optimized Natural Color, Aerosol optical thickness | off | off |
 | Agriculture, Geology 12, 8, 2, Barren Soil, NDWI, NDSI | on | off |
 | NDVI, Moisture index, EVI, SAVI, NDRE, MTVI2, Moisture Stress, NDDI, NDDI change, NBR | on | *All vegetation* (*Forest* in the Forest configuration, the Nutzungsflächen without forest in Agriculture) |
-| Forest Disturbance Classification, NDVI difference to a reference date | on | *Forest* |
+| Forest Disturbance Classification | on | *Forest* |
+| NDVI difference to a reference date | on | *Forest, swissTLM3D* (in every configuration) |
 | Terrain / solar incidence | clouds and cloud shadows (not the terrain mask, which it shows) | off |
 
 Links made before these defaults (November 2026) that carry no mask parameters open with the masks on.

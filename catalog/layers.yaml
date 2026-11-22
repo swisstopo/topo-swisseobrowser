@@ -13,7 +13,8 @@
 #                                               or any other value of the vegetationMask URL parameter
 #                                               (README, URL parameters), e.g. tlm or lfi-broad:30.85
 #                    A layer without masks starts without any. A configuration can replace the vegetation
-#                    mask (catalog/configurations.yaml, masks: vegetation), except where it is off here.
+#                    mask (catalog/configurations.yaml, masks: vegetation) where it is forest or vegetation
+#                    here; off and a specific mask (e.g. tlm for analyst) stay in every configuration.
 # Only tick a layer as verified when it has really been checked (see README, Layer verification).
 #
 # label and note are used for the generated checklist in README.md. The order is the order of the
@@ -150,7 +151,7 @@ layers:
   - id: "analyst"
     label: "NDVI difference to a reference date"
     verified: true
-    masks: { cloud: true, shadow: true, terrain: true, vegetation: "forest" }
+    masks: { cloud: true, shadow: true, terrain: true, vegetation: "tlm" }
   - id: "ndvidiff22"
     label: "swissEO NDVIdiff v200_MVC BETA"
     verified: false

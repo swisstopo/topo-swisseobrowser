@@ -238,7 +238,7 @@ def configs_block(configs, layers):
             lines.append("    [{}, [{}{}".format(json.dumps(g.get("title", "")), ids, end))
     lines.append("};")
     # the masks a layer starts with (cloud, shadow, terrain, veg); a configuration's veg replaces a layer's
-    # vegetation mask unless that is off
+    # vegetation mask only where that is the habitat map (forest or vegetation); off or a specific mask stays
     lines.append("const MASK_DEFAULTS = {")
     lines.extend(mask_defaults(layers))
     lines.append("};")

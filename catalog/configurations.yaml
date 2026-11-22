@@ -7,9 +7,10 @@
 #   beta: true   the whole configuration is only offered on integration, with a BETA label
 #   highlights   the key of a story set in HIGHLIGHTS in the page (texts stay there); a configuration with
 #                highlights may have no groups (groups: []): it then lists only the stories
-#   masks        { vegetation: forest }: the vegetation mask of every layer of this configuration that has
-#                one (masks.vegetation not off in catalog/layers.yaml), e.g. the forest in Forest or the
-#                BLW Nutzungsflaechen without forest in Agriculture
+#   masks        { vegetation: forest }: the vegetation mask of every layer of this configuration that
+#                starts with the habitat map (masks.vegetation forest or vegetation in catalog/layers.yaml),
+#                e.g. the forest in Forest or the BLW Nutzungsflaechen without forest in Agriculture; a layer
+#                with a specific mask (tlm for analyst) keeps it
 #
 # The key is also the themeId of a permalink (upper case, no dashes). tools/build-catalog.py
 # writes this into the page; never edit the generated block there by hand.

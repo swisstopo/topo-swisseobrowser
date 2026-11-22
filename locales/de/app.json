@@ -656,7 +656,7 @@
       "subtitle": "Aus den Bändern B11, B08, B02"
     },
     "analyst": {
-      "description": "# NDVI-Differenz zu einem Referenzdatum\n\nMethode des NDVI Analyst von Raffael Bienz (Kanton Aargau): die NDVI-Differenz zwischen zwei Daten (späteres minus früheres), mit der swissEO-S2-SR-Reflektanz, negative Werte auf 0 gesetzt, auf Wald maskiert. Veränderungen sind Pixel mit einem NDVI-Rückgang unter dem Schwellenwert (Standard −0.08); ein 3 × 3-Mehrheitsfilter entfernt Randeffekte. *Erkannte Veränderung* zeigt das binäre Ergebnis. Die Statistik eines Interessengebiets gibt die Waldfläche und die betroffene Fläche in ha und % an, mit und ohne Entfernung der Randeffekte, wie das Originalskript.\n\nMehr Informationen [hier](https://github.com/RaffiBienz/ndvi_analyst).",
+      "description": "# NDVI-Differenz zu einem Referenzdatum\n\nMethode des NDVI Analyst von Raffael Bienz (Kanton Aargau): die NDVI-Differenz zwischen zwei Daten (späteres minus früheres), mit der swissEO-S2-SR-Reflektanz, negative Werte auf 0 gesetzt, auf den Wald von swissTLM3D maskiert. Veränderungen sind Pixel mit einem NDVI-Rückgang unter dem Schwellenwert (Standard −0.08); ein 3 × 3-Mehrheitsfilter entfernt Randeffekte. *Erkannte Veränderung* zeigt das binäre Ergebnis. Die Statistik eines Interessengebiets gibt die Waldfläche und die betroffene Fläche in ha und % an, mit und ohne Entfernung der Randeffekte, wie das Originalskript.\n\nMehr Informationen [hier](https://github.com/RaffiBienz/ndvi_analyst).",
       "name": "NDVI-Differenz zu einem Referenzdatum",
       "subtitle": "NDVI-Veränderung zwischen zwei Daten im Wald, mit Veränderungserkennung"
     },
