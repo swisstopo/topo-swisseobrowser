@@ -10,7 +10,7 @@ table of the repository README.
 - `maplibre-gl-6.17.0.css`: maplibre-gl 6.17.0
 - `maplibre-gl-6.17.0.mjs`: maplibre-gl 6.17.0
 - `maplibre-gl-worker-6.17.0.mjs`: maplibre-gl 6.17.0
-- `proj4-2.22.0.js`: proj4 2.22.0
+- `proj4-2.23.0.js`: proj4 2.23.0
 - `geotiff-2.1.3.js`: geotiff 2.1.3
 - `gifenc-1.0.3.esm.js`: gifenc 1.0.3
 - `togeojson-7.1.4.umd.js`: @tmcw/togeojson 7.1.4
@@ -18,7 +18,7 @@ table of the repository README.
 - `shp-6.2.0.min.js`: shpjs 6.2.0
 - `mgrs-2.2.0.js`: mgrs 2.2.0
 - `geotiff-decoder-worker-2.1.3.js`: geotiff (decoder worker) 2.1.3
-- `proj4-2.22.0.esm.js`: proj4 2.22.0
+- `proj4-2.23.0.esm.js`: proj4 2.23.0
 - `pbf-5.1.2.esm.js`: pbf 5.1.2
 - `vector-tile-3.0.0.esm.js`: @mapbox/vector-tile 3.0.0
 - `vt-pbf-4.3.3.esm.js`: @maplibre/vt-pbf 4.3.3

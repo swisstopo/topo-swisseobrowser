@@ -1124,12 +1124,12 @@ table.kv td:first-child{color:var(--muted)}
   </div>
 </div>
 
-<script src="lib/proj4-2.22.0.js"></script>
+<script src="lib/proj4-2.23.0.js"></script>
 <script src="lib/geotiff-2.1.3.js"></script>
 <script src="lib/i18next-26.5.11.min.js"></script>
 <script>
 /* A lone copy of the page without the lib/ folder falls back to the pinned CDN builds. */
-if (!window.proj4) document.write('<script src="https://cdn.jsdelivr.net/npm/proj4@2.22.0/dist/proj4.js"><\/script>');
+if (!window.proj4) document.write('<script src="https://cdn.jsdelivr.net/npm/proj4@2.23.0/dist/proj4.js"><\/script>');
 if (!window.GeoTIFF) document.write('<script src="https://cdn.jsdelivr.net/npm/geotiff@2.1.3/dist-browser/geotiff.js"><\/script>');
 if (!window.i18next) document.write('<script src="https://cdn.jsdelivr.net/npm/i18next@26.5.11/dist/umd/i18next.min.js"><\/script>');
 </script>
@@ -1145,7 +1145,7 @@ if (!window.i18next) document.write('<script src="https://cdn.jsdelivr.net/npm/i
 const LIB_CDN = {
   "maplibre-gl-6.17.0.mjs":        "https://cdn.jsdelivr.net/npm/maplibre-gl@6.17.0/dist/maplibre-gl.mjs",
   "maplibre-gl-worker-6.17.0.mjs": "https://cdn.jsdelivr.net/npm/maplibre-gl@6.17.0/dist/maplibre-gl-worker.mjs",
-  "proj4-2.22.0.esm.js":           "https://cdn.jsdelivr.net/npm/proj4@2.22.0/+esm",
+  "proj4-2.23.0.esm.js":           "https://cdn.jsdelivr.net/npm/proj4@2.23.0/+esm",
   "pbf-5.1.2.esm.js":              "https://cdn.jsdelivr.net/npm/pbf@5.1.2/+esm",
   "vector-tile-3.0.0.esm.js":      "https://cdn.jsdelivr.net/npm/@mapbox/vector-tile@3.0.0/+esm",
   "vt-pbf-4.3.3.esm.js":           "https://cdn.jsdelivr.net/npm/@maplibre/vt-pbf@4.3.3/+esm",
@@ -1301,7 +1301,7 @@ maplibregl.addProjection({ name: "EPSG:2056", definition: DEF2056, projection: P
 /* GeoJSON sources (area of interest, drawing) are tiled in MapLibre's workers, which build the projection from
    DEF2056 with proj4 as well. */
 await maplibregl.importScriptInWorkers(workerScript(
-  'import proj4 from ' + JSON.stringify(libUrl("proj4-2.22.0.esm.js")) + ';\n' +
+  'import proj4 from ' + JSON.stringify(libUrl("proj4-2.23.0.esm.js")) + ';\n' +
   'self.setProjectionHandler(def => proj4("EPSG:4326", def));\n'))
   .catch(e => console.warn("GeoJSON projection in the workers:", e));
 
@@ -2095,7 +2095,7 @@ const VT_LAYERS = ["place_city", "place_town_village", "place_other", "transport
                    "water_name_point_label"];
 const VT_DZ = Math.log2(2 * Math.PI * 6378137 * Math.cos(46.8 * Math.PI / 180) / (TILE * RES0));     // about 4.39
 const vtWorker = sourceLayers => `
-import proj4 from ${JSON.stringify(libUrl("proj4-2.22.0.esm.js"))};
+import proj4 from ${JSON.stringify(libUrl("proj4-2.23.0.esm.js"))};
 import { PbfReader } from ${JSON.stringify(libUrl("pbf-5.1.2.esm.js"))};
 import { VectorTile } from ${JSON.stringify(libUrl("vector-tile-3.0.0.esm.js"))};
 import { fromVectorTileJs } from ${JSON.stringify(libUrl("vt-pbf-4.3.3.esm.js"))};

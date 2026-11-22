@@ -1102,7 +1102,7 @@ works under a Content-Security-Policy without `'unsafe-eval'` (it needs `worker-
 | Library | Version | Licence | Source | Used for |
 | --- | --- | --- | --- | --- |
 | [MapLibre GL JS](https://github.com/maplibre/maplibre-gl-js) | 6.17.0 | BSD-3-Clause | npm `maplibre-gl` | map and its workers |
-| [proj4js](https://github.com/proj4js/proj4js) | 2.22.0 | MIT | npm `proj4` | LV95 coordinates, also in the workers |
+| [proj4js](https://github.com/proj4js/proj4js) | 2.23.0 | MIT | npm `proj4` | LV95 coordinates, also in the workers |
 | [geotiff.js](https://github.com/geotiffjs/geotiff.js) | 2.1.3 | MIT | npm `geotiff` | reading the COGs (held at 2.x, see [`dependabot.yml`](.github/dependabot.yml)); its decoder worker, extracted from the package, as `lib/geotiff-decoder-worker-2.1.3.js` |
 | [pbf](https://github.com/mapbox/pbf) | 5.1.2 | BSD-3-Clause | npm `pbf` | label tiles (workers) |
 | [vector-tile](https://github.com/mapbox/vector-tile-js) | 3.0.0 | BSD-3-Clause | npm `@mapbox/vector-tile` | label tiles (workers) |
