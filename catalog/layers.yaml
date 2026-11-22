@@ -6,11 +6,15 @@
 #   verified: true   no label, offered everywhere
 #   masks:           the masks that are on when the layer is opened (the user can still change them):
 #                      cloud, shadow, terrain   true or false (only Sentinel-2 layers can be masked)
+#                      illumination             true or false: the low-illumination mask (solar incidence
+#                                               angle >= 70 degrees, adjustable in the layer menu); off
+#                                               when missing, as on every layer today
 #                      vegetation               off, forest or vegetation (the habitat map of the date),
 #                                               or any other value of the vegetationMask URL parameter
 #                                               (README, URL parameters), e.g. tlm or lfi-broad:30.85
 #                    A layer without masks starts without any. A configuration can replace the vegetation
-#                    mask (catalog/configurations.yaml, masks: vegetation), except where it is off here.
+#                    mask (catalog/configurations.yaml, masks: vegetation) where it is forest or vegetation
+#                    here; off and a specific mask (e.g. tlm for analyst) stay in every configuration.
 # Only tick a layer as verified when it has really been checked (see README, Layer verification).
 #
 # label and note are used for the generated checklist in README.md. The order is the order of the
@@ -33,7 +37,7 @@ layers:
     masks: { cloud: false, shadow: false, terrain: false }
   - id: "urban"
     label: "False color (urban)"
-    verified: false
+    verified: true
     masks: { cloud: false, shadow: false, terrain: false }
   - id: "swir"
     label: "SWIR"
@@ -53,19 +57,19 @@ layers:
     masks: { cloud: true, shadow: true, terrain: true, vegetation: "vegetation" }
   - id: "ndwi"
     label: "NDWI"
-    verified: false
+    verified: true
     masks: { cloud: true, shadow: true, terrain: true }
   - id: "ndmi"
     label: "Moisture index"
-    verified: false
+    verified: true
     masks: { cloud: true, shadow: true, terrain: true, vegetation: "vegetation" }
   - id: "ndsi"
     label: "NDSI"
-    verified: false
+    verified: true
     masks: { cloud: true, shadow: true, terrain: true }
   - id: "nbr"
     label: "Normalized Burn Ratio (NBR)"
-    verified: false
+    verified: true
     masks: { cloud: true, shadow: true, terrain: true, vegetation: "vegetation" }
   - id: "aot"
     label: "Aerosol optical thickness"
@@ -89,15 +93,23 @@ layers:
     verified: true
   - id: "evi"
     label: "EVI"
-    verified: false
+    verified: true
     masks: { cloud: true, shadow: true, terrain: true, vegetation: "vegetation" }
   - id: "savi"
     label: "SAVI"
+    verified: true
+    masks: { cloud: true, shadow: true, terrain: true, vegetation: "vegetation" }
+  - id: "ndre"
+    label: "NDRE"
+    verified: false
+    masks: { cloud: true, shadow: true, terrain: true, vegetation: "vegetation" }
+  - id: "mtvi2"
+    label: "MTVI2"
     verified: false
     masks: { cloud: true, shadow: true, terrain: true, vegetation: "vegetation" }
   - id: "barren"
     label: "Barren Soil"
-    verified: false
+    verified: true
     masks: { cloud: true, shadow: true, terrain: true }
   - id: "mstress"
     label: "Moisture Stress"
@@ -105,8 +117,8 @@ layers:
     masks: { cloud: true, shadow: true, terrain: true, vegetation: "vegetation" }
   - id: "hon"
     label: "Highlight Optimized Natural Color"
-    verified: false
-    masks: { cloud: true, shadow: true, terrain: true }
+    verified: true
+    masks: { cloud: false, shadow: false, terrain: false }
   - id: "ndvidiff"
     label: "swissEO NDVIdiff"
     verified: true
@@ -138,5 +150,13 @@ layers:
     masks: { cloud: true, shadow: true, terrain: true, vegetation: "vegetation" }
   - id: "analyst"
     label: "NDVI difference to a reference date"
+    verified: true
+    masks: { cloud: true, shadow: true, terrain: true, vegetation: "tlm" }
+  - id: "ndvidiff22"
+    label: "swissEO NDVIdiff v200_MVC BETA"
+    verified: false
+    masks: { cloud: true, shadow: true, terrain: true, vegetation: "forest" }
+  - id: "ndvidiff23"
+    label: "swissEO NDVIdiff v200_Median BETA"
     verified: false
     masks: { cloud: true, shadow: true, terrain: true, vegetation: "forest" }

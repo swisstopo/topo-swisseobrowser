@@ -8,8 +8,8 @@
 - UI and documentation texts are in English. Highlight stories have at most ten lines and credit their
   source.
 - Keep the "Not for operational use" notice and the AI note ("Please note that AI (Claude Code with the Opus 5.5 model,
-  medium effort) was used extensively to prepare this website ...") in the README and the help page; do
-  not add other mentions of Claude to the page or the documentation. In the application itself the warning is the red
+  medium effort) was used extensively to prepare this website ...") in the README (the help page no longer has
+  them, at the user's request); do not add other mentions of Claude to the page or the documentation. In the application itself the warning is the red
   integration bar, and the Info tab only links to the README and the help page (issue #39): it holds four short cards
   (Feedback, Selected date, How this works, Terms) and no explanations of its own, so nothing is written twice.
 
@@ -36,7 +36,9 @@
   never add a CDN `<script>`. A new or bumped library goes into `tools/vendor/package.json` (and `vendor.mjs`
   if it needs copying or bundling), into the `LIB_CDN` map of the page (the `file://` fallback), and into the
   README SBOM table; `tools/check-dist.sh` holds the expected CDN-hostname counts of the page and fails the
-  deploys when they drift. GitHub Actions in the workflows are pinned to commit SHAs.
+  deploys when they drift. GitHub Actions in the workflows are pinned to commit SHAs. geotiff.js' decoder worker
+  (`lib/geotiff-decoder-worker-<version>.js`, the page's `decodePool`) is extracted from the package by `vendor.mjs`
+  and self-tested there; after a geotiff.js bump, rename it in the page too.
 - **Releases**: the production deploy creates a GitHub release per merge into `main` (`tools/release.sh`: semver,
   minor by default, labels `release: patch` / `major` / `none` on the PR, notes from the commit subjects, so write
   subjects a reader of the release notes understands). The first release is v1.0.0.
@@ -106,3 +108,6 @@
   headless Chromium (Playwright, `--use-angle=swiftshader`) renders it, clicks and drags included; the map object
   is module-scoped, so test through permalinks and the UI.
 - Check data reads against an independent rasterio / GDAL read of the same COG where possible.
+- After a change to the tile pipeline (the `swisseo` protocol, `renderTile` / `renderScene`, `readGridBands`, the
+  basemap tiles), measure it: `cd tools/bench && node bench.mjs --compare baseline.json` (pan and zoom scenarios,
+  tile times, requests, decodes, long tasks; README, *Map performance*). Compare runs of the same machine only.

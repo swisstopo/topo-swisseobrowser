@@ -5,9 +5,12 @@
 # BETA label and is removed from these groups in the production build.
 #
 #   beta: true   the whole configuration is only offered on integration, with a BETA label
-#   highlights   the key of a story set in HIGHLIGHTS in the page (texts stay there)
-#   masks        { vegetation: forest }: the vegetation mask of every layer of this configuration that has
-#                one (masks.vegetation not off in catalog/layers.yaml), e.g. the forest in Forest
+#   highlights   the key of a story set in HIGHLIGHTS in the page (texts stay there); a configuration with
+#                highlights may have no groups (groups: []): it then lists only the stories
+#   masks        { vegetation: forest }: the vegetation mask of every layer of this configuration that
+#                starts with the habitat map (masks.vegetation forest or vegetation in catalog/layers.yaml),
+#                e.g. the forest in Forest or the BLW Nutzungsflaechen without forest in Agriculture; a layer
+#                with a specific mask (tlm for analyst) keeps it
 #
 # The key is also the themeId of a permalink (upper case, no dashes). tools/build-catalog.py
 # writes this into the page; never edit the generated block there by hand.
@@ -23,34 +26,35 @@ configurations:
     beta: false
     groups:
       - title: "Composites"
-        layers: ["true", "nir", "urban", "swir", "agri", "geo"]
+        layers: ["true", "nir", "urban", "hon", "swir", "agri", "geo", "barren"]
       - title: "Indices"
-        layers: ["ndvi", "ndwi", "ndmi", "ndsi", "nbr", "aot", "vhi", "vhiveg", "ndvidiff"]
+        layers: ["ndvi", "ndwi", "ndmi", "ndsi", "nbr", "aot", "savi", "vhi", "vhiveg", "ndvidiff"]
       - title: "Masks & quality"
         layers: ["scl", "cloud", "terrain"]
   - key: AGRICULTURE
     name: "Agriculture"
     beta: false
+    # the indices Agroscope recommends (issue #52), on the farmland of the BLW Nutzungsflaechen (every class but forest)
+    masks: { vegetation: "lnf:a.dw.dp.r.o.dk.g.s.h.u.so.v" }
     groups:
       - title: "Layers"
-        layers: ["true", "nir", "ndvi", "evi", "barren", "mstress", "ndmi", "agri", "savi"]
+        layers: ["true", "ndvi", "evi", "ndre", "mtvi2"]
   - key: DROUGHT
     name: "Drought"
     beta: false
     groups:
       - title: "Layers"
-        layers: ["true", "ndvi", "evi", "ndmi", "vhi", "vhiveg", "ndvidiff", "ndvidiff2", "ndviz", "nddi", "nddichg", "analyst"]
+        layers: ["true", "ndvi", "evi", "ndmi", "mstress", "vhi", "vhiveg", "ndvidiff", "ndvidiff2", "ndvidiff22", "ndvidiff23", "ndviz", "nddi", "nddichg", "analyst"]
   - key: DROUGHT2026
     name: "Drought 2026"
     beta: false
     highlights: drought2026
-    groups:
-      - title: "Layers"
-        layers: ["true", "ndmi", "ndwi", "mstress", "ndvi", "swir", "urban", "hon"]
+    # only the highlights: each story opens its own layer (true colour), so no layer list
+    groups: []
   - key: FOREST
     name: "Forest"
     beta: false
     masks: { vegetation: "forest" }
     groups:
       - title: "Layers"
-        layers: ["true", "ndvi", "evi", "vhi", "vhidef", "vhiext", "ndvidiff", "ndvidiff2", "ndviz", "analyst", "nbr", "ndmi", "fdc"]
+        layers: ["true", "ndvi", "evi", "vhi", "vhidef", "vhiext", "ndvidiff", "ndvidiff2", "ndvidiff22", "ndvidiff23", "ndviz", "analyst", "nbr", "ndmi", "fdc"]

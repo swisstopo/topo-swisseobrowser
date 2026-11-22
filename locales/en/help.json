@@ -1,7 +1,6 @@
 {
   "about": {
-    "box1": "<b>Not for operational use.</b> This is an experimental beta prototype. Values, renderings and statistics are computed in the browser, are not validated and may be wrong or incomplete. Layers that have not yet been checked in depth carry the label <span class=\"beta\" style=\"margin:0\">BETA</span>. For authoritative data use the swisstopo products and services directly.<br>Please note that AI (Claude Code with the Opus 5.5 model, medium effort) was used extensively to prepare this website, adapting it from the Copernicus Browser. The indices were edited and tested manually in QGIS or with rasterio and GDAL.",
-    "p1": "The swissEO Browser is a web viewer for the <b>swissEO</b> satellite products of swisstopo: the Sentinel-2 surface reflectance mosaics (swissEO S2-SR) and the products derived from them, such as the Vegetation Health Index (VHI) and the NDVI change maps. You can look at the images, compare dates, compute vegetation and water indices, restrict them to forest or farmland, get statistics and time series for your own areas, look at them on the terrain in 3D, and download images and data.",
+    "p1": "The swissEO Browser is a specialist application for the <b>swissEO</b> satellite products of swisstopo and the products derived from them, which federal and cantonal specialist offices produce and maintain. You can look at the images, compare dates, compute vegetation and water indices, restrict them to forest or farmland, get statistics and time series for your own areas, look at them on the terrain in 3D, and download images and data.",
     "p2": "Its user interface copies the <a href=\"https://browser.dataspace.copernicus.eu/\" target=\"_blank\" rel=\"noopener\">Copernicus Browser</a> of the European Copernicus Data Space Ecosystem, so if you know that one, you will feel at home. The difference is under the hood: the swissEO Browser is a single web page without a server of its own and without a login. <b>Everything is calculated on the fly in your web browser</b>, directly from the swissEO Cloud Optimized GeoTIFFs (COGs) on data.geo.admin.ch. Nothing is precomputed: when you change a layer, a date or a setting, your browser reads the needed pixels and computes the result.",
     "p3": "This help has two parts. <a href=\"#t1\">Part A</a> is a short tutorial for your first visit: it takes about fifteen minutes. <a href=\"#vis\">Part B</a> describes every function in the order of the <a href=\"https://documentation.dataspace.copernicus.eu/Applications/Browser.html\" target=\"_blank\" rel=\"noopener\">Copernicus Browser documentation</a>. You can open this page at any time with the <span class=\"key\">i</span> button at the top right of the map. The data and their sources are listed in <a href=\"#data\">section 4</a>.",
     "p4": "No prior knowledge needed. Open the <a data-home href=\"../\" target=\"_blank\" rel=\"noopener\">swissEO Browser</a> in a second window and follow along.",
@@ -50,7 +49,7 @@
     "td33": "swisstopo, map.geo.admin.ch",
     "td4": "swissEO VHI",
     "td5": "Daily Vegetation Health Index for forest and all vegetation, relative to 1991–2020; VHI season layers",
-    "td6": "<a href=\"https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-vhi\" target=\"_blank\" rel=\"noopener\">swisstopo</a>",
+    "td6": "<a href=\"https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-vhi\" target=\"_blank\" rel=\"noopener\">swisstopo</a>, <a href=\"https://www.meteoswiss.admin.ch\" target=\"_blank\" rel=\"noopener\">MeteoSwiss</a>",
     "td7": "swissEO NDVIdiff and NDVIz",
     "td8": "NDVI change compared with the previous year, and NDVI anomaly, for the forest, at the end of July, August and September",
     "td9": "<a href=\"https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-ndvidiff\" target=\"_blank\" rel=\"noopener\">NDVIdiff</a>, <a href=\"https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-ndviz\" target=\"_blank\" rel=\"noopener\">NDVIz</a>, swisstopo",
@@ -65,7 +64,7 @@
   },
   "envbar": "<b>Integration version for testing.</b> Not for operational use: the layers and values shown here are not validated and may be wrong. The official version is not yet published.",
   "footer": {
-    "p1": "swissEO Browser, a prototype of <a href=\"https://www.swisstopo.admin.ch\" target=\"_blank\" rel=\"noopener\">swisstopo</a>. Data © swisstopo (open government data); swissEO S2-SR and swissEO VHI contain modified Copernicus Sentinel data. Forest Type NFI © WSL (Waser et al. 2025, funded by the BAFU); ETH tree species © Zhou et al. 2026 (ETH Zürich), CC BY-NC 4.0, non-commercial use only; Nutzungsflächen © BLW and the cantons. User interface modelled on the Copernicus Browser of the Copernicus Data Space Ecosystem; this project is not affiliated with or endorsed by it. Source code and technical details: <a href=\"https://github.com/swisstopo/topo-swisseobrowser\" target=\"_blank\" rel=\"noopener\">github.com/swisstopo/topo-swisseobrowser</a>.",
+    "p1": "swissEO Browser, a prototype of <a href=\"https://www.swisstopo.admin.ch\" target=\"_blank\" rel=\"noopener\">swisstopo</a>. Data © swisstopo (open government data), swissEO VHI together with MeteoSwiss; swissEO S2-SR and swissEO VHI contain modified Copernicus Sentinel data. Forest Type NFI © WSL (Waser et al. 2025, funded by the BAFU); ETH tree species © Zhou et al. 2026 (ETH Zürich), CC BY-NC 4.0, non-commercial use only; Nutzungsflächen © BLW and the cantons. User interface modelled on the Copernicus Browser of the Copernicus Data Space Ecosystem; this project is not affiliated with or endorsed by it. Source code and technical details: <a href=\"https://github.com/swisstopo/topo-swisseobrowser\" target=\"_blank\" rel=\"noopener\">github.com/swisstopo/topo-swisseobrowser</a>.",
     "p2": "<a href=\"https://www.swisstopo.admin.ch/en/impressum-federal-office-of-topography\" target=\"_blank\" rel=\"noopener\">Impressum</a> · <a href=\"https://www.swisstopo.admin.ch/en/legal-framework\" target=\"_blank\" rel=\"noopener\">Legal framework</a> · <a href=\"https://www.swisstopo.admin.ch/en/terms-and-conditions\" target=\"_blank\" rel=\"noopener\">Terms and conditions</a> · <a href=\"https://www.swisstopo.admin.ch/en/swisstopo-netiquette-rules\" target=\"_blank\" rel=\"noopener\">Netiquette</a>"
   },
   "header": {
@@ -182,10 +181,10 @@
     "cap1": "<b>Fig. 5</b> NDVI near Kerzers, 13 August 2026, restricted by the Nutzungsflächen mask to arable land, permanent meadows and permanent pastures.",
     "img1": "NDVI restricted to arable land, meadows and pastures, with the category check boxes",
     "li1": "In the layer menu, scroll down to <b>Masks</b>. The pull-down <i>Vegetation mask</i> says <i>Off</i>.",
-    "li2": "Choose a mask, for example <i>Land use (categories below)</i> under <i>Nutzungsflächen</i>: the agricultural land use of the cantons.",
+    "li2": "Choose a mask, for example <i>Land use</i> under <i>Nutzungsflächen</i>: the agricultural land use of the cantons.",
     "li3": "Tick the categories you want to keep, for example arable land, permanent meadows and permanent pastures. The map now shows the layer only there.",
     "p1": "Often only part of the landscape matters: the forest for a drought assessment, the fields for a harvest. The <b>vegetation mask</b> hides everything else.",
-    "p2": "The other masks keep forest (the habitat map of swissEO VHI or the swissTLM3D forest), conifer, mixed or broadleaf forest (Forest Type NFI 2023, ETH tree species), single tree species (ETH) or all vegetation. They are described, with their sources, in <a href=\"#vis-veg\">Vegetation masks</a>. Masks also apply to statistics, downloads and the timelapse.",
+    "p2": "The other masks keep forest (the habitat map of swissEO VHI or the swissTLM3D forest), conifer, mixed or broadleaf forest (Forest Type NFI 2023), single tree species (ETH) or all vegetation. They are described, with their sources, in <a href=\"#vis-veg\">Vegetation masks</a>. Masks also apply to statistics, downloads and the timelapse.",
     "title": "<span class=\"n\">5</span>Keep only forest or farmland"
   },
   "t6": {
@@ -235,7 +234,7 @@
     "img1": "Image download dialog, Analytical tab",
     "li1": "<b>Basic</b>: the current view as PNG or JPG, with captions (data source, date, the vegetation mask, scale bar), an optional description, the map labels, the legend and the area of interest; also in compare mode and in 3D.",
     "li2": "<b>Analytical</b>: several layers and raw bands at once, for the view or the area of interest, at 40, 20 or 10 m or a custom resolution (up to 2500 × 2500 pixels). Formats: PNG, JPG or GeoTIFF in Swiss coordinates (LV95): 8-bit, 16-bit (the stored values) or <b>32-bit float with the index or physical values</b> for your own analysis. Several files are zipped. The masks of the layer apply.",
-    "li3": "<b>High-res print</b>: the view rendered for a printed size: width and height in cm (or A4 / A3, portrait or landscape), DPI and a scale. <i>Fit</i> keeps the whole view (or the area of interest) on the paper; a fixed scale such as 1:25 000 centres the print on the area of interest and warns when it does not fit.",
+    "li3": "<b>High-res print</b>: the view rendered for a printed size: width and height in cm (or A4 / A3, portrait or landscape), DPI and a scale. <i>Fit</i> keeps the whole view (or the area of interest) on the paper; a fixed scale such as 1:25 000 centres the print on the area of interest and warns when it does not fit. The <i>Size</i> list also has social media sizes, for example 1080 × 1920 px for a Story or Reel: the whole view or area is fitted into them.",
     "title": "Image download"
   },
   "tools-insp": {
@@ -244,6 +243,7 @@
   },
   "tools-search": {
     "p1": "<b>Go to Place</b> searches places, addresses, municipalities, districts and cantons with the location search of map.geo.admin.ch. A result zooms to its extent, or to its point at a scale of about 1:25,000.",
+    "p2": "It also takes <b>coordinates</b>, as map.geo.admin.ch: LV95 (<code>2600000 1200000</code>, also <code>2'600'000, 1'200'000</code>), LV03 (<code>600000 200000</code>), WGS84 in decimal degrees (<code>46.95 7.44</code>) or in degrees, minutes and seconds (<code>46°57'08.66\" N 7°26'22.50\" E</code>) and MGRS (<code>32T LT 8076 0141</code>). The result shows the point in LV95; click it and the map zooms there and drops a pin.",
     "title": "Place search"
   },
   "tools-spec": {
@@ -268,7 +268,7 @@
     "li1": "choose the time range and <i>Select 1 image per</i> orbit, day, week, month or year; the month buttons skip seasons you do not want (for example winter);",
     "li2": "click <b>Search</b>: per interval the image with the best coverage of your area and the clearest sky is chosen;",
     "li3": "check the list: thumbnails, cloud cover and coverage of your area; the sliders filter cloudy or incomplete images;",
-    "li4": "play the <b>preview</b> (speed, fade, legend, captions) and download it as <b>GIF</b> or <b>video</b>.",
+    "li4": "play the <b>preview</b> (speed, fade, legend, captions) and download it as <b>GIF</b> or <b>video</b>, in the size of your area or in a social media size (<i>Size</i>, for example a 1080 × 1920 px video for a Story or Reel).",
     "p1": "The film button builds an animation of the current layer, with its masks, over the area of interest (or the view):",
     "p2": "There are no hard limits: a weekly glacier animation over ten years works, it just takes a few minutes.",
     "title": "Timelapse"
@@ -314,7 +314,7 @@
     "title": "Comparing visualizations"
   },
   "vis-date": {
-    "p1": "A link without a date opens on the latest day with data. The arrows and the calendar only offer days whose images actually <b>reach the map view</b>, so they update when you move the map. The cloud slider in the calendar hides days whose mosaic is cloudier than the chosen percentage. For the swissEO products with only a few dates per year (NDVIdiff, NDVIz) the product nearest to the selected date is shown, and the text below the date says which one.",
+    "p1": "A link without a date opens on the latest day with data. The arrows and the calendar only offer days whose images actually <b>reach the map view</b>, so they update when you move the map. The cloud slider in the calendar hides days whose mosaic is cloudier than the chosen percentage. For the swissEO products with only a few dates per year (NDVIdiff, NDVIz) the product nearest to the selected date is shown, and the text below the date says which one. Whenever the layer shows another day than the selected one (also the nearest swissEO VHI day), the date turns grey, in the menu and in the date box at the top left of the map, and the box names the day of the data below it.",
     "title": "Date and cloud filter"
   },
   "vis-hl": {
@@ -330,13 +330,13 @@
     "p2": "The true color is the image delivered with each swissEO mosaic. All other layers are computed from the bands in your browser, or read from the swissEO products (VHI, NDVIdiff, NDVIz). When several satellite passes cover the same day, they are joined into one mosaic, the most recent on top.",
     "td1": "Default",
     "td10": "true color, NDVI, EVI, swissEO VHI forest, VHI cumulative deficit, VHI days in extreme stress, swissEO NDVIdiff and NDVIz, NDVI difference to a reference date, NBR, moisture index, Forest Disturbance Classification",
-    "td2": "composites (true color, false color, urban, SWIR, agriculture, geology), indices (NDVI, NDWI, moisture index, NDSI, NBR, AOT), swissEO VHI forest and vegetation, swissEO NDVIdiff, scene classification, cloud mask, terrain",
+    "td2": "composites (true color, false color, urban, Highlight Optimized Natural Color, SWIR, agriculture, geology, Barren Soil), indices (NDVI, NDWI, moisture index, NDSI, NBR, AOT, SAVI), swissEO VHI forest and vegetation, swissEO NDVIdiff, scene classification, cloud mask, terrain",
     "td3": "Agriculture",
-    "td4": "true color, false color, NDVI, EVI, Barren Soil, Moisture Stress, moisture index, agriculture, SAVI",
+    "td4": "true color, NDVI, EVI, NDRE, MTVI2 (the indices Agroscope recommends for crops), on the farmland of the Nutzungsflächen",
     "td5": "Drought",
-    "td6": "true color, NDVI, EVI, moisture index, swissEO VHI, swissEO NDVIdiff and NDVIz, NDDI and NDDI change, NDVI difference to a reference date",
+    "td6": "true color, NDVI, EVI, moisture index, Moisture Stress, swissEO VHI, swissEO NDVIdiff and NDVIz, NDDI and NDDI change, NDVI difference to a reference date",
     "td7": "Drought 2026",
-    "td8": "true color, moisture index, NDWI, Moisture Stress, NDVI, SWIR, urban, Highlight Optimized Natural Color, plus the <a href=\"#vis-hl\">highlights</a>",
+    "td8": "only the <a href=\"#vis-hl\">highlights</a>; each story opens the true color of its two dates",
     "td9": "Forest",
     "th1": "Configuration",
     "th2": "Layers",
@@ -345,12 +345,13 @@
   "vis-mask": {
     "cap1": "<b>Fig. 13</b> A custom mask with two polygons: the NDVI is shown only inside them.",
     "img1": "NDVI shown only inside two custom polygons",
-    "p1": "You can restrict any layer to your own polygons, for example a forest map, the parcels of a farm or a nature reserve. In the layer menu, under <i>Custom mask</i>, load a file (GeoJSON, KML/KMZ, GPX, WKT or a zipped Shapefile) or a URL. Then choose <b>Inside</b> (show the data only inside the polygons) or <b>Outside</b> (only outside). The mask applies to the map, compare, statistics, exports and the timelapse, and can be combined with a vegetation mask. A mask loaded from a URL is part of copied links; a mask from a file stays on your computer.",
+    "p1": "You can restrict any layer to your own polygons, for example a forest map, the parcels of a farm or a nature reserve. In the layer menu, under <i>Custom mask</i>, load a file (GeoJSON, KML/KMZ, GPX, WKT or a zipped Shapefile) or a URL. Then choose <b>Inside</b> (show the data only inside the polygons) or <b>Outside</b> (only outside). The mask applies to the map, compare, statistics, exports and the timelapse, and can be combined with a vegetation mask. A mask loaded from a URL is part of copied links; a mask from a file stays on your computer. On the map, zoomed in closer than 2.5 m per pixel, its edges follow 2.5 m steps (the map then enlarges the 2.5 m tiles); statistics and exports use the polygons at their own resolution.",
     "title": "Custom masks: your own geometries"
   },
   "vis-masks": {
     "li1": "<b>Clouds</b> and <b>Cloud shadows</b>: the cloud mask delivered with each swissEO mosaic (thick and thin cloud, cloud shadow);",
     "li2": "<b>Terrain shadow</b>: the slopes in the shadow of the terrain at the time of the acquisition;",
+    "li2b": "<b>Low illumination</b>: slopes the sun hardly lights, where its angle of incidence reaches a threshold (70° unless you move the slider below the switch); off until you switch it on;",
     "li3": "<b>Vegetation mask</b>: keeps forest, all vegetation, conifer, mixed or broadleaf forest, chosen tree species, or chosen categories of the agricultural land use (next section);",
     "li4": "<b>Custom mask</b>: your own polygons (see <a href=\"#vis-mask\">Custom masks</a>).",
     "p1": "Every Sentinel-2 layer has these masks in its menu; they hide pixels on the map and leave them out of statistics, downloads and the timelapse. Most layers hide clouds, cloud shadows and terrain shadows as soon as they are opened (True color, False color, SWIR and the aerosol layer start without masks); switch a mask on or off in the layer's menu:",
@@ -363,7 +364,7 @@
     "li2": "<b>Legend</b> with an adjustable colour scale (min / max) and <i>Reset colour scale</i>.",
     "li3": "<b>Masks</b>: see the next two sections.",
     "li4": "<b>Show effects and advanced options</b>: gain, gamma, the red / green / blue ranges and the opacity. For the band composites also <i>Look</i> (standard stretch or the <i>True color optimized</i> tone curve of the Copernicus Browser) and <i>Adaptive gain</i>, which avoids saturated snow and clouds. <i>Reset effects</i> undoes all changes.",
-    "p1": "The chevron on the active layer opens its menu:",
+    "p1": "Choosing a layer opens its menu (except True color, whose menu stays closed); the chevron on the active layer opens and closes it:",
     "title": "Modifying a visualization"
   },
   "vis-veg": {
@@ -376,11 +377,9 @@
     "li3": "The two-date layers (NDDI change, NDVI difference to a reference date) use the mask of the selected date on both dates, so a new version of a habitat map never shows up as a change.",
     "li4": "The mask also applies to the <a href=\"#tools-stats\">statistics</a> (where you can choose another one), the <a href=\"#tools-spec\">spectral explorer</a>, the downloads and the timelapse; the change report gives the masked area in hectares.",
     "li5": "The <a href=\"#tools-insp\">pixel inspector</a> shows at every spot the habitat map, the swissTLM3D forest class, the broadleaf probability (Forest Type NFI), the broadleaf share and dominant tree species (ETH) and the Nutzungsflächen category, whichever mask is chosen; with a leaf type mask also the class at the current limits.",
-    "p1": "The pull-down <i>Vegetation mask</i> starts with <i>All vegetation</i> for the vegetation indices (NDVI, EVI, SAVI, moisture indices, NDDI) and NBR, with <i>Forest</i> for the forest layers and for every vegetation index in the <i>Forest</i> configuration, and with <i>Off</i> (\"Choose one\") for the composites and the other indices. Its entries, in this order:",
+    "p1": "The pull-down <i>Vegetation mask</i> starts with <i>All vegetation</i> for the vegetation indices (NDVI, EVI, SAVI, NDRE, MTVI2, moisture indices, NDDI) and NBR, with <i>Forest</i> for the forest layers and for every vegetation index in the <i>Forest</i> configuration, with the farmland of the Nutzungsflächen (every category but forest) in the <i>Agriculture</i> configuration, and with <i>Off</i> (\"Choose one\") for the composites and the other indices. Its entries, in this order:",
     "p2": "Good to know:",
     "td1": "Habitat Map: Forest, All vegetation",
-    "td10": "ETH tree species (30 m): Conifer forest, Mixed forest, Broadleaf forest",
-    "td11": "The same three classes and slider (30 / 85 %) on the <b>broadleaf share of the basal area</b>: a share, not a probability as in Forest Type NFI, so the limits are not directly comparable. The 3 × 3 mean covers 3 × 3 pixels of 30 m (90 m). Only the forest pixels of the ETH map, without a further forest mask.",
     "td12": "<a href=\"https://arxiv.org/abs/2611.08095\" target=\"_blank\" rel=\"noopener\">ETH tree species</a>, Zhou et al. 2026 (ETH Zürich, preprint arXiv:2611.08095), 30 m, trained on National Forest Inventory plots; licence CC BY-NC 4.0 (non-commercial use only)",
     "td13": "ETH tree species (30 m): Dominant tree species",
     "td14": "Check boxes for the class with the largest basal-area share per 30 m pixel: Spruce (Fichte), Fir (Tanne), Pine (Föhre), Larch (Lärche), Arolla pine (Arve), Beech (Buche), Maple (Ahorn), Ash (Esche), Oak (Eiche), Chestnut (Kastanie), Other (Andere); <i>All conifers</i>, <i>All broadleaves</i> and <i>All</i> set them at once.",

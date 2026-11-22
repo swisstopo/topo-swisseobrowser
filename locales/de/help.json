@@ -1,7 +1,6 @@
 {
   "about": {
-    "box1": "<b>Nicht für den operativen Einsatz.</b> Dies ist ein experimenteller Beta-Prototyp. Werte, Darstellungen und Statistiken werden im Browser berechnet, sind nicht validiert und können falsch oder unvollständig sein. Ebenen, die noch nicht vertieft geprüft wurden, tragen das Label <span class=\"beta\" style=\"margin:0\">BETA</span>. Für massgebende Daten verwenden Sie direkt die Produkte und Dienste von swisstopo.<br>Bitte beachten Sie, dass KI (Claude Code mit dem Modell Opus 5.5, mittlerer Aufwand) intensiv eingesetzt wurde, um diese Website vorzubereiten und sie vom Copernicus Browser abzuleiten. Die Indizes wurden in QGIS oder mit rasterio und GDAL von Hand bearbeitet und getestet.",
-    "p1": "Der swissEO Browser ist ein Web-Viewer für die <b>swissEO</b>-Satellitenprodukte von swisstopo: die Sentinel-2-Mosaike der Oberflächenreflektanz (swissEO S2-SR) und die daraus abgeleiteten Produkte wie den Vegetation Health Index (VHI) und die NDVI-Veränderungskarten. Sie können die Bilder ansehen, Daten vergleichen, Vegetations- und Wasserindizes berechnen, sie auf Wald oder Landwirtschaftsland beschränken, Statistiken und Zeitreihen für eigene Gebiete erhalten, sie in 3D auf dem Gelände betrachten und Bilder und Daten herunterladen.",
+    "p1": "Der swissEO Browser ist eine Fachanwendung für die <b>swissEO</b>-Satellitenprodukte von swisstopo und daraus abgeleitete Produkte, die von Bundes- und kantonalen Fachstellen erstellt und betreut werden. Sie können die Bilder ansehen, Daten vergleichen, Vegetations- und Wasserindizes berechnen, sie auf Wald oder Landwirtschaftsland beschränken, Statistiken und Zeitreihen für eigene Gebiete erhalten, sie in 3D auf dem Gelände betrachten und Bilder und Daten herunterladen.",
     "p2": "Seine Benutzeroberfläche folgt dem <a href=\"https://browser.dataspace.copernicus.eu/\" target=\"_blank\" rel=\"noopener\">Copernicus Browser</a> des europäischen Copernicus Data Space Ecosystem: Wer diesen kennt, fühlt sich sofort zu Hause. Der Unterschied liegt unter der Haube: Der swissEO Browser ist eine einzige Webseite ohne eigenen Server und ohne Login. <b>Alles wird laufend in Ihrem Webbrowser berechnet</b>, direkt aus den swissEO Cloud Optimized GeoTIFFs (COGs) auf data.geo.admin.ch. Nichts ist vorberechnet: Wenn Sie eine Ebene, ein Datum oder eine Einstellung ändern, liest Ihr Browser die nötigen Pixel und berechnet das Ergebnis.",
     "p3": "Diese Hilfe hat zwei Teile. <a href=\"#t1\">Teil A</a> ist eine kurze Anleitung für Ihren ersten Besuch: Sie dauert etwa fünfzehn Minuten. <a href=\"#vis\">Teil B</a> beschreibt jede Funktion in der Reihenfolge der <a href=\"https://documentation.dataspace.copernicus.eu/Applications/Browser.html\" target=\"_blank\" rel=\"noopener\">Dokumentation des Copernicus Browser</a>. Sie können diese Seite jederzeit mit der Schaltfläche <span class=\"key\">i</span> oben rechts auf der Karte öffnen. Die Daten und ihre Quellen sind in <a href=\"#data\">Abschnitt 4</a> aufgeführt.",
     "p4": "Kein Vorwissen nötig. Öffnen Sie den <a data-home href=\"../\" target=\"_blank\" rel=\"noopener\">swissEO Browser</a> in einem zweiten Fenster und machen Sie mit.",
@@ -47,7 +46,7 @@
     "td33": "swisstopo, map.geo.admin.ch",
     "td4": "swissEO VHI",
     "td5": "Täglicher Vegetation Health Index für Wald und alle Vegetation, gegenüber 1991–2020; VHI-Saisonebenen",
-    "td6": "<a href=\"https://www.swisstopo.admin.ch/de/satellitenbilder-swisseo-vhi\" target=\"_blank\" rel=\"noopener\">swisstopo</a>",
+    "td6": "<a href=\"https://www.swisstopo.admin.ch/de/satellitenbilder-swisseo-vhi\" target=\"_blank\" rel=\"noopener\">swisstopo</a>, <a href=\"https://www.meteoschweiz.admin.ch\" target=\"_blank\" rel=\"noopener\">MeteoSchweiz</a>",
     "td7": "swissEO NDVIdiff und NDVIz",
     "td8": "NDVI-Veränderung gegenüber dem Vorjahr und NDVI-Anomalie, für den Wald, Ende Juli, August und September",
     "td9": "<a href=\"https://www.swisstopo.admin.ch/de/satellitenbilder-swisseo-ndvidiff\" target=\"_blank\" rel=\"noopener\">NDVIdiff</a>, <a href=\"https://www.swisstopo.admin.ch/de/satellitenbilder-swisseo-ndviz\" target=\"_blank\" rel=\"noopener\">NDVIz</a>, swisstopo",
@@ -65,7 +64,7 @@
   },
   "envbar": "<b>Integrationsversion zum Testen.</b> Nicht für den operativen Einsatz: Die hier gezeigten Ebenen und Werte sind nicht validiert und können falsch sein. Die offizielle Version ist noch nicht veröffentlicht.",
   "footer": {
-    "p1": "swissEO Browser, ein Prototyp von <a href=\"https://www.swisstopo.admin.ch\" target=\"_blank\" rel=\"noopener\">swisstopo</a>. Daten © swisstopo (Open Government Data); swissEO S2-SR und swissEO VHI enthalten veränderte Copernicus-Sentinel-Daten. Waldmischungsgrad LFI © WSL (Waser et al. 2025, finanziert vom BAFU); ETH-Baumarten © Zhou et al. 2026 (ETH Zürich), CC BY-NC 4.0, nur nicht kommerzielle Nutzung; Nutzungsflächen © BLW und die Kantone. Benutzeroberfläche nach dem Vorbild des Copernicus Browser des Copernicus Data Space Ecosystem; dieses Projekt ist mit ihm weder verbunden noch von ihm unterstützt. Quellcode und technische Details: <a href=\"https://github.com/swisstopo/topo-swisseobrowser\" target=\"_blank\" rel=\"noopener\">github.com/swisstopo/topo-swisseobrowser</a>.",
+    "p1": "swissEO Browser, ein Prototyp von <a href=\"https://www.swisstopo.admin.ch\" target=\"_blank\" rel=\"noopener\">swisstopo</a>. Daten © swisstopo (Open Government Data), swissEO VHI gemeinsam mit MeteoSchweiz; swissEO S2-SR und swissEO VHI enthalten veränderte Copernicus-Sentinel-Daten. Waldmischungsgrad LFI © WSL (Waser et al. 2025, finanziert vom BAFU); ETH-Baumarten © Zhou et al. 2026 (ETH Zürich), CC BY-NC 4.0, nur nicht kommerzielle Nutzung; Nutzungsflächen © BLW und die Kantone. Benutzeroberfläche nach dem Vorbild des Copernicus Browser des Copernicus Data Space Ecosystem; dieses Projekt ist mit ihm weder verbunden noch von ihm unterstützt. Quellcode und technische Details: <a href=\"https://github.com/swisstopo/topo-swisseobrowser\" target=\"_blank\" rel=\"noopener\">github.com/swisstopo/topo-swisseobrowser</a>.",
     "p2": "<a href=\"https://www.swisstopo.admin.ch/de/impressum-bundesamt-fuer-landestopografie\" target=\"_blank\" rel=\"noopener\">Impressum</a> · <a href=\"https://www.swisstopo.admin.ch/de/rechtliche-grundlagen\" target=\"_blank\" rel=\"noopener\">Rechtliche Grundlagen</a> · <a href=\"https://www.swisstopo.admin.ch/de/allgemeine-geschaeftsbedingungen\" target=\"_blank\" rel=\"noopener\">Allgemeine Geschäftsbedingungen</a> · <a href=\"https://www.swisstopo.admin.ch/de/netiquette-von-swisstopo\" target=\"_blank\" rel=\"noopener\">Netiquette</a>"
   },
   "header": {
@@ -182,10 +181,10 @@
     "cap1": "<b>Abb. 5</b> NDVI bei Kerzers, 13. August 2026, mit der Maske Nutzungsflächen auf Ackerfläche, Dauerwiesen und Dauerweiden beschränkt.",
     "img1": "NDVI beschränkt auf Ackerfläche, Wiesen und Weiden, mit den Kontrollkästchen der Kategorien",
     "li1": "Scrollen Sie im Ebenenmenü hinunter zu <b>Masken</b>. Das Ausklappmenü <i>Vegetationsmaske</i> steht auf <i>Aus</i>.",
-    "li2": "Wählen Sie eine Maske, zum Beispiel <i>Landnutzung (Kategorien unten)</i> unter <i>Nutzungsflächen</i>: die landwirtschaftliche Nutzung der Kantone.",
+    "li2": "Wählen Sie eine Maske, zum Beispiel <i>Landnutzung</i> unter <i>Nutzungsflächen</i>: die landwirtschaftliche Nutzung der Kantone.",
     "li3": "Haken Sie die Kategorien an, die Sie behalten möchten, zum Beispiel Ackerfläche, Dauerwiesen und Dauerweiden. Die Karte zeigt die Ebene jetzt nur noch dort.",
     "p1": "Oft zählt nur ein Teil der Landschaft: der Wald für eine Trockenheitsbeurteilung, die Felder für eine Ernte. Die <b>Vegetationsmaske</b> blendet alles andere aus.",
-    "p2": "Die anderen Masken behalten Wald (die Habitatkarte von swissEO VHI oder den swissTLM3D-Wald), Nadel-, Misch- oder Laubwald (Waldmischungsgrad LFI 2023, ETH-Baumarten), einzelne Baumarten (ETH) oder alle Vegetation. Sie sind mit ihren Quellen unter <a href=\"#vis-veg\">Vegetationsmasken</a> beschrieben. Masken gelten auch für Statistik, Downloads und den Zeitraffer.",
+    "p2": "Die anderen Masken behalten Wald (die Habitatkarte von swissEO VHI oder den swissTLM3D-Wald), Nadel-, Misch- oder Laubwald (Waldmischungsgrad LFI 2023), einzelne Baumarten (ETH) oder alle Vegetation. Sie sind mit ihren Quellen unter <a href=\"#vis-veg\">Vegetationsmasken</a> beschrieben. Masken gelten auch für Statistik, Downloads und den Zeitraffer.",
     "title": "<span class=\"n\">5</span>Nur Wald oder Landwirtschaftsland behalten"
   },
   "t6": {
@@ -235,7 +234,7 @@
     "img1": "Dialog Bild herunterladen, Register Analytisch",
     "li1": "<b>Einfach</b>: die aktuelle Ansicht als PNG oder JPG, mit Bildlegenden (Datenquelle, Datum, Vegetationsmaske, Massstabsbalken), einer optionalen Beschreibung, den Kartenbeschriftungen, der Legende und dem Interessengebiet; auch im Vergleichsmodus und in 3D.",
     "li2": "<b>Analytisch</b>: mehrere Ebenen und Rohbänder auf einmal, für die Ansicht oder das Interessengebiet, mit 40, 20 oder 10 m oder einer eigenen Auflösung (bis 2500 × 2500 Pixel). Formate: PNG, JPG oder GeoTIFF in Schweizer Koordinaten (LV95): 8 Bit, 16 Bit (die gespeicherten Werte) oder <b>32-Bit-Gleitkomma mit den Index- oder physikalischen Werten</b> für Ihre eigene Analyse. Mehrere Dateien werden gezippt. Die Masken der Ebene gelten.",
-    "li3": "<b>Druck in hoher Auflösung</b>: die Ansicht für ein Druckformat gerechnet: Breite und Höhe in cm (oder A4 / A3, hoch oder quer), DPI und ein Massstab. <i>Einpassen</i> behält die ganze Ansicht (oder das Interessengebiet) auf dem Papier; ein fester Massstab wie 1:25 000 zentriert den Druck auf das Interessengebiet und warnt, wenn es nicht passt.",
+    "li3": "<b>Druck in hoher Auflösung</b>: die Ansicht für ein Druckformat gerechnet: Breite und Höhe in cm (oder A4 / A3, hoch oder quer), DPI und ein Massstab. <i>Einpassen</i> behält die ganze Ansicht (oder das Interessengebiet) auf dem Papier; ein fester Massstab wie 1:25 000 zentriert den Druck auf das Interessengebiet und warnt, wenn es nicht passt. Die Liste <i>Grösse</i> enthält auch Formate für soziale Medien, zum Beispiel 1080 × 1920 px für eine Story oder ein Reel: Die ganze Ansicht oder das ganze Gebiet wird darin eingepasst.",
     "title": "Bild herunterladen"
   },
   "tools-insp": {
@@ -244,7 +243,8 @@
   },
   "tools-search": {
     "p1": "<b>Ort suchen</b> sucht Orte, Adressen, Gemeinden, Bezirke und Kantone mit der Ortssuche von map.geo.admin.ch. Ein Ergebnis zoomt auf seine Ausdehnung oder auf seinen Punkt in einem Massstab von etwa 1:25 000.",
-    "title": "Ortssuche"
+    "title": "Ortssuche",
+    "p2": "Sie nimmt auch <b>Koordinaten</b> an, wie map.geo.admin.ch: LV95 (<code>2600000 1200000</code>, auch <code>2'600'000, 1'200'000</code>), LV03 (<code>600000 200000</code>), WGS84 in Dezimalgrad (<code>46.95 7.44</code>) oder in Grad, Minuten und Sekunden (<code>46°57'08.66\" N 7°26'22.50\" E</code>) und MGRS (<code>32T LT 8076 0141</code>). Das Ergebnis zeigt den Punkt in LV95; ein Klick darauf zoomt die Karte dorthin und setzt eine Markierung."
   },
   "tools-spec": {
     "p1": "Die mittlere Oberflächenreflektanz aller zwölf Sentinel-2-Bänder über dem Gebiet, mit ± einer Standardabweichung, als Diagramm und als CSV. Sie zeigt die spektrale Signatur dessen, was in Ihrem Gebiet liegt: Wasser, Wald, Kulturen oder offener Boden. Auch hier lässt sich die Vegetationsmaske wählen.",
@@ -268,7 +268,7 @@
     "li1": "wählen Sie den Zeitraum und <i>1 Bild auswählen pro</i> Orbit, Tag, Woche, Monat oder Jahr; die Monats-Schaltflächen überspringen Jahreszeiten, die Sie nicht wollen (zum Beispiel den Winter);",
     "li2": "klicken Sie auf <b>Suchen</b>: Pro Intervall wird das Bild mit der besten Abdeckung Ihres Gebiets und dem klarsten Himmel gewählt;",
     "li3": "prüfen Sie die Liste: Vorschaubilder, Wolkenbedeckung und Abdeckung Ihres Gebiets; die Schieberegler filtern bewölkte oder unvollständige Bilder;",
-    "li4": "spielen Sie die <b>Vorschau</b> ab (Geschwindigkeit, Überblenden, Legende, Bildlegenden) und laden Sie sie als <b>GIF</b> oder <b>Video</b> herunter.",
+    "li4": "spielen Sie die <b>Vorschau</b> ab (Geschwindigkeit, Überblenden, Legende, Bildlegenden) und laden Sie sie als <b>GIF</b> oder <b>Video</b> herunter, in der Grösse Ihres Gebiets oder in einem Format für soziale Medien (<i>Grösse</i>, zum Beispiel ein Video mit 1080 × 1920 px für eine Story oder ein Reel).",
     "p1": "Die Film-Schaltfläche erstellt eine Animation der aktuellen Ebene mit ihren Masken über dem Interessengebiet (oder der Ansicht):",
     "p2": "Es gibt keine harten Grenzen: Eine wöchentliche Gletscheranimation über zehn Jahre funktioniert, sie dauert nur einige Minuten.",
     "title": "Zeitraffer"
@@ -314,7 +314,7 @@
     "title": "Visualisierungen vergleichen"
   },
   "vis-date": {
-    "p1": "Ein Link ohne Datum öffnet den neuesten Tag mit Daten. Die Pfeile und der Kalender bieten nur Tage an, deren Bilder die <b>Kartenansicht tatsächlich erreichen</b>, sie ändern sich also, wenn Sie die Karte verschieben. Der Wolkenregler im Kalender blendet Tage aus, deren Mosaik bewölkter ist als der gewählte Prozentsatz. Für die swissEO-Produkte mit nur wenigen Daten pro Jahr (NDVIdiff, NDVIz) wird das Produkt gezeigt, das dem gewählten Datum am nächsten liegt, und der Text unter dem Datum sagt, welches.",
+    "p1": "Ein Link ohne Datum öffnet den neuesten Tag mit Daten. Die Pfeile und der Kalender bieten nur Tage an, deren Bilder die <b>Kartenansicht tatsächlich erreichen</b>, sie ändern sich also, wenn Sie die Karte verschieben. Der Wolkenregler im Kalender blendet Tage aus, deren Mosaik bewölkter ist als der gewählte Prozentsatz. Für die swissEO-Produkte mit nur wenigen Daten pro Jahr (NDVIdiff, NDVIz) wird das Produkt gezeigt, das dem gewählten Datum am nächsten liegt, und der Text unter dem Datum sagt, welches. Zeigt die Ebene einen anderen Tag als den gewählten (auch den nächsten Tag von swissEO VHI), wird das Datum grau, im Menü und im Datumsfeld oben links auf der Karte, und das Feld nennt darunter den Tag der Daten.",
     "title": "Datum und Wolkenfilter"
   },
   "vis-hl": {
@@ -330,13 +330,13 @@
     "p2": "Die Echtfarben sind das Bild, das mit jedem swissEO-Mosaik geliefert wird. Alle anderen Ebenen werden in Ihrem Browser aus den Bändern berechnet oder aus den swissEO-Produkten gelesen (VHI, NDVIdiff, NDVIz). Wenn mehrere Satellitenüberflüge denselben Tag abdecken, werden sie zu einem Mosaik zusammengefügt, der neueste oben.",
     "td1": "Standard",
     "td10": "Echtfarben, NDVI, EVI, swissEO VHI Wald, kumuliertes VHI-Defizit, VHI-Tage in extremem Stress, swissEO NDVIdiff und NDVIz, NDVI-Differenz zu einem Referenzdatum, NBR, Feuchtigkeitsindex, Klassifikation von Waldstörungen",
-    "td2": "Komposite (Echtfarben, Falschfarben, Siedlung, SWIR, Landwirtschaft, Geologie), Indizes (NDVI, NDWI, Feuchtigkeitsindex, NDSI, NBR, AOT), swissEO VHI Wald und Vegetation, swissEO NDVIdiff, Szenenklassifikation, Wolkenmaske, Gelände",
+    "td2": "Komposite (Echtfarben, Falschfarben, Siedlung, natürliche Farben mit Lichteroptimierung, SWIR, Landwirtschaft, Geologie, offener Boden), Indizes (NDVI, NDWI, Feuchtigkeitsindex, NDSI, NBR, AOT, SAVI), swissEO VHI Wald und Vegetation, swissEO NDVIdiff, Szenenklassifikation, Wolkenmaske, Gelände",
     "td3": "Landwirtschaft",
-    "td4": "Echtfarben, Falschfarben, NDVI, EVI, offener Boden, NDMI für Trockenstress, Feuchtigkeitsindex, Landwirtschaft, SAVI",
+    "td4": "Echtfarben, NDVI, EVI, NDRE, MTVI2 (die Indizes, die Agroscope für Kulturen empfiehlt), auf dem Landwirtschaftsland der Nutzungsflächen",
     "td5": "Trockenheit",
-    "td6": "Echtfarben, NDVI, EVI, Feuchtigkeitsindex, swissEO VHI, swissEO NDVIdiff und NDVIz, NDDI und NDDI-Veränderung, NDVI-Differenz zu einem Referenzdatum",
+    "td6": "Echtfarben, NDVI, EVI, Feuchtigkeitsindex, NDMI für Trockenstress, swissEO VHI, swissEO NDVIdiff und NDVIz, NDDI und NDDI-Veränderung, NDVI-Differenz zu einem Referenzdatum",
     "td7": "Trockenheit 2026",
-    "td8": "Echtfarben, Feuchtigkeitsindex, NDWI, NDMI für Trockenstress, NDVI, SWIR, Siedlung, natürliche Farben mit Lichteroptimierung, dazu die <a href=\"#vis-hl\">Highlights</a>",
+    "td8": "nur die <a href=\"#vis-hl\">Highlights</a>; jede Geschichte öffnet die Echtfarben ihrer zwei Daten",
     "td9": "Wald",
     "th1": "Konfiguration",
     "th2": "Ebenen",
@@ -345,7 +345,7 @@
   "vis-mask": {
     "cap1": "<b>Abb. 13</b> Eine eigene Maske mit zwei Polygonen: Der NDVI wird nur innerhalb davon gezeigt.",
     "img1": "NDVI nur innerhalb von zwei eigenen Polygonen",
-    "p1": "Sie können jede Ebene auf Ihre eigenen Polygone beschränken, zum Beispiel eine Waldkarte, die Parzellen eines Betriebs oder ein Naturschutzgebiet. Laden Sie im Ebenenmenü unter <i>Eigene Maske</i> eine Datei (GeoJSON, KML/KMZ, GPX, WKT oder ein gezipptes Shapefile) oder eine URL. Wählen Sie dann <b>Innen</b> (die Daten nur innerhalb der Polygone zeigen) oder <b>Aussen</b> (nur ausserhalb). Die Maske gilt für Karte, Vergleich, Statistik, Exporte und Zeitraffer und lässt sich mit einer Vegetationsmaske kombinieren. Eine von einer URL geladene Maske ist Teil kopierter Links; eine Maske aus einer Datei bleibt auf Ihrem Computer.",
+    "p1": "Sie können jede Ebene auf Ihre eigenen Polygone beschränken, zum Beispiel eine Waldkarte, die Parzellen eines Betriebs oder ein Naturschutzgebiet. Laden Sie im Ebenenmenü unter <i>Eigene Maske</i> eine Datei (GeoJSON, KML/KMZ, GPX, WKT oder ein gezipptes Shapefile) oder eine URL. Wählen Sie dann <b>Innen</b> (die Daten nur innerhalb der Polygone zeigen) oder <b>Aussen</b> (nur ausserhalb). Die Maske gilt für Karte, Vergleich, Statistik, Exporte und Zeitraffer und lässt sich mit einer Vegetationsmaske kombinieren. Eine von einer URL geladene Maske ist Teil kopierter Links; eine Maske aus einer Datei bleibt auf Ihrem Computer. Zoomen Sie näher als 2,5 m pro Pixel heran, folgen ihre Ränder auf der Karte Stufen von 2,5 m (die Karte vergrössert dann die 2,5-m-Kacheln); Statistik und Exporte verwenden die Polygone in ihrer eigenen Auflösung.",
     "title": "Eigene Masken: Ihre eigenen Geometrien"
   },
   "vis-masks": {
@@ -354,7 +354,8 @@
     "li3": "<b>Vegetationsmaske</b>: behält Wald, alle Vegetation, Nadel-, Misch- oder Laubwald, gewählte Baumarten oder gewählte Kategorien der landwirtschaftlichen Nutzung (nächster Abschnitt);",
     "li4": "<b>Eigene Maske</b>: Ihre eigenen Polygone (siehe <a href=\"#vis-mask\">Eigene Masken</a>).",
     "p1": "Jede Sentinel-2-Ebene hat diese Masken in ihrem Menü; sie blenden Pixel auf der Karte aus und lassen sie bei Statistik, Downloads und Zeitraffer weg. Die meisten Ebenen blenden Wolken, Wolkenschatten und Geländeschatten aus, sobald sie geöffnet werden (Echtfarben, Falschfarben, SWIR und die Aerosol-Ebene beginnen ohne Masken); schalten Sie eine Maske im Menü der Ebene ein oder aus:",
-    "title": "Masken"
+    "title": "Masken",
+    "li2b": "<b>Schwache Beleuchtung</b>: Hänge, die die Sonne kaum beleuchtet, wo ihr Einfallswinkel einen Schwellenwert erreicht (70°, ausser Sie verschieben den Regler unter dem Schalter); aus, bis Sie sie einschalten;"
   },
   "vis-menu": {
     "cap1": "<b>Abb. 10</b> Effekte und erweiterte Optionen.",
@@ -363,7 +364,7 @@
     "li2": "<b>Legende</b> mit einstellbarer Farbskala (Min. / Max.) und <i>Farbskala zurücksetzen</i>.",
     "li3": "<b>Masken</b>: siehe die nächsten zwei Abschnitte.",
     "li4": "<b>Effekte und erweiterte Optionen anzeigen</b>: Verstärkung, Gamma, die Bereiche für Rot / Grün / Blau und die Deckkraft. Für die Bandkomposite auch <i>Darstellung</i> (Standard-Streckung oder die Tonkurve <i>True color optimized</i> des Copernicus Browser) und <i>Adaptive Verstärkung</i>, die übersteuerten Schnee und Wolken vermeidet. <i>Effekte zurücksetzen</i> macht alle Änderungen rückgängig.",
-    "p1": "Der Pfeil an der aktiven Ebene öffnet ihr Menü:",
+    "p1": "Beim Wählen einer Ebene öffnet sich ihr Menü (ausser bei Echtfarben, deren Menü geschlossen bleibt); der Pfeil an der aktiven Ebene öffnet und schliesst es:",
     "title": "Eine Visualisierung anpassen"
   },
   "vis-veg": {
@@ -376,11 +377,9 @@
     "li3": "Die Zwei-Daten-Ebenen (NDDI-Veränderung, NDVI-Differenz zu einem Referenzdatum) verwenden an beiden Daten die Maske des gewählten Datums, so erscheint eine neue Version einer Habitatkarte nie als Veränderung.",
     "li4": "Die Maske gilt auch für die <a href=\"#tools-stats\">Statistik</a> (wo Sie eine andere wählen können), die <a href=\"#tools-spec\">Spektralanalyse</a>, die Downloads und den Zeitraffer; der Veränderungsbericht gibt die maskierte Fläche in Hektaren an.",
     "li5": "Die <a href=\"#tools-insp\">Pixelabfrage</a> zeigt an jeder Stelle die Habitatkarte, die swissTLM3D-Waldklasse, die Laubholzwahrscheinlichkeit (Waldmischungsgrad LFI), den Laubholzanteil und die dominante Baumart (ETH) sowie die Kategorie der Nutzungsflächen, unabhängig von der gewählten Maske; mit einer Maske nach Waldtyp auch die Klasse bei den aktuellen Grenzen.",
-    "p1": "Das Ausklappmenü <i>Vegetationsmaske</i> steht bei den Vegetationsindizes (NDVI, EVI, SAVI, Feuchtigkeitsindizes, NDDI) und beim NBR zu Beginn auf <i>Alle Vegetation</i>, bei den Waldebenen und bei jedem Vegetationsindex in der Konfiguration <i>Wald</i> auf <i>Wald</i>, und bei den Kompositen und den übrigen Indizes auf <i>Aus</i> («Eine auswählen»). Seine Einträge in dieser Reihenfolge:",
+    "p1": "Das Ausklappmenü <i>Vegetationsmaske</i> steht bei den Vegetationsindizes (NDVI, EVI, SAVI, NDRE, MTVI2, Feuchtigkeitsindizes, NDDI) und beim NBR zu Beginn auf <i>Alle Vegetation</i>, bei den Waldebenen und bei jedem Vegetationsindex in der Konfiguration <i>Wald</i> auf <i>Wald</i>, und bei den Kompositen und den übrigen Indizes auf <i>Aus</i> («Eine auswählen»). In der Konfiguration <i>Landwirtschaft</i> startet jeder Vegetationsindex mit dem Landwirtschaftsland der Nutzungsflächen (alle Kategorien ausser Wald). Seine Einträge in dieser Reihenfolge:",
     "p2": "Gut zu wissen:",
     "td1": "Habitatkarte: Wald, Alle Vegetation",
-    "td10": "ETH-Baumarten (30 m): Nadelwald, Mischwald, Laubwald",
-    "td11": "Dieselben drei Klassen und derselbe Schieberegler (30 / 85 %) auf dem <b>Laubholzanteil an der Basalfläche</b>: ein Anteil, keine Wahrscheinlichkeit wie im Waldmischungsgrad LFI, die Grenzen sind also nicht direkt vergleichbar. Das 3 × 3-Mittel umfasst 3 × 3 Pixel von 30 m (90 m). Nur die Waldpixel der ETH-Karte, ohne weitere Waldmaske.",
     "td12": "<a href=\"https://arxiv.org/abs/2611.08095\" target=\"_blank\" rel=\"noopener\">ETH-Baumarten</a>, Zhou et al. 2026 (ETH Zürich, Preprint arXiv:2611.08095), 30 m, trainiert mit Stichproben des Landesforstinventars; Lizenz CC BY-NC 4.0 (nur nicht kommerzielle Nutzung)",
     "td13": "ETH-Baumarten (30 m): Dominante Baumart",
     "td14": "Kontrollkästchen für die Klasse mit dem grössten Basalflächenanteil pro 30-m-Pixel: Fichte, Tanne, Föhre, Lärche, Arve, Buche, Ahorn, Esche, Eiche, Kastanie, Andere; <i>Alle Nadelbäume</i>, <i>Alle Laubbäume</i> und <i>Alle</i> setzen sie auf einmal.",

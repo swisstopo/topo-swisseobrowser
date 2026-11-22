@@ -48,7 +48,7 @@ CFG_END = "/* catalog:configs:end */"
 VER_MARKER = "const VERIFIED_IDS = null; // replaced on deploy"
 VER_WRITTEN = 'const VERIFIED_IDS = {ids}; // from catalog/layers.yaml'
 RM_START = "<!-- verification:start -->"
-MASK_KEYS = ("cloud", "shadow", "terrain")
+MASK_KEYS = ("cloud", "shadow", "terrain", "illumination")
 # the values of the vegetationMask URL parameter (README, Vegetation masks); the page normalizes the details
 VEG_RE = re.compile(r"off|forest|vegetation|tlm(:[0-9.]+)?|(lfi|eth)-(conif|mixed|broad)(:[0-9.]+)*(:m3)?(\+(forest|tlm|none))?"
                     r"|eth-sp(:[0-9.]+)?|lnf(:[a-z.]+)?")
@@ -110,6 +110,10 @@ def load():
                 if lid not in listed:
                     fail("the configuration '{}' uses the layer '{}', which is not in "
                          "catalog/layers.yaml".format(c["key"], lid), "catalog/configurations.yaml")
+    for c in configs:
+        if not any(g.get("layers") for g in c.get("groups") or []) and not c.get("highlights"):
+            fail("the configuration '{}' has neither layers nor highlights".format(c["key"]),
+                 "catalog/configurations.yaml")
     check_masks(layers, configs, page)
     used = {lid for c in configs for g in c.get("groups", []) for lid in g.get("layers", [])}
     for lid in sorted(set(listed) - used):
@@ -122,9 +126,9 @@ def load():
 
 
 def check_masks(layers, configs, page):
-    """masks: { cloud, shadow, terrain: true/false, vegetation: a vegetationMask value }, only where the page
-    can apply them: cloud, shadow and terrain on the Sentinel-2 layers of a maskable type, the vegetation
-    mask on every Sentinel-2 layer."""
+    """masks: { cloud, shadow, terrain, illumination: true/false, vegetation: a vegetationMask value }, only where
+    the page can apply them: cloud, shadow, terrain and illumination on the Sentinel-2 layers of a maskable
+    type, the vegetation mask on every Sentinel-2 layer."""
     kind = {m.group(1): (m.group(2), m.group(3)) for m in
             re.finditer(r'^\s*\{ id:"([a-z0-9_]+)"[^\n]*?type:"(\w+)"[^\n]*?source:"(\w+)"', page, re.M)}
     m = re.search(r"^const MASKABLE = \{([^}]*)\}", page, re.M)
@@ -156,7 +160,7 @@ def check_masks(layers, configs, page):
                     fail("{}: '{}' cannot have a vegetation mask: it is not a Sentinel-2 layer".format(where, lid),
                          where)
             else:
-                fail("{}: unknown key masks.{} of '{}' (cloud, shadow, terrain, vegetation)".format(where, k, lid),
+                fail("{}: unknown key masks.{} of '{}' (cloud, shadow, terrain, illumination, vegetation)".format(where, k, lid),
                      where)
     for c in configs:
         masks = c.get("masks")
@@ -199,7 +203,7 @@ def published(layers, configs, env):
             keep = [lid for lid in g.get("layers", []) if lid in verified]
             if keep:
                 groups.append({"title": g.get("title", ""), "layers": keep})
-        if not groups:
+        if not groups and not c.get("highlights"):
             print("::warning file=catalog/configurations.yaml::the configuration '{}' has no "
                   "verified layer and is not offered in production".format(c["key"]))
             continue
@@ -224,7 +228,9 @@ def configs_block(configs, layers):
         if (c.get("masks") or {}).get("vegetation"):
             head += ", veg: " + json.dumps(c["masks"]["vegetation"])
         lines.append(head + ", groups: [")
-        groups = c.get("groups", [])
+        groups = c.get("groups") or []
+        if not groups:                    # only highlights
+            lines[-1] = head + ", groups: [] },"
         for i, g in enumerate(groups):
             ids = ", ".join(json.dumps(x) for x in g["layers"])
             # close the ids array, the [title, ids] pair and, on the last group, the groups array
@@ -232,7 +238,7 @@ def configs_block(configs, layers):
             lines.append("    [{}, [{}{}".format(json.dumps(g.get("title", "")), ids, end))
     lines.append("};")
     # the masks a layer starts with (cloud, shadow, terrain, veg); a configuration's veg replaces a layer's
-    # vegetation mask unless that is off
+    # vegetation mask only where that is the habitat map (forest or vegetation); off or a specific mask stays
     lines.append("const MASK_DEFAULTS = {")
     lines.extend(mask_defaults(layers))
     lines.append("};")

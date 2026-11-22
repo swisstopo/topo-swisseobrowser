@@ -1,7 +1,6 @@
 {
   "about": {
-    "box1": "<b>Pas pour un usage opérationnel.</b> Il s'agit d'un prototype bêta expérimental. Les valeurs, les rendus et les statistiques sont calculés dans le navigateur, ne sont pas validés et peuvent être faux ou incomplets. Les couches qui n'ont pas encore été vérifiées en profondeur portent l'étiquette <span class=\"beta\" style=\"margin:0\">BETA</span>. Pour des données faisant foi, utilisez directement les produits et services de swisstopo.<br>Veuillez noter que l'IA (Claude Code avec le modèle Opus 5.5, effort moyen) a été largement utilisée pour préparer ce site web, en l'adaptant du Copernicus Browser. Les indices ont été modifiés et testés manuellement dans QGIS ou avec rasterio et GDAL.",
-    "p1": "Le swissEO Browser est une visionneuse web des produits satellitaires <b>swissEO</b> de swisstopo : les mosaïques de réflectance de surface Sentinel-2 (swissEO S2-SR) et les produits qui en sont dérivés, comme le Vegetation Health Index (VHI) et les cartes de changement du NDVI. Vous pouvez regarder les images, comparer des dates, calculer des indices de végétation et d'eau, les limiter à la forêt ou aux terres agricoles, obtenir des statistiques et des séries temporelles pour vos propres zones, les voir en 3D sur le relief et télécharger des images et des données.",
+    "p1": "Le swissEO Browser est une application spécialisée pour les produits satellitaires <b>swissEO</b> de swisstopo et les produits qui en sont dérivés, élaborés et gérés par des services spécialisés de la Confédération et des cantons. Vous pouvez regarder les images, comparer des dates, calculer des indices de végétation et d'eau, les limiter à la forêt ou aux terres agricoles, obtenir des statistiques et des séries temporelles pour vos propres zones, les voir en 3D sur le relief et télécharger des images et des données.",
     "p2": "Son interface reprend celle du <a href=\"https://browser.dataspace.copernicus.eu/\" target=\"_blank\" rel=\"noopener\">Copernicus Browser</a> de l'écosystème européen Copernicus Data Space : si vous le connaissez, vous vous sentirez chez vous. La différence se trouve sous le capot : le swissEO Browser est une seule page web, sans serveur propre et sans connexion. <b>Tout est calculé à la volée dans votre navigateur</b>, directement à partir des Cloud Optimized GeoTIFFs (COG) swissEO sur data.geo.admin.ch. Rien n'est précalculé : quand vous changez une couche, une date ou un réglage, votre navigateur lit les pixels nécessaires et calcule le résultat.",
     "p3": "Cette aide comporte deux parties. La <a href=\"#t1\">partie A</a> est un court tutoriel pour votre première visite : il dure environ quinze minutes. La <a href=\"#vis\">partie B</a> décrit chaque fonction dans l'ordre de la <a href=\"https://documentation.dataspace.copernicus.eu/Applications/Browser.html\" target=\"_blank\" rel=\"noopener\">documentation du Copernicus Browser</a>. Vous pouvez ouvrir cette page à tout moment avec le bouton <span class=\"key\">i</span> en haut à droite de la carte. Les données et leurs sources sont listées à la <a href=\"#data\">section 4</a>.",
     "p4": "Aucune connaissance préalable n'est nécessaire. Ouvrez le <a data-home href=\"../\" target=\"_blank\" rel=\"noopener\">swissEO Browser</a> dans une deuxième fenêtre et suivez les étapes.",
@@ -47,7 +46,7 @@
     "td33": "swisstopo, map.geo.admin.ch",
     "td4": "swissEO VHI",
     "td5": "Vegetation Health Index quotidien pour la forêt et toute la végétation, par rapport à 1991–2020 ; couches de saison VHI",
-    "td6": "<a href=\"https://www.swisstopo.admin.ch/fr/imagesatellite-swisseo-vhi\" target=\"_blank\" rel=\"noopener\">swisstopo</a>",
+    "td6": "<a href=\"https://www.swisstopo.admin.ch/fr/imagesatellite-swisseo-vhi\" target=\"_blank\" rel=\"noopener\">swisstopo</a>, <a href=\"https://www.meteosuisse.admin.ch\" target=\"_blank\" rel=\"noopener\">MétéoSuisse</a>",
     "td7": "swissEO NDVIdiff et NDVIz",
     "td8": "Changement du NDVI par rapport à l'année précédente et anomalie du NDVI, pour la forêt, fin juillet, août et septembre",
     "td9": "<a href=\"https://www.swisstopo.admin.ch/fr/imagesatellite-swisseo-ndvidiff\" target=\"_blank\" rel=\"noopener\">NDVIdiff</a>, <a href=\"https://www.swisstopo.admin.ch/fr/imagesatellite-swisseo-ndviz\" target=\"_blank\" rel=\"noopener\">NDVIz</a>, swisstopo",
@@ -65,7 +64,7 @@
   },
   "envbar": "<b>Version d'intégration pour les tests.</b> Pas pour un usage opérationnel : les couches et valeurs affichées ici ne sont pas validées et peuvent être fausses. La version officielle n'est pas encore publiée.",
   "footer": {
-    "p1": "swissEO Browser, un prototype de <a href=\"https://www.swisstopo.admin.ch\" target=\"_blank\" rel=\"noopener\">swisstopo</a>. Données © swisstopo (open government data) ; swissEO S2-SR et swissEO VHI contiennent des données Copernicus Sentinel modifiées. Degré de mélange LFI © WSL (Waser et al. 2025, financé par l'OFEV) ; essences ETH © Zhou et al. 2026 (ETH Zurich), CC BY-NC 4.0, usage non commercial uniquement ; Nutzungsflächen © OFAG et les cantons. Interface inspirée du Copernicus Browser de l'écosystème Copernicus Data Space ; ce projet n'y est ni affilié ni soutenu par lui. Code source et détails techniques : <a href=\"https://github.com/swisstopo/topo-swisseobrowser\" target=\"_blank\" rel=\"noopener\">github.com/swisstopo/topo-swisseobrowser</a>.",
+    "p1": "swissEO Browser, un prototype de <a href=\"https://www.swisstopo.admin.ch\" target=\"_blank\" rel=\"noopener\">swisstopo</a>. Données © swisstopo (open government data), swissEO VHI en collaboration avec MétéoSuisse ; swissEO S2-SR et swissEO VHI contiennent des données Copernicus Sentinel modifiées. Degré de mélange LFI © WSL (Waser et al. 2025, financé par l'OFEV) ; essences ETH © Zhou et al. 2026 (ETH Zurich), CC BY-NC 4.0, usage non commercial uniquement ; Nutzungsflächen © OFAG et les cantons. Interface inspirée du Copernicus Browser de l'écosystème Copernicus Data Space ; ce projet n'y est ni affilié ni soutenu par lui. Code source et détails techniques : <a href=\"https://github.com/swisstopo/topo-swisseobrowser\" target=\"_blank\" rel=\"noopener\">github.com/swisstopo/topo-swisseobrowser</a>.",
     "p2": "<a href=\"https://www.swisstopo.admin.ch/fr/impressum-office-federal-de-topographie\" target=\"_blank\" rel=\"noopener\">Impressum</a> · <a href=\"https://www.swisstopo.admin.ch/fr/bases-legales\" target=\"_blank\" rel=\"noopener\">Bases légales</a> · <a href=\"https://www.swisstopo.admin.ch/fr/conditions-generales\" target=\"_blank\" rel=\"noopener\">Conditions générales</a> · <a href=\"https://www.swisstopo.admin.ch/fr/netiquette-de-swisstopo\" target=\"_blank\" rel=\"noopener\">Nétiquette</a>"
   },
   "header": {
@@ -182,10 +181,10 @@
     "cap1": "<b>Fig. 5</b> NDVI près de Chiètres, 13 août 2026, limité par le masque Nutzungsflächen aux terres assolées, prairies permanentes et pâturages permanents.",
     "img1": "NDVI limité aux terres assolées, prairies et pâturages, avec les cases à cocher des catégories",
     "li1": "Dans le menu de la couche, descendez jusqu'à <b>Masques</b>. La liste déroulante <i>Masque de végétation</i> indique <i>Désactivé</i>.",
-    "li2": "Choisissez un masque, par exemple <i>Utilisation du sol (catégories ci-dessous)</i> sous <i>Nutzungsflächen</i> : l'utilisation agricole du sol des cantons.",
+    "li2": "Choisissez un masque, par exemple <i>Utilisation du sol</i> sous <i>Nutzungsflächen</i> : l'utilisation agricole du sol des cantons.",
     "li3": "Cochez les catégories que vous voulez garder, par exemple les terres assolées, les prairies permanentes et les pâturages permanents. La carte ne montre maintenant la couche que là.",
     "p1": "Souvent, seule une partie du paysage compte : la forêt pour évaluer une sécheresse, les champs pour une récolte. Le <b>masque de végétation</b> masque tout le reste.",
-    "p2": "Les autres masques gardent la forêt (la carte des habitats de swissEO VHI ou la forêt swissTLM3D), la forêt de résineux, mixte ou de feuillus (Degré de mélange LFI 2023, essences ETH), des essences isolées (ETH) ou toute la végétation. Ils sont décrits, avec leurs sources, sous <a href=\"#vis-veg\">Masques de végétation</a>. Les masques s'appliquent aussi aux statistiques, aux téléchargements et au timelapse.",
+    "p2": "Les autres masques gardent la forêt (la carte des habitats de swissEO VHI ou la forêt swissTLM3D), la forêt de résineux, mixte ou de feuillus (Degré de mélange LFI 2023), des essences isolées (ETH) ou toute la végétation. Ils sont décrits, avec leurs sources, sous <a href=\"#vis-veg\">Masques de végétation</a>. Les masques s'appliquent aussi aux statistiques, aux téléchargements et au timelapse.",
     "title": "<span class=\"n\">5</span>Ne garder que la forêt ou les terres agricoles"
   },
   "t6": {
@@ -235,7 +234,7 @@
     "img1": "Boîte de dialogue de téléchargement d'image, onglet Analytique",
     "li1": "<b>Simple</b> : la vue actuelle en PNG ou JPG, avec mentions (source des données, date, masque de végétation, barre d'échelle), une description facultative, les étiquettes de la carte, la légende et la zone d'intérêt ; aussi en mode comparaison et en 3D.",
     "li2": "<b>Analytique</b> : plusieurs couches et bandes brutes à la fois, pour la vue ou la zone d'intérêt, à 40, 20 ou 10 m ou à une résolution personnalisée (jusqu'à 2500 × 2500 pixels). Formats : PNG, JPG ou GeoTIFF en coordonnées suisses (LV95) : 8 bits, 16 bits (les valeurs stockées) ou <b>32 bits flottants avec les valeurs d'indice ou physiques</b> pour votre propre analyse. Plusieurs fichiers sont zippés. Les masques de la couche s'appliquent.",
-    "li3": "<b>Impression haute résolution</b> : la vue calculée pour un format imprimé : largeur et hauteur en cm (ou A4 / A3, portrait ou paysage), DPI et une échelle. <i>Ajuster</i> garde toute la vue (ou la zone d'intérêt) sur le papier ; une échelle fixe comme 1:25 000 centre l'impression sur la zone d'intérêt et avertit quand elle ne tient pas.",
+    "li3": "<b>Impression haute résolution</b> : la vue calculée pour un format imprimé : largeur et hauteur en cm (ou A4 / A3, portrait ou paysage), DPI et une échelle. <i>Ajuster</i> garde toute la vue (ou la zone d'intérêt) sur le papier ; une échelle fixe comme 1:25 000 centre l'impression sur la zone d'intérêt et avertit quand elle ne tient pas. La liste <i>Taille</i> propose aussi des formats pour les réseaux sociaux, par exemple 1080 × 1920 px pour une Story ou un Reel : toute la vue ou toute la zone y est ajustée.",
     "title": "Téléchargement d'image"
   },
   "tools-insp": {
@@ -244,7 +243,8 @@
   },
   "tools-search": {
     "p1": "<b>Aller à un lieu</b> recherche des lieux, adresses, communes, districts et cantons avec la recherche de lieux de map.geo.admin.ch. Un résultat zoome sur son étendue, ou sur son point à une échelle d'environ 1:25 000.",
-    "title": "Recherche de lieu"
+    "title": "Recherche de lieu",
+    "p2": "Elle accepte aussi des <b>coordonnées</b>, comme map.geo.admin.ch : LV95 (<code>2600000 1200000</code>, aussi <code>2'600'000, 1'200'000</code>), LV03 (<code>600000 200000</code>), WGS84 en degrés décimaux (<code>46.95 7.44</code>) ou en degrés, minutes et secondes (<code>46°57'08.66\" N 7°26'22.50\" E</code>) et MGRS (<code>32T LT 8076 0141</code>). Le résultat indique le point en LV95 ; un clic dessus centre la carte sur ce point et y place un repère."
   },
   "tools-spec": {
     "p1": "La réflectance de surface moyenne des douze bandes de Sentinel-2 sur la zone, avec ± un écart type, sous forme de graphique et de CSV. Elle montre la signature spectrale de ce qui se trouve dans votre zone : eau, forêt, cultures ou sol nu. Le masque de végétation peut aussi être choisi ici.",
@@ -268,7 +268,7 @@
     "li1": "choisissez la période et <i>Sélectionner 1 image par</i> orbite, jour, semaine, mois ou année ; les boutons des mois ignorent les saisons que vous ne voulez pas (par exemple l'hiver) ;",
     "li2": "cliquez sur <b>Rechercher</b> : pour chaque intervalle, l'image avec la meilleure couverture de votre zone et le ciel le plus dégagé est choisie ;",
     "li3": "vérifiez la liste : vignettes, couverture nuageuse et couverture de votre zone ; les curseurs filtrent les images nuageuses ou incomplètes ;",
-    "li4": "lisez l'<b>aperçu</b> (vitesse, fondu, légende, mentions) et téléchargez-le en <b>GIF</b> ou en <b>vidéo</b>.",
+    "li4": "lisez l'<b>aperçu</b> (vitesse, fondu, légende, mentions) et téléchargez-le en <b>GIF</b> ou en <b>vidéo</b>, à la taille de votre zone ou dans un format pour les réseaux sociaux (<i>Taille</i>, par exemple une vidéo de 1080 × 1920 px pour une Story ou un Reel).",
     "p1": "Le bouton film crée une animation de la couche actuelle, avec ses masques, sur la zone d'intérêt (ou la vue) :",
     "p2": "Il n'y a pas de limites strictes : une animation hebdomadaire d'un glacier sur dix ans fonctionne, elle prend juste quelques minutes.",
     "title": "Timelapse"
@@ -314,7 +314,7 @@
     "title": "Comparer des visualisations"
   },
   "vis-date": {
-    "p1": "Un lien sans date s'ouvre sur le jour le plus récent avec des données. Les flèches et le calendrier ne proposent que les jours dont les images <b>atteignent réellement la vue de la carte</b> : ils changent donc quand vous déplacez la carte. Le curseur des nuages du calendrier masque les jours dont la mosaïque est plus nuageuse que le pourcentage choisi. Pour les produits swissEO avec seulement quelques dates par an (NDVIdiff, NDVIz), le produit le plus proche de la date choisie est affiché, et le texte sous la date indique lequel.",
+    "p1": "Un lien sans date s'ouvre sur le jour le plus récent avec des données. Les flèches et le calendrier ne proposent que les jours dont les images <b>atteignent réellement la vue de la carte</b> : ils changent donc quand vous déplacez la carte. Le curseur des nuages du calendrier masque les jours dont la mosaïque est plus nuageuse que le pourcentage choisi. Pour les produits swissEO avec seulement quelques dates par an (NDVIdiff, NDVIz), le produit le plus proche de la date choisie est affiché, et le texte sous la date indique lequel. Chaque fois que la couche montre un autre jour que celui choisi (aussi le jour swissEO VHI le plus proche), la date devient grise, dans le menu et dans le champ de date en haut à gauche de la carte, et ce champ indique en dessous le jour des données.",
     "title": "Date et filtre de nuages"
   },
   "vis-hl": {
@@ -330,13 +330,13 @@
     "p2": "Les couleurs naturelles sont l'image livrée avec chaque mosaïque swissEO. Toutes les autres couches sont calculées à partir des bandes dans votre navigateur, ou lues dans les produits swissEO (VHI, NDVIdiff, NDVIz). Quand plusieurs passages du satellite couvrent le même jour, ils sont assemblés en une mosaïque, le plus récent au-dessus.",
     "td1": "Par défaut",
     "td10": "couleurs naturelles, NDVI, EVI, swissEO VHI forêt, déficit VHI cumulé, jours VHI en stress extrême, swissEO NDVIdiff et NDVIz, différence de NDVI par rapport à une date de référence, NBR, indice d'humidité, classification des perturbations forestières",
-    "td2": "composites (couleurs naturelles, fausses couleurs, urbain, SWIR, agriculture, géologie), indices (NDVI, NDWI, indice d'humidité, NDSI, NBR, AOT), swissEO VHI forêt et végétation, swissEO NDVIdiff, classification de la scène, masque des nuages, relief",
+    "td2": "composites (couleurs naturelles, fausses couleurs, urbain, couleurs naturelles optimisées, SWIR, agriculture, géologie, sol nu), indices (NDVI, NDWI, indice d'humidité, NDSI, NBR, AOT, SAVI), swissEO VHI forêt et végétation, swissEO NDVIdiff, classification de la scène, masque des nuages, relief",
     "td3": "Agriculture",
-    "td4": "couleurs naturelles, fausses couleurs, NDVI, EVI, sol nu, NDMI pour le stress hydrique, indice d'humidité, agriculture, SAVI",
+    "td4": "couleurs naturelles, NDVI, EVI, NDRE, MTVI2 (les indices recommandés par Agroscope pour les cultures), sur les terres agricoles des surfaces d'exploitation",
     "td5": "Sécheresse",
-    "td6": "couleurs naturelles, NDVI, EVI, indice d'humidité, swissEO VHI, swissEO NDVIdiff et NDVIz, NDDI et changement de NDDI, différence de NDVI par rapport à une date de référence",
+    "td6": "couleurs naturelles, NDVI, EVI, indice d'humidité, NDMI pour le stress hydrique, swissEO VHI, swissEO NDVIdiff et NDVIz, NDDI et changement de NDDI, différence de NDVI par rapport à une date de référence",
     "td7": "Sécheresse 2026",
-    "td8": "couleurs naturelles, indice d'humidité, NDWI, NDMI pour le stress hydrique, NDVI, SWIR, urbain, couleurs naturelles optimisées, ainsi que les <a href=\"#vis-hl\">points forts</a>",
+    "td8": "uniquement les <a href=\"#vis-hl\">points forts</a> ; chaque histoire ouvre les couleurs naturelles de ses deux dates",
     "td9": "Forêt",
     "th1": "Configuration",
     "th2": "Couches",
@@ -345,7 +345,7 @@
   "vis-mask": {
     "cap1": "<b>Fig. 13</b> Un masque personnalisé avec deux polygones : le NDVI n'est affiché qu'à l'intérieur.",
     "img1": "NDVI affiché uniquement à l'intérieur de deux polygones personnalisés",
-    "p1": "Vous pouvez limiter n'importe quelle couche à vos propres polygones, par exemple une carte forestière, les parcelles d'une exploitation ou une réserve naturelle. Dans le menu de la couche, sous <i>Masque personnalisé</i>, chargez un fichier (GeoJSON, KML/KMZ, GPX, WKT ou un Shapefile zippé) ou une URL. Choisissez ensuite <b>Intérieur</b> (afficher les données uniquement à l'intérieur des polygones) ou <b>Extérieur</b> (uniquement à l'extérieur). Le masque s'applique à la carte, à la comparaison, aux statistiques, aux exports et au timelapse, et peut être combiné avec un masque de végétation. Un masque chargé depuis une URL fait partie des liens copiés ; un masque issu d'un fichier reste sur votre ordinateur.",
+    "p1": "Vous pouvez limiter n'importe quelle couche à vos propres polygones, par exemple une carte forestière, les parcelles d'une exploitation ou une réserve naturelle. Dans le menu de la couche, sous <i>Masque personnalisé</i>, chargez un fichier (GeoJSON, KML/KMZ, GPX, WKT ou un Shapefile zippé) ou une URL. Choisissez ensuite <b>Intérieur</b> (afficher les données uniquement à l'intérieur des polygones) ou <b>Extérieur</b> (uniquement à l'extérieur). Le masque s'applique à la carte, à la comparaison, aux statistiques, aux exports et au timelapse, et peut être combiné avec un masque de végétation. Un masque chargé depuis une URL fait partie des liens copiés ; un masque issu d'un fichier reste sur votre ordinateur. Sur la carte, lorsque vous zoomez au-delà de 2,5 m par pixel, ses bords suivent des pas de 2,5 m (la carte agrandit alors les tuiles de 2,5 m) ; les statistiques et les exports utilisent les polygones à leur propre résolution.",
     "title": "Masques personnalisés : vos propres géométries"
   },
   "vis-masks": {
@@ -354,7 +354,8 @@
     "li3": "<b>Masque de végétation</b> : garde la forêt, toute la végétation, la forêt de résineux, mixte ou de feuillus, des essences choisies ou des catégories choisies de l'utilisation agricole du sol (section suivante) ;",
     "li4": "<b>Masque personnalisé</b> : vos propres polygones (voir <a href=\"#vis-mask\">Masques personnalisés</a>).",
     "p1": "Chaque couche Sentinel-2 a ces masques dans son menu ; ils masquent des pixels sur la carte et les excluent des statistiques, des téléchargements et du timelapse. La plupart des couches masquent les nuages, les ombres de nuages et les ombres du relief dès leur ouverture (Couleurs naturelles, Fausses couleurs, SWIR et la couche des aérosols commencent sans masque) ; activez ou désactivez un masque dans le menu de la couche :",
-    "title": "Masques"
+    "title": "Masques",
+    "li2b": "<b>Faible éclairement</b> : les pentes à peine éclairées par le soleil, où son angle d'incidence atteint un seuil (70°, sauf si vous déplacez le curseur sous l'interrupteur) ; désactivé tant que vous ne l'activez pas ;"
   },
   "vis-menu": {
     "cap1": "<b>Fig. 10</b> Effets et options avancées.",
@@ -363,7 +364,7 @@
     "li2": "<b>Légende</b> avec une échelle de couleurs réglable (min. / max.) et <i>Réinitialiser l'échelle de couleurs</i>.",
     "li3": "<b>Masques</b> : voir les deux sections suivantes.",
     "li4": "<b>Afficher les effets et les options avancées</b> : gain, gamma, les plages rouge / vert / bleu et l'opacité. Pour les composites de bandes aussi <i>Rendu</i> (étirement standard ou la courbe tonale <i>True color optimized</i> du Copernicus Browser) et <i>Gain adaptatif</i>, qui évite la neige et les nuages saturés. <i>Réinitialiser les effets</i> annule toutes les modifications.",
-    "p1": "Le chevron de la couche active ouvre son menu :",
+    "p1": "Choisir une couche ouvre son menu (sauf pour les couleurs naturelles, dont le menu reste fermé) ; le chevron de la couche active l'ouvre et le ferme :",
     "title": "Modifier une visualisation"
   },
   "vis-veg": {
@@ -376,11 +377,9 @@
     "li3": "Les couches à deux dates (changement de NDDI, différence de NDVI par rapport à une date de référence) utilisent le masque de la date choisie pour les deux dates, si bien qu'une nouvelle version d'une carte des habitats n'apparaît jamais comme un changement.",
     "li4": "Le masque s'applique aussi aux <a href=\"#tools-stats\">statistiques</a> (où vous pouvez en choisir un autre), à l'<a href=\"#tools-spec\">explorateur spectral</a>, aux téléchargements et au timelapse ; le rapport de changement indique la surface masquée en hectares.",
     "li5": "L'<a href=\"#tools-insp\">inspecteur de pixels</a> montre à chaque endroit la carte des habitats, la classe forestière swissTLM3D, la probabilité de feuillus (Degré de mélange LFI), la part de feuillus et l'essence dominante (ETH) ainsi que la catégorie des Nutzungsflächen, quel que soit le masque choisi ; avec un masque par type de forêt aussi la classe aux limites actuelles.",
-    "p1": "La liste déroulante <i>Masque de végétation</i> commence par <i>Toute la végétation</i> pour les indices de végétation (NDVI, EVI, SAVI, indices d'humidité, NDDI) et le NBR, par <i>Forêt</i> pour les couches forestières et pour chaque indice de végétation dans la configuration <i>Forêt</i>, et par <i>Désactivé</i> (« En choisir une ») pour les composites et les autres indices. Ses entrées, dans cet ordre :",
+    "p1": "La liste déroulante <i>Masque de végétation</i> commence par <i>Toute la végétation</i> pour les indices de végétation (NDVI, EVI, SAVI, NDRE, MTVI2, indices d'humidité, NDDI) et le NBR, par <i>Forêt</i> pour les couches forestières et pour chaque indice de végétation dans la configuration <i>Forêt</i>, et par <i>Désactivé</i> (« En choisir une ») pour les composites et les autres indices. Dans la configuration <i>Agriculture</i>, chaque indice de végétation commence avec les terres agricoles des surfaces d'exploitation (toutes les catégories sauf la forêt). Ses entrées, dans cet ordre :",
     "p2": "Bon à savoir :",
     "td1": "Carte des habitats : forêt, toute la végétation",
-    "td10": "Essences ETH (30 m) : forêt de résineux, forêt mixte, forêt de feuillus",
-    "td11": "Les trois mêmes classes et le même curseur (30 / 85 %) sur la <b>part de feuillus dans la surface terrière</b> : une part, non une probabilité comme dans le Degré de mélange LFI, les limites ne sont donc pas directement comparables. La moyenne 3 × 3 couvre 3 × 3 pixels de 30 m (90 m). Uniquement les pixels forestiers de la carte ETH, sans autre masque forestier.",
     "td12": "<a href=\"https://arxiv.org/abs/2611.08095\" target=\"_blank\" rel=\"noopener\">Essences ETH</a>, Zhou et al. 2026 (ETH Zurich, prépublication arXiv:2611.08095), 30 m, entraîné sur les placettes de l'Inventaire forestier national ; licence CC BY-NC 4.0 (usage non commercial uniquement)",
     "td13": "Essences ETH (30 m) : essence dominante",
     "td14": "Cases à cocher pour la classe avec la plus grande part de surface terrière par pixel de 30 m : épicéa (Fichte), sapin (Tanne), pin (Föhre), mélèze (Lärche), arole (Arve), hêtre (Buche), érable (Ahorn), frêne (Esche), chêne (Eiche), châtaignier (Kastanie), autres (Andere) ; <i>Tous les résineux</i>, <i>Tous les feuillus</i> et <i>Toutes</i> les cochent d'un coup.",

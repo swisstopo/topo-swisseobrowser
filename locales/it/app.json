@@ -152,7 +152,13 @@
     "seasonStart": "La stagione inizia il 1° aprile: scegli un giorno successivo.",
     "seasonSums": "Somme della stagione dal 1° aprile al {{day}}, sulle mappe forestali VHI giornaliere (la prima visualizzazione richiede un po' di tempo).",
     "vhiDay": "Giorno VHI {{day}}",
-    "vhiNearest": "Giorno VHI {{day}} (il più vicino disponibile al {{date}})"
+    "vhiNearest": "Giorno VHI {{day}} (il più vicino disponibile al {{date}})",
+    "daysWindow_one": "finestra di {{count}} giorno",
+    "daysWindow_many": "finestra di {{count}} giorni",
+    "daysWindow_other": "finestra di {{count}} giorni",
+    "winCompared": "confrontata con {{from}} – {{to}}: {{n}}",
+    "winRange": "{{from}} – {{to}}",
+    "window": "Finestra {{from}} – {{to}} ({{days}} giorni): {{n}}"
   },
   "dialogs": {
     "export": {
@@ -189,7 +195,6 @@
       "layers": "Livelli",
       "low40MPx": "BASSA (40 m/px)",
       "medium20MPx": "MEDIA (20 m/px)",
-      "paper": "Carta",
       "pngNoGeoreference": "PNG (senza georeferenziazione)",
       "raw": "Grezzo",
       "resolutionXMPx": "Risoluzione X (m/px)",
@@ -202,7 +207,8 @@
       "tiff32BitFloat": "TIFF (32 bit a virgola mobile)",
       "tiff32BitFloat2": "TIFF (32 bit a virgola mobile): i livelli di indice forniscono il valore dell'indice, le bande grezze il valore fisico (riflettanza, AOT). TIFF (16 bit): le bande grezze forniscono il DN memorizzato. Più livelli vengono scaricati in un unico ZIP.",
       "tiff8Bit": "TIFF (8 bit)",
-      "visualised": "Visualizzati"
+      "visualised": "Visualizzati",
+      "size": "Dimensione"
     },
     "import": {
       "anAreaImportedFrom": "Un'area importata da un file <b>non viene condivisa quando copiate il link</b>: solo le aree piccole (fino a circa 270 vertici) entrano in un link. Per condividere un'area importata, caricatela da un URL.",
@@ -302,7 +308,6 @@
       "selectAll": "Seleziona tutto",
       "showCaptions": "Mostra didascalie",
       "showLegend": "Mostra legenda",
-      "sizePx": "Dimensioni [px]",
       "speed": "Velocità",
       "timeRange": "Periodo",
       "timelapse": "Timelapse",
@@ -311,7 +316,9 @@
       "videoMp4Webm": "Video (MP4 / WebM)",
       "visualisation": "Visualizzazione",
       "week": "settimana",
-      "year": "anno"
+      "year": "anno",
+      "size": "Dimensione",
+      "sizeArea": "Area (libera, px)"
     },
     "feedback": {
       "title": "Riscontro via e-mail",
@@ -324,6 +331,15 @@
       "copyText": "Copia il testo",
       "copied": "Copiato",
       "openMailApp": "Apri il programma di posta"
+    },
+    "sizes": {
+      "paper": "Carta",
+      "socialMedia": "Social media",
+      "story": "Storia / Reel 9:16 · 1080 × 1920 px",
+      "carousel": "Carosello 3:4 · 1080 × 1440 px",
+      "post": "Post verticale 4:5 · 1080 × 1350 px",
+      "square": "Quadrato 1:1 · 1080 × 1080 px",
+      "landscape": "Orizzontale 16:9 · 1920 × 1080 px"
     }
   },
   "env": {
@@ -342,14 +358,13 @@
     "badRes": "Inserisci una risoluzione superiore a 0 m/px.",
     "compare": "Confronto: {{list}}",
     "cors": "Una tessera ha bloccato l'esportazione del canvas (intestazioni CORS mancanti). Prova un'altra mappa di sfondo.",
-    "credit": "© swisstopo · contiene dati Copernicus Sentinel modificati",
+    "credit": "{{credits}} · contiene dati Copernicus Sentinel modificati",
     "encodeFailed": "La codifica dell'immagine non è riuscita.",
     "encoding": "Codifica…",
     "imageFailed": "Richiesta dell'immagine non riuscita",
     "infoA": "{{w}} × {{h}} px a {{rx}} × {{ry}} m/px",
     "infoB": "Vista attuale: {{w}} × {{h}} px a {{res}} m/px",
     "infoCompare": "confronto, {{n}} livelli",
-    "labelsCredit": "etichette © swisstopo",
     "loadingBasemap": "Caricamento della mappa di sfondo…",
     "noData": "Nessun dato per il {{date}} in quest'area.",
     "noRef": "(nessun riferimento)",
@@ -367,7 +382,8 @@
     "tooBigP": "L'immagine è troppo grande (max. 12000 px per lato e 60 megapixel). Riduci le dimensioni o i DPI.",
     "vhiForest": "VHI foresta",
     "vhiVegetation": "VHI vegetazione",
-    "vsRef": "rispetto al riferimento intorno al {{date}}"
+    "vsRef": "rispetto al riferimento intorno al {{date}}",
+    "vsWindow": "(finestra di {{days}} giorni) rispetto a {{from}} – {{to}}"
   },
   "external": {
     "chooseOrSearchA": "Scegliere o cercare un servizio (fornitori di geo.admin.ch)",
@@ -498,7 +514,7 @@
     "openAGithubIssue": "Aprire un issue su GitHub con il link alla vista attuale",
     "reportAnIssueImprovement": "Segnalare un problema o un miglioramento",
     "selectedDate": "Data selezionata",
-    "swisstopoOpenGovernmentData": "© swisstopo, <a href=\"https://www.swisstopo.admin.ch/ogd-conditions\" target=\"_blank\">open government data</a>. I prodotti swissEO contengono dati Copernicus Sentinel modificati. Terreno 3D: <a href=\"https://www.swisstopo.admin.ch/it/modello-altimetrico-swissalti3d\" target=\"_blank\" rel=\"noopener\">swissALTI3D</a>, <a href=\"https://www.geocat.ch/datahub/dataset/f7f058e9-288b-4c55-8f4e-6360880dbb59\" target=\"_blank\" rel=\"noopener\">swissALTIRegio</a>, swissSURFACE3D © swisstopo. Etichette © swisstopo. <a href=\"https://doi.org/10.16904/1000001.7\" target=\"_blank\" rel=\"noopener\">Tipo di bosco IFN</a> © WSL (Waser et al. 2025, finanziato dall'UFAM). <a href=\"https://arxiv.org/abs/2611.08095\" target=\"_blank\" rel=\"noopener\">Specie arboree ETH</a> © Zhou et al. 2026 (ETH Zurigo), con licenza CC BY-NC 4.0: solo per uso non commerciale. <a href=\"https://www.geocat.ch/datahub/dataset/ae183bc4-5c91-467e-89bc-85f390340efb\" target=\"_blank\" rel=\"noopener\">Superfici di utilizzo</a> © UFAG e i Cantoni. Livelli di altri servizi WMS / WMTS: © i rispettivi fornitori. Non per uso operativo. Codice sorgente, documentazione e issue: <a href=\"https://github.com/swisstopo/topo-swisseobrowser\" target=\"_blank\" rel=\"noopener\">github.com/swisstopo/topo-swisseobrowser</a>.",
+    "swisstopoOpenGovernmentData": "© swisstopo, <a href=\"https://www.swisstopo.admin.ch/ogd-conditions\" target=\"_blank\">open government data</a>: i prodotti swissEO, il terreno 3D (<a href=\"https://www.swisstopo.admin.ch/it/modello-altimetrico-swissalti3d\" target=\"_blank\" rel=\"noopener\">swissALTI3D</a>, <a href=\"https://www.geocat.ch/datahub/dataset/f7f058e9-288b-4c55-8f4e-6360880dbb59\" target=\"_blank\" rel=\"noopener\">swissALTIRegio</a>, swissSURFACE3D), le carte di base e le etichette; swissEO VHI in collaborazione con <a href=\"https://www.meteosvizzera.admin.ch\" target=\"_blank\" rel=\"noopener\">MeteoSvizzera</a>. I prodotti swissEO contengono dati Copernicus Sentinel modificati. <a href=\"https://doi.org/10.16904/1000001.7\" target=\"_blank\" rel=\"noopener\">Tipo di bosco IFN</a> © WSL (Waser et al. 2025, finanziato dall'UFAM). <a href=\"https://arxiv.org/abs/2611.08095\" target=\"_blank\" rel=\"noopener\">Specie arboree ETH</a> © Zhou et al. 2026 (ETH Zurigo), con licenza CC BY-NC 4.0: solo per uso non commerciale. <a href=\"https://www.geocat.ch/datahub/dataset/ae183bc4-5c91-467e-89bc-85f390340efb\" target=\"_blank\" rel=\"noopener\">Superfici di utilizzo</a> © UFAG e i Cantoni. Livelli di altri servizi WMS / WMTS: © i rispettivi fornitori. Non per uso operativo. Codice sorgente, documentazione e issue: <a href=\"https://github.com/swisstopo/topo-swisseobrowser\" target=\"_blank\" rel=\"noopener\">github.com/swisstopo/topo-swisseobrowser</a>.",
     "terms": "Note legali",
     "theHelpPageExplains": "La <a href=\"docs/index.html\" target=\"_blank\" rel=\"noopener\">pagina di aiuto</a> spiega ogni funzione con schermate e contiene un tutorial per la prima visita. Il <a href=\"https://github.com/swisstopo/topo-swisseobrowser#readme\" target=\"_blank\" rel=\"noopener\">README</a> descrive i prodotti e i servizi dietro i livelli, la scalatura e i valori no-data di ogni asset, le formule, i limiti del browser e la <a href=\"https://github.com/swisstopo/topo-swisseobrowser#layer-verification\" target=\"_blank\" rel=\"noopener\">verifica dei livelli</a> che determina quali livelli portano l'etichetta <span class=\"ver\">BETA</span>.",
     "writeAnEMail": "Scrivere un'e-mail con il link alla vista attuale (apre il programma di posta)",
@@ -552,7 +568,15 @@
     "tlm": "Bosco swissTLM3D",
     "unread": "({{n}} non leggibili)",
     "vegetation": "vegetazione",
-    "vhiDays": "Giorni con un valore VHI"
+    "vhiDays": "Giorni con un valore VHI",
+    "illumMasked": "mascherato: illuminazione scarsa (≥ {{thr}}°)",
+    "clearObs": "{{n}} chiare su {{total}} acquisizioni",
+    "customMask": "maschera personalizzata",
+    "masked": "Mascherato",
+    "maxNdvi": "NDVI massimo",
+    "medianNdvi": "NDVI mediano",
+    "observations": "Osservazioni",
+    "readingWindows": "Lettura di ogni acquisizione delle due finestre…"
   },
   "layer": {
     "adaptiveGain": "Guadagno adattivo",
@@ -603,7 +627,21 @@
     "standard": "Standard",
     "terrainShadow": "Ombra del terreno",
     "terrainShadowHelp": "Maschera del terreno valore 200: ombra portata o propria",
-    "threshold": "Soglia"
+    "threshold": "Soglia",
+    "illumThreshold": "Soglia [°]",
+    "illumination": "Illuminazione scarsa",
+    "illuminationHelp": "Maschera del terreno: angolo di incidenza solare pari o superiore alla soglia, pendii che il sole illumina appena",
+    "acqCount_one": "{{count}} acquisizione",
+    "acqCount_many": "{{count}} acquisizioni",
+    "acqCount_other": "{{count}} acquisizioni",
+    "window": "Finestra",
+    "windowDays_one": "{{count}} giorno",
+    "windowDays_many": "{{count}} giorni",
+    "windowDays_other": "{{count}} giorni",
+    "windowHelpMax": "NDVI più alto delle acquisizioni chiare, confrontato con la stessa finestra un anno prima",
+    "windowHelpMedian": "NDVI mediano delle acquisizioni chiare, confrontato con la stessa finestra un anno prima",
+    "windowInfo": "{{now}}: {{n}}; un anno prima, {{ref}}: {{m}}. La prima visualizzazione le legge tutte e richiede un po' di tempo.",
+    "windowTitle": "Giorni fino alla data"
   },
   "layerList": {
     "addCompare": "Aggiungi al confronto",
@@ -624,7 +662,7 @@
       "subtitle": "Dalle bande B11, B08, B02"
     },
     "analyst": {
-      "description": "# Differenza di NDVI rispetto a una data di riferimento\n\nMetodo del NDVI Analyst di Raffael Bienz (Cantone di Argovia): la differenza di NDVI tra due date (la più recente meno la precedente), dalla riflettanza swissEO S2-SR con i valori negativi posti a 0, mascherata sul bosco. I cambiamenti sono i pixel con un calo dell'NDVI sotto la soglia (predefinita −0.08); un filtro di maggioranza 3 × 3 rimuove gli effetti di bordo. *Cambiamento rilevato* mostra il risultato binario. Le statistiche di un'area di interesse indicano la superficie forestale e la superficie colpita in ha e %, con e senza rimozione degli effetti di bordo, come lo script originale.\n\nMaggiori informazioni [qui](https://github.com/RaffiBienz/ndvi_analyst).",
+      "description": "# Differenza di NDVI rispetto a una data di riferimento\n\nMetodo del NDVI Analyst di Raffael Bienz (Cantone di Argovia): la differenza di NDVI tra due date (la più recente meno la precedente), dalla riflettanza swissEO S2-SR con i valori negativi posti a 0, mascherata sul bosco di swissTLM3D. I cambiamenti sono i pixel con un calo dell'NDVI sotto la soglia (predefinita −0.08); un filtro di maggioranza 3 × 3 rimuove gli effetti di bordo. *Cambiamento rilevato* mostra il risultato binario. Le statistiche di un'area di interesse indicano la superficie forestale e la superficie colpita in ha e %, con e senza rimozione degli effetti di bordo, come lo script originale.\n\nMaggiori informazioni [qui](https://github.com/RaffiBienz/ndvi_analyst).",
       "name": "Differenza di NDVI rispetto a una data di riferimento",
       "subtitle": "Variazione dell'NDVI tra due date nel bosco, con rilevamento dei cambiamenti"
     },
@@ -775,6 +813,26 @@
       "name": "swissEO VHI vegetazione",
       "note": "Visualizzato da wms.geo.admin.ch. No-data = 110.",
       "subtitle": "Vegetation Health Index su tutta la vegetazione, rispetto al 1991–2020"
+    },
+    "ndre": {
+      "name": "NDRE",
+      "subtitle": "Normalized Difference Red Edge (B8 - B5)/(B8 + B5)",
+      "description": "# Normalized Difference Red Edge (NDRE)\n\nL'NDRE sostituisce la banda rossa dell'NDVI con il red edge (B05, 705 nm), dove la riflettanza delle foglie cresce rapidamente e dipende dal loro contenuto di clorofilla. Rispecchia quindi lo stato di clorofilla e di azoto di una coltura e continua a crescere nelle coperture dense dove l'NDVI satura, il che lo rende utile più avanti nella stagione. Valori tipici: suolo nudo circa 0–0.1, colture circa 0.2–0.6. Uno degli indici raccomandati da Agroscope per il monitoraggio delle colture, insieme a NDVI, EVI e MTVI2.\n\nDati: riflettanza swissEO S2-SR ρ = DN × 0.0001 − 0.1 di B08 (10 m) e B05 (20 m), ρ negative poste a 0.\n\nRiferimenti: Gitelson & Merzlyak 1994, [doi:10.1016/1011-1344(93)06963-4](https://doi.org/10.1016/1011-1344%2893%2906963-4); [Awesome Spectral Indices](https://github.com/awesome-spectral-indices/awesome-spectral-indices) (NDREI, Montero et al. 2023); [Index DataBase](https://www.indexdatabase.de/db/i-single.php?id=223)."
+    },
+    "mtvi2": {
+      "name": "MTVI2",
+      "subtitle": "Modified Triangular Vegetation Index 2 (B3, B4, B8)",
+      "description": "# Modified Triangular Vegetation Index 2 (MTVI2)\n\nL'MTVI2 (Haboudane et al. 2004) è stato concepito per stimare l'indice di area fogliare verde (LAI) delle colture senza dipendere dal contenuto di clorofilla delle foglie; il denominatore contiene una correzione per il suolo. Segue la densità della copertura su un intervallo più ampio dell'NDVI. I valori vanno da circa −1 a 1; i campi vegetati si trovano perlopiù tra 0.2 e 0.8. Uno degli indici raccomandati da Agroscope per il monitoraggio delle colture, insieme a NDVI, EVI e NDRE.\n\nDati: riflettanza swissEO S2-SR ρ = DN × 0.0001 − 0.1 di B03 (verde), B04 (rosso) e B08 (NIR), tutte a 10 m, ρ negative poste a 0 (così √ρ(B04) è definito). La formula richiede la riflettanza, non i DN.\n\nRiferimenti: Haboudane et al. 2004, Remote Sensing of Environment 90, 337–352, [doi:10.1016/j.rse.2003.12.013](https://doi.org/10.1016/j.rse.2003.12.013); [Awesome Spectral Indices](https://github.com/awesome-spectral-indices/awesome-spectral-indices) (Montero et al. 2023); [Index DataBase](https://www.indexdatabase.de/db/i-single.php?id=47)."
+    },
+    "ndvidiff22": {
+      "description": "# swissEO NDVIdiff v200_MVC BETA\n\n**Versione beta, un test calcolato al volo, non un prodotto ufficiale.** Variazione annuale del NDVI da un **composito del valore massimo (MVC)**: per pixel il NDVI più alto della finestra, l'approccio classico di [Holben (1986)](https://doi.org/10.1080/01431168608948945). Nuvole, foschia e ombre abbassano il NDVI, quindi il massimo sceglie di solito l'osservazione più limpida; con più osservazioni chiare in un anno che nell'altro, il massimo tende a essere più alto in quell'anno.\n\nLa finestra termina alla data scelta e si imposta nel menu del livello: **7, 16, 30 o 60 giorni** (30 per default; si può scegliere qualsiasi giorno, non solo i giorni con un'acquisizione). Viene letta ogni acquisizione swissEO S2-SR v200 della finestra la cui copertura nuvolosa supera il filtro; per pixel vengono scartate le osservazioni segnalate dalla maschera delle nuvole (1, 2, 3, secondo le maschere scelte), in ombra del terreno (200) o fuori dall'impronta della scena. NDVI = (NIR − Red) / (NIR + Red) della riflettanza (ρ = DN × 0.0001 − 0.1, ρ negativo posto a 0). Lo stesso calcolo è fatto per la stessa finestra di calendario un anno prima, e la carta mostra la differenza. Con la maschera del bosco (default) un pixel conta solo se è bosco nella carta degli habitat della data e in quella della data un anno prima. L'ispettore di pixel indica i due compositi e il numero di osservazioni chiare in ogni finestra.\n\nCalcolato nel tuo browser da tutte le acquisizioni delle due finestre: una finestra di 60 giorni può quindi richiedere un po' di tempo per essere disegnata. Le finestre brevi lasciano lacune dopo periodi nuvolosi.",
+      "name": "swissEO NDVIdiff v200_MVC BETA",
+      "subtitle": "BETA: NDVI massimo di una finestra di giorni rispetto alla stessa finestra un anno prima"
+    },
+    "ndvidiff23": {
+      "description": "# swissEO NDVIdiff v200_Median BETA\n\n**Versione beta, un test calcolato al volo, non un prodotto ufficiale.** Variazione annuale del NDVI da un **composito mediano**: per pixel la mediana del NDVI delle osservazioni chiare della finestra (con un numero pari, la media dei due valori centrali). Meno sensibile del composito del valore massimo alle nuvole non rilevate, ai valori anomali chiari e a un numero diverso di osservazioni nei due anni.\n\nLa finestra termina alla data scelta e si imposta nel menu del livello: **7, 16, 30 o 60 giorni** (30 per default; si può scegliere qualsiasi giorno, non solo i giorni con un'acquisizione). Viene letta ogni acquisizione swissEO S2-SR v200 della finestra la cui copertura nuvolosa supera il filtro; per pixel vengono scartate le osservazioni segnalate dalla maschera delle nuvole (1, 2, 3, secondo le maschere scelte), in ombra del terreno (200) o fuori dall'impronta della scena. NDVI = (NIR − Red) / (NIR + Red) della riflettanza (ρ = DN × 0.0001 − 0.1, ρ negativo posto a 0). Lo stesso calcolo è fatto per la stessa finestra di calendario un anno prima, e la carta mostra la differenza. Con la maschera del bosco (default) un pixel conta solo se è bosco nella carta degli habitat della data e in quella della data un anno prima. L'ispettore di pixel indica i due compositi e il numero di osservazioni chiare in ogni finestra.\n\nCalcolato nel tuo browser da tutte le acquisizioni delle due finestre: una finestra di 60 giorni può quindi richiedere un po' di tempo per essere disegnata. Le finestre brevi lasciano lacune dopo periodi nuvolosi.",
+      "name": "swissEO NDVIdiff v200_Median BETA",
+      "subtitle": "BETA: NDVI mediano di una finestra di giorni rispetto alla stessa finestra un anno prima"
     }
   },
   "legal": {
@@ -828,6 +886,7 @@
     "copyLinkALink": "Copia link: un link esattamente a questa vista",
     "createATimelapseOf": "Creare un timelapse di quest'area",
     "createAnAreaOf": "Creare un'area di interesse",
+    "dataDay": "{{name}} {{day}}",
     "date": "Data",
     "downloadTheAreaOf": "Scaricare l'area di interesse come GeoJSON",
     "downloadTheCurrentView": "Scaricare la vista attuale come PNG",
@@ -845,7 +904,7 @@
     "pixelInspector": "Ispettore di pixel",
     "pixelInspectorOffClick": "Ispettore di pixel (spento): fate clic, poi fate clic sulla mappa per leggere i valori di un pixel",
     "searchAPlace": "Cerca un luogo",
-    "searchPlacesAddressesMunicipalities": "Cercare luoghi, indirizzi, comuni e cantoni (ricerca di luoghi di geo.admin.ch)",
+    "searchPlacesAddressesMunicipalities": "Cercare luoghi, indirizzi, comuni e cantoni (ricerca di luoghi di geo.admin.ch) o coordinate (LV95, LV03, WGS84, MGRS)",
     "spectralExplorerForThe": "Esploratore spettrale per l'area di interesse",
     "statisticalInfoTimeSeries": "Statistiche e serie temporale per l'area di interesse",
     "sunShadingOfThe": "Ombreggiatura solare del terreno on/off",
@@ -898,7 +957,7 @@
     "leafLong": "{{type}}, {{src}} ({{limits}}; {{base}})",
     "leafShort": "maschera {{type}} ({{src}}, {{limits}}, {{base}})",
     "lfiHelp": "All'interno: il bosco della carta degli habitat della data, di swissTLM3D (tutte le classi) o tutta la vegetazione sopra i 3 m. Probabilità di latifoglie per pixel di 10 m (0–100 %); il larice conta come conifera. L'IFN definisce latifoglie pure sopra l'85 %. Telerilevamento 2021–2023, aggiornamenti annuali previsti dal 2027.",
-    "lnfCategories": "Uso del suolo (categorie sotto)",
+    "lnfCategories": "Uso del suolo",
     "lnfLong": "Superfici di utilizzazione: {{groups}}",
     "lnfRead": "Letto dal geoportale federale con 4 × 4 campioni per cella (2,5 m per una cella di 10 m).",
     "lnfShort": "maschera delle superfici di utilizzazione ({{groups}})",
@@ -910,7 +969,7 @@
     "source": "Fonte:",
     "title": "Maschera della vegetazione",
     "tlm": "Bosco, swissTLM3D",
-    "tlmClasses": "Bosco (classi sotto)",
+    "tlmClasses": "Bosco",
     "tlmShort": "maschera forestale swissTLM3D",
     "vegLong": "{{kind}}, {{map}}",
     "vegShort": "maschera {{kind}} ({{map}})",
@@ -949,7 +1008,9 @@
     "stac": "Apri nel browser STAC di swisstopo"
   },
   "search": {
+    "coordinate": "Coordinata",
     "none": "Nessun luogo trovato",
+    "outside": "La coordinata {{c}} (LV95) è fuori dalla carta.",
     "unavailable": "La ricerca non è disponibile: {{msg}}"
   },
   "season": {
@@ -1039,7 +1100,12 @@
     "shadow": "Ombra",
     "title": "Statistiche: {{name}}",
     "validBoth": "Validi in entrambe le date",
-    "validPixels": "Pixel validi"
+    "validPixels": "Pixel validi",
+    "excludeIllum": "Escludere l'illuminazione scarsa (incidenza solare ≥ {{thr}}°)",
+    "noBothWin": "Nessun pixel con un'osservazione chiara in entrambe le finestre.",
+    "noTsWindow": "Le serie temporali non sono disponibili per i compositi di finestra. Usa il NDVI per una serie temporale.",
+    "validBothWin": "Validi in entrambe le finestre",
+    "winHead": "{{comp}} di {{now}} ({{n}}) rispetto a {{ref}} ({{m}}) · si confrontano le celle con un'osservazione chiara in entrambe le finestre."
   },
   "status": {
     "catalogueFailed": "Richiesta al catalogo non riuscita: {{msg}}",
@@ -1061,7 +1127,8 @@
     "searchNext": "Ricerca della data successiva con dati…",
     "searchPrev": "Ricerca della data precedente con dati…",
     "useArrows": "Usa ‹ › o il pulsante con la freccia per passare a una data con dati.",
-    "vhiMaskFailed": "Non è stato possibile caricare la maschera forestale di swissEO VHI v100."
+    "vhiMaskFailed": "Non è stato possibile caricare la maschera forestale di swissEO VHI v100.",
+    "noAcqWindow": "Nessuna acquisizione nei {{days}} giorni fino al <b>{{date}}</b>."
   },
   "sun": {
     "above": "altezza {{alt}}° sopra l'orizzonte.",
