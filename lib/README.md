@@ -7,9 +7,9 @@ local file). Versions are pinned in `tools/vendor/package.json`; licences are li
 table of the repository README.
 
 - `i18next-27.1.3.min.js`: i18next 27.1.3
-- `maplibre-gl-6.17.0.css`: maplibre-gl 6.17.0
-- `maplibre-gl-6.17.0.mjs`: maplibre-gl 6.17.0
-- `maplibre-gl-worker-6.17.0.mjs`: maplibre-gl 6.17.0
+- `maplibre-gl-6.18.0.css`: maplibre-gl 6.18.0
+- `maplibre-gl-6.18.0.mjs`: maplibre-gl 6.18.0
+- `maplibre-gl-worker-6.18.0.mjs`: maplibre-gl 6.18.0
 - `proj4-2.23.0.js`: proj4 2.23.0
 - `geotiff-2.1.3.js`: geotiff 2.1.3
 - `gifenc-1.0.3.esm.js`: gifenc 1.0.3
