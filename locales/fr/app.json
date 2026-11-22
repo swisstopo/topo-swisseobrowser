@@ -5,7 +5,9 @@
     "copyFailed": "La copie a échoué : {{msg}}",
     "create": "Créer une zone d'intérêt",
     "drawPoly": "Cliquez pour ajouter des sommets ; double-cliquez ou cliquez sur le premier sommet pour terminer. Échap annule.",
+    "drawPolyTouch": "Touchez pour ajouter des sommets ; touchez le premier ou le dernier sommet pour terminer. Touchez à nouveau l'outil pour annuler.",
     "drawRect": "Cliquez sur deux coins opposés. Échap annule.",
+    "drawRectTouch": "Touchez deux coins opposés. Touchez à nouveau l'outil pour annuler.",
     "remove": "Supprimer la zone d'intérêt",
     "selfCross": "Le contour ne doit pas se croiser : placez le sommet ailleurs. Échap annule."
   },

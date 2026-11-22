@@ -5,7 +5,9 @@
     "copyFailed": "Copia non riuscita: {{msg}}",
     "create": "Creare un'area di interesse",
     "drawPoly": "Clicca per aggiungere vertici; doppio clic o clic sul primo vertice per terminare. Esc annulla.",
+    "drawPolyTouch": "Tocca per aggiungere vertici; tocca il primo o l'ultimo vertice per terminare. Tocca di nuovo lo strumento per annullare.",
     "drawRect": "Clicca su due angoli opposti. Esc annulla.",
+    "drawRectTouch": "Tocca due angoli opposti. Tocca di nuovo lo strumento per annullare.",
     "remove": "Rimuovi l'area di interesse",
     "selfCross": "Il contorno non deve intersecarsi: posiziona il vertice altrove. Esc annulla."
   },

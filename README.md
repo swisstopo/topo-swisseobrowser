@@ -534,7 +534,9 @@ The swissEO Browser therefore always uses the physical reflectance.
     line and the layer's details say so);
   - permalink: `panel=wms` with `wmsUrl`, `wmsLayer` and `wmsOpacity`; external layers in the compare list keep their
     service URL, type and layer name in `compareLayers`.
-- **Area of interest**: draw a rectangle (axis-aligned in LV95) or polygon, or import KML/KMZ, GPX, WKT,
+- **Area of interest**: draw a rectangle (axis-aligned in LV95) or polygon (on a touch screen the tools read taps
+  from the touch events, as iOS may drop the click a tap would make; a tap on the first or the last vertex finishes
+  a polygon), or import KML/KMZ, GPX, WKT,
   GeoJSON, a zipped Shapefile, an MGRS / GEOREF cell or a bounding box (WGS84, LV95 and LV03 coordinates
   are detected). Files can be uploaded or **loaded from a URL** (KML, KMZ, GPX, GeoJSON / JSON including API or
   WFS URLs returning GeoJSON, WKT, zipped Shapefile; the type comes from the extension, otherwise from

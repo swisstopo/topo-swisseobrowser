@@ -5,7 +5,9 @@
     "copyFailed": "Kopieren fehlgeschlagen: {{msg}}",
     "create": "Interessengebiet erstellen",
     "drawPoly": "Klicken, um Eckpunkte zu setzen; Doppelklick oder Klick auf den ersten Punkt beendet. Esc bricht ab.",
+    "drawPolyTouch": "Tippen, um Eckpunkte zu setzen; Tippen auf den ersten oder letzten Punkt beendet. Erneutes Tippen auf das Werkzeug bricht ab.",
     "drawRect": "Zwei gegenüberliegende Ecken anklicken. Esc bricht ab.",
+    "drawRectTouch": "Zwei gegenüberliegende Ecken antippen. Erneutes Tippen auf das Werkzeug bricht ab.",
     "remove": "Interessengebiet entfernen",
     "selfCross": "Der Umriss darf sich nicht selbst schneiden: Punkt anderswo setzen. Esc bricht ab."
   },

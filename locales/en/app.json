@@ -5,7 +5,9 @@
     "copyFailed": "Copy failed: {{msg}}",
     "create": "Create an area of interest",
     "drawPoly": "Click to add vertices; double-click or click the first vertex to finish. Esc cancels.",
+    "drawPolyTouch": "Tap to add vertices; tap the first or the last vertex to finish. Tap the tool again to cancel.",
     "drawRect": "Click two opposite corners. Esc cancels.",
+    "drawRectTouch": "Tap two opposite corners. Tap the tool again to cancel.",
     "remove": "Remove area of interest",
     "selfCross": "The outline must not cross itself: place the vertex elsewhere. Esc cancels."
   },

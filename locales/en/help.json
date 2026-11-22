@@ -225,7 +225,7 @@
     "li1": "files: GeoJSON, KML / KMZ, GPX, WKT and zipped Shapefiles;",
     "li2": "a URL to such a file (also API or WFS addresses that return GeoJSON); the server must allow access from other websites (CORS);",
     "li3": "a pasted geometry, an MGRS or GEOREF grid cell, or a bounding box in WGS84, LV95 or LV03 coordinates.",
-    "p1": "The pentagon button opens three options: <b>import</b>, <b>rectangle</b> and <b>polygon</b>. A polygon is finished with a double-click or a click on its first vertex. Drawing again adds another polygon. The vertices stay editable: drag a white dot to move a vertex, drag or click a light dot on the middle of a side to add one, and right-click a vertex to remove it. The outline cannot cross itself. The import accepts:",
+    "p1": "The pentagon button opens three options: <b>import</b>, <b>rectangle</b> and <b>polygon</b>. A polygon is finished with a double-click or a click on its first vertex; on a phone or tablet, tap the corners or vertices and tap the first or the last vertex to finish. Drawing again adds another polygon. The vertices stay editable: drag a white dot to move a vertex, drag or click a light dot on the middle of a side to add one, and right-click a vertex to remove it. The outline cannot cross itself. The import accepts:",
     "p2": "The toolbar of the area copies the geometry, shows the area, centres the map, opens the <a href=\"#tools-stats\">statistics</a> and the <a href=\"#tools-spec\">spectral explorer</a>, and downloads the area as GeoJSON. Small areas are part of copied links; large areas from a file are not (the toolbar then shows <i>⚠ not in link</i>), while areas loaded from a URL are shared as that URL.",
     "title": "Area of interest"
   },
