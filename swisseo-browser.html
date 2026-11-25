@@ -2743,7 +2743,7 @@ const SOURCES = {
     items: ["2017-07-31t235959", "2017-08-31t235959", "2017-09-30t235959", "2018-07-31t235959", "2018-08-31t235959", "2018-09-30t235959", "2019-07-31t235959", "2019-08-31t235959", "2019-09-30t235959", "2020-07-31t235959", "2020-08-31t235959", "2020-09-30t235959", "2021-07-31t235959", "2021-08-31t235959", "2021-09-30t235959", "2022-07-31t235959", "2022-08-31t235959", "2022-09-30t235959", "2023-07-31t235959", "2023-08-31t235959", "2023-09-30t235959", "2024-07-31t235959", "2024-08-31t235959", "2024-09-30t235959", "2025-07-31t235959", "2025-08-31t235959", "2025-09-30t235959", "2026-07-31t235959", "2026-08-31t235959", "2026-09-30t235959"] },
   // BETA, from the static STAC catalogue of WSL (stac: the collection.json, whose item links are the dates): a map every
   // 5 days from June to September; sameYear: a date of a year without maps shows none (and not the nearest one);
-  // complete: finished maps, so no cloud, shadow and terrain masks and no wording about orbits and valid shares
+  // complete: finished maps, so the statistics have no masked share, no minimum of valid pixels and no orbits
   discoch: { coll: null, stac: DISCOCH + "discoch-retro/collection.json", name: "WSL DiscoCH", firstYear: 2026, sparse: true, sameYear: true, complete: true,
     credit: 'DiscoCH &copy; <a href="' + DOI_DISCOCH + '" target="_blank" rel="noopener">WSL</a>, CC BY 4.0' }
 };
@@ -3802,7 +3802,10 @@ function mdLite(text) {
 }
 LAYERS.forEach(r => { if (r.ramp) r.domain = [r.min, r.max]; });
 const MASKABLE = { rgb: 1, index: 1, cont: 1, terrain: 1, fnrgb: 1, diff2: 1, fnclass: 1, wincomp: 1 };
-/* A complete product of another provider (DiscoCH): its masks are already in the maps, so none are offered. */
+/* The cloud, shadow, terrain and illumination masks belong to the Sentinel-2 mosaics: products read from their own COGs
+   (NDVIdiff, NDVIz, DiscoCH) are finished maps, so their menu and their links do not have them. */
+const isMaskable = rec => !!MASKABLE[rec.type] && rec.source === "s2";
+/* A complete product of another provider (DiscoCH): its statistics do not speak of masked or valid shares and orbits. */
 const isComplete = rec => !!(SOURCES[rec.source] && SOURCES[rec.source].complete);
 /* The terrain mask (terrainmask_10m: 0–180 solar incidence angle in degrees, 200 shadow, 255 no data) as a test of one
    layer's settings: terrain shadow (200) and, with the illumination mask, an incidence angle at or above the threshold,
@@ -4294,7 +4297,7 @@ function settingsToObj(rec, s) {
   if (rec.type === "wincomp" && s.days !== d.days) o.days = s.days;
   if (rec.type !== "wms" && !rec.ext && (s.cmask === "in" || s.cmask === "out")) o.customMask = s.cmask;
   if (s.opacity !== 100) o.opacity = s.opacity;
-  if (MASKABLE[rec.type] && !isComplete(rec)) {
+  if (isMaskable(rec)) {
     if (s.cloud !== d.cloud) o.cloudMask = s.cloud;
     if (s.shadow !== d.shadow) o.shadowMask = s.shadow;
     if (s.terrain !== d.terrain) o.terrainMask = s.terrain;
@@ -6045,7 +6048,7 @@ function layerBody(rec) {
 
   /* ---- masks ---- */
   if (rec.source === "s2") sec(t("layer.masks", "Masks"));
-  if (MASKABLE[rec.type] && !isComplete(rec)) {
+  if (isMaskable(rec)) {
     const tog = (key, label, small, relist) => {
       const l = el("label", "tog");
       l.innerHTML = "<span>" + label + "<small>" + small + "</small></span>";

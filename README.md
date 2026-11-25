@@ -438,9 +438,8 @@ The swissEO Browser therefore always uses the physical reflectance.
     nearest to the selected date **of the same year** is shown; a year without maps shows none, so that a comparison of
     two years never shows the same map twice. ‹ ›, the arrow button and the calendar know all its dates.
     Credit on the map and in the exports: *DiscoCH © WSL, CC BY 4.0*.
-    **Complete product** (`complete` in `SOURCES`): the maps are finished and masked by WSL, so the layer menu offers no
-    cloud, shadow, terrain and low-illumination masks (the custom mask stays), and the statistics have no *masked* share
-    and no *Min. valid pixels*: every map counts. The time series is drawn from 0 % to the highest value of the area
+    **Complete product** (`complete` in `SOURCES`): the maps are finished and masked by WSL, so the statistics have
+    no *masked* share and no *Min. valid pixels*: every map counts. The time series is drawn from 0 % to the highest value of the area
     (mean + σ, the band kept within 0–100 %), the histogram has classes of 2 % (the values are whole percents).
   - *swissEO NDVIdiff v200_MVC BETA* (`ndvidiff22`) and *swissEO NDVIdiff v200_Median BETA* (`ndvidiff23`): tests computed
     in the page, not official products. The user picks a **window of 7, 16, 30 or 60 days** ending on the selected
@@ -547,7 +546,8 @@ The swissEO Browser therefore always uses the physical reflectance.
     ([#14](https://github.com/swisstopo/topo-swisseobrowser/issues/14): in November, with a low sun, 40 % of the pixels
     there are that dark and were left empty). The footprint comes from the TCI's internal mask at about 160 m;
     the edge zone is computed once per scene;
-  - masks: clouds and cloud shadows (OmniCloudMask), terrain shadow (terrain mask 200), **low illumination**
+  - masks (Sentinel-2 layers; the products read from their own COGs, swissEO NDVIdiff, NDVIz, NDVIdiff v200 BETA and DiscoCH,
+    are finished maps and offer only the custom mask): clouds and cloud shadows (OmniCloudMask), terrain shadow (terrain mask 200), **low illumination**
     ([#53](https://github.com/swisstopo/topo-swisseobrowser/issues/53): a solar incidence angle of the terrain mask
     at or above a threshold, default 70°, adjustable in the layer menu from 0 to 90°, so slopes the sun hardly
     lights are left out; off by default, also in the AOI statistics and the 32-bit export), a vegetation
