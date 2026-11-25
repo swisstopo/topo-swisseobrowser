@@ -65,6 +65,11 @@
   they use the area around the centre, and the compare split is not available. The labels are swisstopo's vector tiles
   (Web Mercator), moved into the LV95 grid in MapLibre's workers (`swisseo-vt://`, `vtWorker`); their style's zoom
   stops are shifted by `VT_DZ`.
+- **3D objects** (section 2b2: buildings, trees, bridges; 3D Tiles drawn with three.js in a custom layer): off whenever 3D is
+  switched on. A three.js class the page starts to use goes into `tools/vendor/stubs/three-tiles.js`. Draco's
+  WebAssembly decoder needs `'wasm-unsafe-eval'` in the CSP, so keep the fallback to its JavaScript decoder (`wasmAllowed`)
+  and the image-element textures (no fetched `blob:` URLs). The tested CSP is in the README (*Libraries*); test changes
+  to workers under it. The point labels are lifted in 3D (`LABEL_LIFT`, `arrangeLabels`).
 - **Opened as a file** (`file://`, e.g. a copy on the desktop), Chrome and Edge refuse module scripts, fetch() of
   local files and module workers from blob URLs: the page then loads the libraries from their pinned CDN URLs
   (`LIB_CDN` / `libUrl`; over http(s) everything comes from `lib/`), starts MapLibre's worker as a classic script

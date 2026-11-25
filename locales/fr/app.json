@@ -281,7 +281,8 @@
       "standard": "Standard",
       "sunShadingOfThe": "Ombrage solaire du terrain (bouton ampoule)",
       "theShadingLightsThe": "L'ombrage éclaire le modèle altimétrique depuis la direction et la hauteur du soleil au centre de la carte (voir <i>Heure solaire</i>). Un ciel, des ombres portées par les montagnes, un reflet d'objectif et la stéréo anaglyphe ne sont pas disponibles dans cette bibliothèque cartographique.<br>Sources : <a href=\"https://www.swisstopo.admin.ch/fr/modele-altimetrique-swissalti3d\" target=\"_blank\" rel=\"noopener\">swissALTI3D</a> (0,5 m, à proximité ; plus loin et hors de Suisse swissALTIRegio), <a href=\"https://www.geocat.ch/datahub/dataset/f7f058e9-288b-4c55-8f4e-6360880dbb59\" target=\"_blank\" rel=\"noopener\">swissALTIRegio</a> (métadonnées sur geocat.ch), <a href=\"https://www.swisstopo.admin.ch/fr/modele-altimetrique-swisssurface3d\" target=\"_blank\" rel=\"noopener\">swissSURFACE3D</a> (rééchantillonné à 10 m par swissEO).",
-      "verticalTerrainScaling": "Exagération verticale du relief"
+      "verticalTerrainScaling": "Exagération verticale du relief",
+      "objShadow": "Ombres des bâtiments, arbres et ponts 3D (avec l'ombrage solaire ; bouton des couches, <i>Objets 3D</i>)"
     },
     "timelapse": {
       "adaptiveGainBrightScenes": "Gain adaptatif (scènes claires)",
@@ -926,6 +927,12 @@
       "tiltDown": "Incliner vers une vue verticale d'en haut",
       "turnKnob": "Faire glisser pour tourner et incliner la carte ; double-clic : nord en haut, vue verticale d'en haut",
       "north": "Nord en haut"
+    },
+    "obj3dTitle": "Objets 3D",
+    "obj3d": {
+      "buildings": "Bâtiments 3D",
+      "trees": "Arbres 3D",
+      "tlm": "Ponts, téléphériques 3D"
     }
   },
   "mask": {
@@ -1130,7 +1137,8 @@
     "searchPrev": "Recherche de la date précédente avec des données…",
     "useArrows": "Utilisez ‹ › ou le bouton fléché pour passer à une date avec des données.",
     "vhiMaskFailed": "Le masque forestier de swissEO VHI v100 n'a pas pu être chargé.",
-    "noAcqWindow": "Aucune acquisition dans les {{days}} jours jusqu'au <b>{{date}}</b>."
+    "noAcqWindow": "Aucune acquisition dans les {{days}} jours jusqu'au <b>{{date}}</b>.",
+    "obj3dFailed": "Chargement impossible : {{name}}"
   },
   "sun": {
     "above": "hauteur {{alt}}° au-dessus de l'horizon.",

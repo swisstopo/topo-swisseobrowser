@@ -44,6 +44,7 @@ the swisstopo WMS/WMTS services directly in the browser.
 | Vegetation masks | Habitat map COGs v1-0 / v1-1 / v1-2 (forest, all vegetation) in `s3-topo-satromo-prod` (`data/MASKS/Vegetation/`, as used by the VHI processor), inside = value ≠ 0; the swissTLM3D forest (`wms.geo.admin.ch`, `ch.swisstopo.swisstlm3d-wald`); Forest Type NFI 2023 (WSL, probability of broadleaf trees per 10 m pixel for all vegetation above 3 m, Float32 COG in `s3-topo-satromo-prod` (`data/MASKS/Vegetation/waldmischungsgrad_2023_10m_2056_cog.tif`); Waser et al. 2025, [doi:10.16904/1000001.7](https://doi.org/10.16904/1000001.7)); the ETH tree species maps (broadleaf basal-area share and dominant species, 30 m, `ETH_forest_leaf_type_share_01_broadleaved.tif` and `ETH_forest_species_argmax.tif` in the same folder; Zhou et al. 2026, [arXiv:2611.08095](https://arxiv.org/abs/2611.08095), CC BY-NC 4.0); the agricultural land use (Nutzungsflächen, BLW from the data of the cantons, `wms.geo.admin.ch` layer `ch.blw.landwirtschaftliche-nutzungsflaechen`; [metadata on geocat.ch](https://www.geocat.ch/datahub/dataset/ae183bc4-5c91-467e-89bc-85f390340efb)) | Forest, vegetation, broadleaf / conifer or land-use mask for every S2-SR layer, statistics and exports |
 | Basemaps | `wmts.geo.admin.ch` (pixelkarte-farbe, swissimage, pixelkarte-grau, swisstlm3d-karte-farbe.3d) | Background maps *Map*, *SWISSIMAGE*, *Map Grey* and, in 3D, *swissTLM map for 3D* on the native LV95 grid |
 | 3D terrain | [swissALTI3D](https://www.swisstopo.admin.ch/en/height-model-swissalti3d): STAC collection `ch.swisstopo.swissalti3d` on `data.geo.admin.ch`, one COG per km² and release (0.5 m asset, else the 2 m one), LV95, near the camera; [swissALTIRegio](https://www.swisstopo.admin.ch/en/height-model-swissaltiregio): one COG on `data.geo.admin.ch` (STAC collection `ch.swisstopo.swissaltiregio`), 10 m, LV95, Switzerland and its border regions ([metadata on geocat.ch](https://www.geocat.ch/datahub/dataset/f7f058e9-288b-4c55-8f4e-6360880dbb59)); the surface model [swissSURFACE3D](https://www.swisstopo.admin.ch/en/height-model-swisssurface3d) resampled to 10 m, one COG in `s3-topo-satromo-prod` (`data/DSM/DSM_10m_EPSG2056_CH_clipped_10km_extended_9999_cog.tif`, Switzerland plus 10 km, no data −9999) | Heights of the optional 3D mode |
+| 3D objects | `3d.geo.admin.ch`: swisstopo's 3D Tiles `ch.swisstopo.swissbuildings3d.3d` (swissBUILDINGS3D), `ch.swisstopo.vegetation.3d` (trees) and `ch.swisstopo.swisstlm3d.3d` (swissTLM3D: bridges, cableways, …), v1, latest version ([docs.geo.admin.ch](https://docs.geo.admin.ch/visualize-data/3d-tiles.html)) | *3D buildings*, *3D trees* and *3D bridges, cableways* of the 3D mode (off by default) |
 | Labels | `vectortiles.geo.admin.ch`: swisstopo's base map vector tiles (`ch.swisstopo.base.vt`, Switzerland and Liechtenstein) with the label layers of its imagery base map style | *Labels*: place, road, peak and lake names above the data |
 | Place search | `api3.geo.admin.ch/rest/services/ech/SearchServer` with `type=locations`, as `searchLocation` in [web-mapviewer `search.api.js`](https://github.com/geoadmin/web-mapviewer/blob/3e5a2900/packages/mapviewer/src/api/search.api.js) | Municipalities, districts, cantons, place names and addresses |
 | WMS / WMTS | `wms.geo.admin.ch` (preset) and the external providers of map.geo.admin.ch ([`external-providers.json`](https://github.com/geoadmin/web-mapviewer/blob/3e5a2900/packages/mapviewer/src/modules/menu/components/advancedTools/ImportCatalogue/external-providers.json), read when the panel is opened), or any WMS / WMTS URL | Layers of other map services on the map and in the compare list |
@@ -222,7 +223,7 @@ The swissEO Browser therefore always uses the physical reflectance.
 - **Basemap switcher** as in the Copernicus Browser: the layer button at the top right opens (on hover) *Basemaps* (*Map* =
   pixelkarte-farbe, *SWISSIMAGE*, *Map Grey* = pixelkarte-grau, *None*; in 3D also the *swissTLM map for 3D*,
   `ch.swisstopo.swisstlm3d-karte-farbe.3d`, the background of map.geo.admin.ch's 3D view) and *Map overlays* (*Labels*,
-  always drawn above the data). Defaults ([#18](https://github.com/swisstopo/topo-swisseobrowser/issues/18)): *Map* in 2D, the *swissTLM map for 3D* in 3D (back in 2D the basemap
+  always drawn above the data), and in 3D *3D objects* (see below). Defaults ([#18](https://github.com/swisstopo/topo-swisseobrowser/issues/18)): *Map* in 2D, the *swissTLM map for 3D* in 3D (back in 2D the basemap
   of before returns); *SWISSIMAGE* always brings the labels, however it becomes the basemap (the switcher, back from
   3D, a link without `labels`), and they can then be switched off; choosing another basemap in the switcher takes them
   away again unless they were changed by hand. A link carries the basemap and the labels only where they differ from these defaults.
@@ -247,7 +248,7 @@ The swissEO Browser therefore always uses the physical reflectance.
   320 px, so their pixels are those of its levels (256 px would give 5, 2.5, 1.25 and 0.625 m, and the nearest pixel
   doubled every fourth row and column would show as ripples in the sun shading); up to zoom 9 (10 m per pixel and
   coarser, far away) from swissALTIRegio. All heights are turned into terrain tiles of the map grid in the browser.
-  swissALTI3D is a bare-earth model: under bridges the image hangs down into the valley. In 3D the tools
+  swissALTI3D is a bare-earth model: under bridges the image hangs down into the valley (the 3D objects add the bridges). In 3D the tools
   of the Copernicus Browser's 3D view are added above the others, as far as MapLibre supports them, and *3D* becomes
   *2D*:
   - **3D settings** (gear): the height model, *swissALTI3D* (0.5 m near, swissALTIRegio far, the default),
@@ -270,13 +271,46 @@ The swissEO Browser therefore always uses the physical reflectance.
   in 2D they stay on (the layer button switches them off). A link with `3d=true` keeps its own `labels` setting. 3D starts
   with the *swissTLM map for 3D* as basemap ([#18](https://github.com/swisstopo/topo-swisseobrowser/issues/18)); back in 2D the basemap of before returns.
 
+  In 3D the **names of places and peaks float 50 m above the terrain** (`symbol-height-offset`, measured from the ground;
+  `LABEL_LIFT`), with or without the 3D objects, and are drawn after them, so trees and buildings do not cover them. The
+  labels along lines (streets, rivers) cannot be lifted: they stay on the ground and are drawn before the 3D objects, which
+  cover them where they stand in front; the lake names stay on the water (`arrangeLabels`). In 2D the offset is removed
+  and the style's label order restored.
+
+  - **3D objects** (layers button, section *3D objects*, only in 3D; ported from the former repository): *3D buildings*, *3D
+    trees* and *3D bridges, cableways*, the tilesets of map.geo.admin.ch's 3D view. They are **off whenever 3D is switched
+    on**; a link keeps them (`objects3d`). three.js and the Draco decoder are loaded with the first check box. The tilesets are
+    3D Tiles 1.0 in ECEF (buildings and bridges: Draco-compressed b3dm; trees: instances of three tree models, i3dm) with
+    Swiss heights in the place of ellipsoidal heights, so they stand on swissALTI3D without a geoid model. The page
+    traverses the tilesets itself (bounding regions, screen-space error, a request queue of 8 and a cache of 800 tiles; the
+    tiles not drawn for the longest time are dropped; a failed request is repeated after 5, 10 and 20 s) and draws them
+    with three.js in a custom MapLibre layer. Every tile gets its own affine ECEF → LV95 mapping at its centre (proj4, as
+    everywhere on the page), positions are relative to an anchor near the map centre so float32 stays precise, and
+    three.js works in a right-handed north-up frame (the MapLibre world square has y to the south). The *vertical terrain
+    scaling* takes the objects with it. Checked with 400 trees on the Gurten: the page's positions equal those of
+    GDAL / PROJ, the affine mapping deviates by at most 9 mm over 340 m, and the tree bases stand a median 7 cm above
+    swissALTI3D (p5 −0.40 m, p95 +0.59 m).
+    - **Distance limit**: objects that would be smaller than a few pixels are not drawn (a building of about 12 m below
+      4 px, a tree of about 6 m below 5 px): buildings beyond about 3.4 km, trees beyond about 1.4 km from the camera
+      on a screen 760 px high; the traversal stops there.
+    - **Shadows** (*3D settings*: *Shadows of the 3D buildings, trees and bridges*, on by default, with the sun shading): the
+      objects are lit by the sun of the sun shading and cast shadows on each other and, through a transparent grid on
+      the terrain heights (MapLibre draws the terrain, three.js cannot shade it), on the ground. The shadow map (2048²)
+      covers a box of 250 m to 2.5 km around the map centre, growing with the camera distance, and is drawn again only
+      when the box, the sun, the vertical scaling or the tiles shown change. A still map draws nothing.
+    - **Performance**: measured in the former repository on an integrated GPU of 2015 (Intel HD Graphics 530, 1400 × 900, Bern):
+      3D without objects 11.7 fps, with buildings and trees 6.5 fps, with their shadows 5.2 fps. Draco's WebAssembly decoder
+      takes about 5 ms per building tile in four workers; where the Content-Security-Policy blocks WebAssembly the page uses
+      the JavaScript decoder, about 31 ms (see [Libraries](#libraries-sbom)).
+    - The surface model swissSURFACE3D already contains buildings and trees: with it the objects stand partly inside it.
+
   In 3D the map can
   be tilted and turned (right-drag or Ctrl+drag, two fingers on touch screens, or the 3D navigation above the zoom
   buttons: a disc that moves the map and one that turns and tilts it, with a red tab pointing north, issue #43); the terrain beyond the basemaps takes the map's background colour. The split comparison needs the flat map, so 3D compares with opacity (switching 3D on turns a split into
   an opacity comparison; the highlights switch back to 2D). Statistics, analytical downloads, prints and the
   timelapse use the area around the centre of the view at its scale; the *Basic* download is the view as seen
-  (without scale bar, an AOI crop clips all of it). The link keeps `3d`, `pitch`, `bearing`, `terrain` and
-  `exaggeration`.
+  (without scale bar, an AOI crop clips all of it), 3D objects included. The link keeps `3d`, `pitch`, `bearing`, `terrain`,
+  `exaggeration` and `objects3d`.
 - **Place search** ("Go to Place", left of the basemap switcher, the width of the Copernicus Browser search field): the
   location search of map.geo.admin.ch, from two characters, results as you type (arrow keys and Enter work). A result
   zooms to its extent (municipality, district, canton) or to its point at the zoom of the result (1:25,000 when it has
@@ -1102,7 +1136,20 @@ The pinned CDN URLs remain in the page only as the fallback when it is opened as
 the `lib/` folder. MapLibre GL JS is an ES module, so the page script is a module too; proj4, pbf,
 vector-tile and vt-pbf also run inside MapLibre's workers. The decision trees of the Forest Disturbance
 Classification are converted into a module as well, so the served page compiles no code at runtime and
-works under a Content-Security-Policy without `'unsafe-eval'` (it needs `worker-src 'self' blob:`).
+works under a Content-Security-Policy without `'unsafe-eval'`. The page needs no policy to run; if one is set (CloudFront),
+use this one, tested, for every path, `lib/` included (a worker has the policy of its own response):
+
+```
+default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' blob:; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; connect-src 'self' https: blob:; frame-ancestors 'none'
+```
+
+- `blob:` in `script-src` **and** `connect-src`: MapLibre's workers fetch and import two scripts the page writes (the LV95
+  projection of GeoJSON sources, the label tiles). Without either one the labels are missing and areas of interest are drawn
+  in the wrong place.
+- `'wasm-unsafe-eval'` allows compiling WebAssembly and nothing else (no `eval`): Draco's decoder of the 3D objects. Without it the
+  page takes Draco's JavaScript decoder, about six times slower (`wasmAllowed`).
+- `worker-src blob:`: Draco's workers. `img-src blob:`: the textures of the tree models, which are image elements, not fetched
+  `blob:` URLs.
 
 | Library | Version | Licence | Source | Used for |
 | --- | --- | --- | --- | --- |
@@ -1117,6 +1164,8 @@ works under a Content-Security-Policy without `'unsafe-eval'` (it needs `worker-
 | [shpjs](https://github.com/calvinmetcalf/shapefile-js) | 6.2.0 | MIT | npm `shpjs` | Shapefile import |
 | [mgrs](https://github.com/proj4js/mgrs) | 2.2.0 | MIT | npm `mgrs` | MGRS grid references |
 | [gifenc](https://github.com/mattdesl/gifenc) | 1.0.3 | MIT | npm `gifenc` | timelapse GIF export |
+| [three.js](https://github.com/mrdoob/three.js) | 0.170.0 | MIT | npm `three` | 3D objects (with its GLTFLoader and DRACOLoader), one tree-shaken bundle |
+| [Draco](https://github.com/google/draco) decoder | as in three.js 0.170.0 | Apache-2.0 | npm `three` (`examples/jsm/libs/draco/gltf/`: `draco_decoder.wasm` with `draco_wasm_wrapper.js`, and `draco_decoder.js`) | meshes of the 3D objects (WebAssembly build, or the JavaScript build where a policy blocks WebAssembly) |
 | [i18next](https://github.com/i18next/i18next) | 27.1.3 | MIT | npm `i18next` | languages of the page and the help page |
 | [Forest Disturbance Classification](https://github.com/sentinel-hub/custom-scripts) | commit `0a071cf` | CC BY-SA 4.0 | sentinel-hub/custom-scripts (Joanneum Research, EvoLand) | `fdc` layer model, 150 decision trees converted to a module |
 | [WMS / WMTS provider list](https://github.com/geoadmin/web-mapviewer) | commit `3e5a2900` | BSD-3-Clause | geoadmin/web-mapviewer | WMS / WMTS panel suggestions |
@@ -1162,6 +1211,7 @@ Parameter names follow the Copernicus Browser where an equivalent exists.
 | `zoom` | `17` | Zoom level of the swisstopo LV95 grid (8 to 27; about 17 to 18 for a region; fractional values give resolutions between the grid levels, interpolated in scale; written with three decimals) |
 | `3d`, `pitch`, `bearing` | `true`, `60`, `160` | 3D terrain mode, with the tilt (0–75°) and the direction of view (degrees from north) |
 | `terrain`, `exaggeration` | `dsm`, `1.5` | 3D height model (`alti3d` = swissALTI3D near and swissALTIRegio far, the default; `alti` = swissALTIRegio 10 m; `dsm` = swissSURFACE3D 10 m) and vertical terrain scaling (0.5–3) |
+| `objects3d` | `buildings,trees,tlm` | 3D objects shown in 3D, comma-separated: `buildings`, `trees`, `tlm` (swissTLM3D: bridges, cableways); none without it |
 | `fromTime`, `toTime` | `2026-10-05T00:00:00.000Z` | Selected date |
 | `cloudCoverage` | `30` | Maximum cloud coverage in % |
 | `layerMenu` | `open` | The menu of the active layer is open (default: closed) |
@@ -1252,7 +1302,7 @@ Example:
   (NDDI drought notebook), the [Waldtrockenheit dashboard](https://waldtrockenheit-dashboard.vercel.app/vhi.html)
   (cumulative VHI deficit and days in extreme stress), [sentinel-hub/custom-scripts](https://github.com/sentinel-hub/custom-scripts)
   (index definitions and visualisations; Forest Disturbance Classification by Joanneum Research, EvoLand); libraries [MapLibre GL JS](https://github.com/maplibre/maplibre-gl-js),
-  [proj4js](https://github.com/proj4js/proj4js), [geotiff.js](https://github.com/geotiffjs/geotiff.js),
+  [proj4js](https://github.com/proj4js/proj4js), [three.js](https://github.com/mrdoob/three.js), [geotiff.js](https://github.com/geotiffjs/geotiff.js),
   [pbf](https://github.com/mapbox/pbf), [vector-tile-js](https://github.com/mapbox/vector-tile-js),
   [vt-pbf](https://github.com/maplibre/vt-pbf), [togeojson](https://github.com/placemark/togeojson), [shpjs](https://github.com/calvinmetcalf/shapefile-js),
   [mgrs](https://github.com/proj4js/mgrs), [JSZip](https://github.com/Stuk/jszip) and

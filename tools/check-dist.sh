@@ -8,7 +8,7 @@
 #    When a library is added or removed, recount with e.g.
 #      grep -c 'cdn\.jsdelivr\.net' _site/index.html
 #    and update the numbers below: jsDelivr = LIB_CDN entries (11) + CSS onerror fallback (1) +
-#    document.write fallbacks (3: proj4, geotiff, i18next); cdnjs = LIB_CDN JSZip (1); raw.githubusercontent = LIB_CDN
+#    document.write fallbacks (3: proj4, geotiff, i18next) + THREE_CDN (1); cdnjs = LIB_CDN JSZip (1); raw.githubusercontent = LIB_CDN
 #    provider list (1) + README fallback (1) + two prose mentions of CORS examples (2).
 set -euo pipefail
 site=${1:?usage: check-dist.sh <site dir>}
@@ -27,7 +27,7 @@ done
 ! grep -qE '<link rel="stylesheet" href="https://' "$page" ||
   { echo "::error::a stylesheet loads from a CDN"; exit 1; }
 
-for h in 'cdn.jsdelivr.net:15' 'cdnjs.cloudflare.com:1' 'raw.githubusercontent.com:4'; do
+for h in 'cdn.jsdelivr.net:16' 'cdnjs.cloudflare.com:1' 'raw.githubusercontent.com:4'; do
   host=${h%%:*}; want=${h##*:}
   n=$(grep -o -F "$host" "$page" | wc -l)
   [ "$n" -eq "$want" ] ||

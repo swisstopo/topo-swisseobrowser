@@ -292,6 +292,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 .bm-list::before{content:attr(data-title);display:flex;justify-content:center;font-size:15px;font-weight:700;color:var(--blue);margin-bottom:6px}
 .bm-base::before{content:attr(data-title);display:block;font-weight:700;font-size:13px;margin-bottom:2px}
 .bm-over::before{content:attr(data-title);display:block;font-weight:700;font-size:13px;margin-bottom:2px}
+.bm-obj::before{content:attr(data-title);display:block;font-weight:700;font-size:13px;margin-bottom:2px}
 .bm-list label{display:block;padding-left:5px;margin:2px 0;cursor:pointer}
 .bm-list input{accent-color:var(--blue);margin:2px 0 0;position:relative;top:1px}
 .bm-sep{height:0;border-top:1px solid #ddd;margin:5px -12px 5px -10px}
@@ -845,6 +846,7 @@ table.kv td:first-child{color:var(--muted)}
         <div class="exgrid" style="margin-top:10px">
           <span data-i18n="dialogs.terrain3d.verticalTerrainScaling">Vertical terrain scaling</span><span class="rng"><input type="range" id="t3dExag" min="0.5" max="3" step="0.1"><b id="t3dExagV"></b></span>
         </div>
+        <label class="chk" style="margin-top:8px"><input type="checkbox" id="t3dObjShadow"> <span data-i18n="[html]dialogs.terrain3d.objShadow">Shadows of the 3D buildings, trees and bridges (with the sun shading; layers button, <i>3D objects</i>)</span></label>
         <div data-i18n="[html]dialogs.terrain3d.theShadingLightsThe" class="hint" style="margin-top:8px">The shading lights the height model from the sun's direction and height at the
           map centre (see <i>Sun time</i>). A sky, shadows cast by mountains, a lens flare and anaglyph stereo are not
           available in this map library.<br>Sources: <a href="https://www.swisstopo.admin.ch/en/height-model-swissalti3d" target="_blank"
@@ -1692,6 +1694,19 @@ map.on("moveend", () => [baseMapLayer].forEach(l => {
   redrawRaster(l);
 }));
 
+/* The 3D objects of the layers control (only in 3D, drawn in section 2b2): size (m) and minPx (pixels) set from which
+   distance an object is too small to be drawn, sse the screen-space error (pixels) up to which a tile is detailed enough,
+   cache the number of tiles kept. swissTLM3D (bridges, cableways, …) has few and light tiles, with content at every level.
+   swisstopo is credited by the terrain and the basemap already. */
+const OBJ3D = {
+  buildings: { url: "https://3d.geo.admin.ch/ch.swisstopo.swissbuildings3d.3d/v1/tileset.json", sse: 8, size: 12, minPx: 4, cache: 800 },
+  trees:     { url: "https://3d.geo.admin.ch/ch.swisstopo.vegetation.3d/v1/tileset.json", sse: 6, size: 6, minPx: 5, cache: 800 },
+  tlm:       { url: "https://3d.geo.admin.ch/ch.swisstopo.swisstlm3d.3d/v1/tileset.json", sse: 8, size: 30, minPx: 3, cache: 400 }
+};
+const OBJ3D_LABEL = { buildings: e => tset(e, "map.obj3d.buildings", "3D buildings"), trees: e => tset(e, "map.obj3d.trees", "3D trees"),
+                      tlm: e => tset(e, "map.obj3d.tlm", "3D bridges, cableways") };
+const obj3dName = k => { const e = document.createElement("span"); OBJ3D_LABEL[k](e); return e.textContent; };
+const obj3dWanted = new Set();          // the check boxes that are on; off again whenever 3D is left
 /* Basemap switcher at the top right, as the layers control of the Copernicus Browser (opens on hover or click). */
 const basemapCtl = (() => {
   const d = el("div", "maplibregl-ctrl bm-ctl"), tg = el("a", "bm-toggle"), list = el("div", "bm-list");
@@ -1716,7 +1731,18 @@ const basemapCtl = (() => {
   tset(lbt, "map.labels", "Labels");
   lb.append(cb, " ", lbt);
   over.append(lb);
-  list.append(base, el("div", "bm-sep"), over);
+  // in 3D: swisstopo's 3D buildings, trees and bridges (section 2b2)
+  const objSep = el("div", "bm-sep"), obj = el("div", "bm-obj"), objCb = {};
+  tset(obj, "map.obj3dTitle", "3D objects", "data-title");
+  Object.keys(OBJ3D).forEach(k => {
+    const ol = el("label"), oc = el("input"), on = el("span");
+    oc.type = "checkbox"; oc.onchange = () => setObj3d(k, oc.checked);
+    objCb[k] = oc;
+    OBJ3D_LABEL[k](on);
+    ol.append(oc, " ", on);
+    obj.append(ol);
+  });
+  list.append(base, el("div", "bm-sep"), over, objSep, obj);
   d.append(tg, list);
   const open = on => d.classList.toggle("open", on);
   d.onmouseenter = () => open(true);
@@ -1727,6 +1753,8 @@ const basemapCtl = (() => {
            sync() {
              Object.keys(radios).forEach(k => { radios[k].checked = k === basemap; radios[k].parentElement.hidden = BASE_3D.has(k) && !terrainOn; });
              cb.checked = labelsOn();
+             Object.keys(objCb).forEach(k => { objCb[k].checked = obj3dWanted.has(k); });
+             objSep.hidden = obj.hidden = !terrainOn;
            } };
 })();
 map.addControl(basemapCtl, "top-right");
@@ -1749,6 +1777,22 @@ function setBasemap(name, user) {
   basemapCtl.sync();
   writeUrlSoon();
 }
+/* In 3D the point labels (places, peaks; not the lake names) float LABEL_LIFT meters above the terrain
+   (symbol-height-offset, measured from the ground) and are drawn after the 3D objects, so buildings and trees do not cover
+   them; the labels along lines (streets, rivers) cannot be lifted, stay on the ground and are drawn before the 3D objects,
+   which cover them where they stand in front. In 2D the offset is removed and the style's order restored. */
+const LABEL_LIFT = 50;
+function arrangeLabels() {
+  const ids = labelIds.filter(id => map.getLayer(id));
+  // the lake names stay on the water, which is flat and not covered: treated as the labels along lines
+  const point = id => (map.getLayoutProperty(id, "symbol-placement") || "point") === "point" &&
+                      map.getLayer(id).sourceLayer !== "water_name";
+  ids.filter(point).forEach(id => map.setLayoutProperty(id, "symbol-height-offset", terrainOn ? LABEL_LIFT : undefined));
+  if (map.getLayer("obj3d")) {
+    ids.filter(id => !point(id)).forEach(id => map.moveLayer(id, "obj3d"));     // each in turn: the order is kept
+    ids.filter(point).forEach(id => map.moveLayer(id, "z-over"));
+  } else ids.forEach(id => map.moveLayer(id, "z-over"));
+}
 /* The labels: swisstopo's vector labels (section 2c). */
 async function setLabels(on) {
   labelsWanted = on;
@@ -1764,6 +1808,7 @@ async function setLabels(on) {
     if (!labelsWanted || labelIds.length) return;
     ls.forEach(l => map.addLayer(l, "z-over"));
     labelIds = ls.map(l => l.id);
+    arrangeLabels();
   } catch (e) {
     console.warn("labels", e);
     if (labelsWanted) setStatus(t("status.labelsFailed", "The swisstopo labels could not be loaded."));
@@ -1885,7 +1930,7 @@ let demLayer = null, terrainOn = false, navCtl = null;
    A sky / atmosphere (not drawn by MapLibre here), cast shadows, a lens flare and anaglyph stereo, as in the
    Copernicus Browser's 3D view, are not available. */
 const T3D_DEFAULT = { dem: "alti3d", shade: true, method: "combined", hsExag: 0.4, shadow: "#000000",
-                      highlight: "#ffffff", accent: "#000000", exag: 1 };
+                      highlight: "#ffffff", accent: "#000000", exag: 1, objShadow: true };
 /* the shading lies over the satellite image, so its colours are partly transparent */
 const rgba = (hex, a) => "rgba(" + [1, 3, 5].map(i => parseInt(hex.substr(i, 2), 16)).join(",") + "," + a + ")";
 const t3d = Object.assign({}, T3D_DEFAULT);
@@ -1927,7 +1972,7 @@ function apply3D() {
                   "hillshade-exaggeration": sun.alt > 0 ? t3d.hsExag : Math.min(1, t3d.hsExag + 0.3),
                   "hillshade-shadow-color": rgba(t3d.shadow, 0.55), "hillshade-highlight-color": rgba(t3d.highlight, 0.2),
                   "hillshade-accent-color": rgba(t3d.accent, 0.3) };
-  const before = labelIds.find(id => map.getLayer(id)) || "z-over";
+  const before = map.getLayersOrder().find(id => id === "obj3d" || labelIds.includes(id)) || "z-over";
   if (t3d.shade && map.getLayer("hs") && map.getLayer("hs").source !== demLayer.id) map.removeLayer("hs");
   if (t3d.shade && !map.getLayer("hs")) map.addLayer({ id: "hs", type: "hillshade", source: demLayer.id, paint }, before);
   else if (t3d.shade) Object.entries(paint).forEach(([k, v]) => map.setPaintProperty("hs", k, v));
@@ -1962,6 +2007,7 @@ function setTerrain3D(on, cam, base) {
   if (on === terrainOn) return;
   terrainOn = on;
   // the basemap of the mode (#18): 3D starts with the swissTLM map (or the link's basemap), 2D gets its own back
+  if (!on) obj3dWanted.clear();           // the 3D objects are off whenever 3D is switched on (a link can bring them)
   if (on) { base2d = basemap; setBasemap(base || baseDefault()); }
   else setBasemap(BASE_3D.has(basemap) ? base2d || baseDefault() : basemap);
   if (on) {
@@ -1991,6 +2037,8 @@ function setTerrain3D(on, cam, base) {
   document.body.classList.toggle("is3d", on);        // the pixel inspector moves above the 3D navigation
   $("#btn3d").textContent = on ? "2D" : "3D";
   $("#btn3d").title = on ? t("terrain3d.back", "Back to the flat map (2D)") : t("terrain3d.on", "3D terrain");
+  syncObj3d();
+  arrangeLabels();
   splitFor3D();
   writeUrlSoon();
 }
@@ -2021,6 +2069,7 @@ function t3dForm() {
   $("#t3dShadow").value = t3d.shadow; $("#t3dHigh").value = t3d.highlight; $("#t3dAccent").value = t3d.accent;
   $("#t3dExag").value = t3d.exag; $("#t3dExagV").textContent = Math.round(t3d.exag * 100) + " %";
   $("#t3dHsBox").classList.toggle("off", !t3d.shade);
+  $("#t3dObjShadow").checked = t3d.objShadow;
 }
 const demOptions = () => {
   const v = $("#t3dDem").value;
@@ -2042,6 +2091,7 @@ $("#t3dHs").oninput = e => { t3d.hsExag = +e.target.value; t3dForm(); apply3D();
 });
 $("#t3dExag").oninput = e => { t3d.exag = +e.target.value; t3dForm(); if (terrainOn) setTerrain(); };
 $("#t3dExag").onchange = writeUrlSoon;
+$("#t3dObjShadow").onchange = e => { t3d.objShadow = e.target.checked; map.triggerRepaint(); };
 $("#t3dReset").onclick = () => {
   const dem = t3d.dem;
   Object.assign(t3d, T3D_DEFAULT, { dem });
@@ -2083,6 +2133,460 @@ $("#sunDate").onchange = $("#sunClock").onchange = () => {
 $("#sunNow").onclick = () => setSun("now");
 $("#sunScene").onclick = () => setSun("scene");
 setInterval(() => { if (terrainOn && t3d.shade && sunMode === "now") apply3D(); }, 60000);
+
+/* ============================================================
+   2b2. 3D objects: swisstopo's 3D buildings, trees and bridges (3D Tiles)
+   ============================================================ */
+/* In 3D the layers control offers swisstopo's 3D Tiles of the buildings (ch.swisstopo.swissbuildings3d.3d,
+   swissBUILDINGS3D), the trees (ch.swisstopo.vegetation.3d) and the bridges and cableways (ch.swisstopo.swisstlm3d.3d),
+   the tilesets of map.geo.admin.ch's 3D view (docs.geo.admin.ch, "3D Tiles"); ported from the former repository
+   davidoesch/swisseobrowser. They are 3D Tiles 1.0 in earth-centred coordinates (ECEF, WGS84): buildings and bridges
+   Draco-compressed batched models (b3dm, one building tile about 170 × 110 m), the trees instances of three tree models
+   (i3dm, also in composite tiles). Their heights are Swiss heights (LHN95) put in the place of ellipsoidal heights, so
+   they stand on the terrain without a geoid model.
+   three.js (GLTFLoader with DRACOLoader) draws them in a custom layer of the map, loaded only when a check box is on. The
+   layer's matrix works in MapLibre's world square (section 1: [0, 0] is the top-left corner of tile 0/0/0, one meter is
+   1 / (TILE × RES0) in x, y and z). The ECEF → LV95 mapping is not linear, so every tile gets its own affine mapping at
+   its centre (ECEF → WGS84 → LV95 with proj4, as everywhere on the page; within a tile it deviates by millimetres), and
+   positions are taken relative to the map centre, so float32 on the GPU stays precise. The tilesets are traversed here
+   (screen-space error of each node from its bounding region, as CesiumJS), with a request queue and a cache.
+   Two choices keep the objects independent of the Content-Security-Policy (README, Libraries): Draco's WebAssembly decoder
+   is used only where the policy allows it ('wasm-unsafe-eval', or no policy at all) and its JavaScript decoder otherwise,
+   and the textures of the tree models are image elements (GLTFLoader's image bitmaps would be fetched from blob: URLs,
+   which connect-src may not allow). */
+const OBJ_X0 = TILE * RES0;             // meters per unit of the world square
+const THREE_CDN = "https://cdn.jsdelivr.net/npm/three@0.170.0/";        // only for a page opened as a file (see LIB_CDN)
+let THREE = null, gltfLoader = null, threeReady = null, obj3dLayer = null, obj3dSeq = 0;
+/* whether WebAssembly may be compiled here: a policy without 'wasm-unsafe-eval' lets this smallest module throw (Draco's
+   worker comes from a blob URL and therefore has the policy of the page) */
+function wasmAllowed() {
+  try { return !!new WebAssembly.Module(new Uint8Array([0, 97, 115, 109, 1, 0, 0, 0])); } catch (e) { return false; }
+}
+function loadThree() {
+  if (!threeReady) {
+    threeReady = (async () => {
+      const file = location.protocol === "file:";
+      const lib = file ? Object.assign({}, ...await Promise.all(["+esm", "examples/jsm/loaders/GLTFLoader.js/+esm", "examples/jsm/loaders/DRACOLoader.js/+esm"]
+        .map(f => import(THREE_CDN + f)))) : await import(libUrl("three-tiles-0.170.0.esm.js"));
+      const man = new lib.LoadingManager();
+      const own = file ? {} : {
+        "draco_wasm_wrapper.js": libUrl("draco-wasm-wrapper-three-0.170.0.js"),
+        "draco_decoder.wasm": libUrl("draco-decoder-three-0.170.0.wasm"),
+        "draco_decoder.js": libUrl("draco-decoder-three-0.170.0.js")             // without WebAssembly, about six times slower
+      };
+      man.setURLModifier(u => own[u] || (u.startsWith("draco_") ? THREE_CDN + "examples/jsm/libs/draco/gltf/" + u : u));
+      const draco = new lib.DRACOLoader(man).setDecoderConfig({ type: wasmAllowed() ? "wasm" : "js" });
+      gltfLoader = new lib.GLTFLoader().setDRACOLoader(draco);
+      gltfLoader.register(parser => {
+        parser.textureLoader = new lib.TextureLoader(parser.options.manager);
+        return { name: "SWISSEO_image_elements" };
+      });
+      THREE = lib;
+    })();
+    threeReady.catch(() => { threeReady = null; });            // asked again with the next check box
+  }
+  return threeReady;
+}
+/* ECEF (WGS84) → lng, lat (degrees), h (Bowring, millimetre accuracy at the earth's surface) */
+function ecefToGeo(x, y, z) {
+  const a = 6378137, f = 1 / 298.257223563, b = a * (1 - f), e2 = f * (2 - f), ep2 = (a * a - b * b) / (b * b);
+  const p = Math.hypot(x, y), th = Math.atan2(z * a, p * b);
+  const lat = Math.atan2(z + ep2 * b * Math.sin(th) ** 3, p - e2 * a * Math.cos(th) ** 3);
+  const n = a / Math.sqrt(1 - e2 * Math.sin(lat) ** 2);
+  return [Math.atan2(y, x) * 180 / Math.PI, lat * 180 / Math.PI, p / Math.cos(lat) - n];
+}
+const worldOfLV = (e, n, h) => [(e - ORIGIN[0]) / OBJ_X0, (ORIGIN[1] - n) / OBJ_X0, h / OBJ_X0];
+function ecefToWorld(x, y, z) {
+  const g = ecefToGeo(x, y, z), p = P2056.forward([g[0], g[1]]);
+  return worldOfLV(p[0], p[1], g[2]);
+}
+/* the affine mapping ECEF → world square at the ECEF point c (columns: the change per meter along X, Y, Z) */
+function ecefFrame(c) {
+  const w0 = ecefToWorld(c[0], c[1], c[2]), d = 10, col = [0, 1, 2].map(i => {
+    const q = c.slice(); q[i] += d;
+    const w = ecefToWorld(q[0], q[1], q[2]);
+    return [0, 1, 2].map(k => (w[k] - w0[k]) / d);
+  });
+  return new THREE.Matrix4().set(col[0][0], col[1][0], col[2][0], w0[0], col[0][1], col[1][1], col[2][1], w0[1],
+                                 col[0][2], col[1][2], col[2][2], w0[2], 0, 0, 0, 1);
+}
+/* glTF is y-up, 3D Tiles z-up: (x, y, z) → (x, −z, y) */
+const yUpToZUp = () => new THREE.Matrix4().makeRotationX(Math.PI / 2);
+/* a bounding region [w, s, e, n (radians), min h, max h] → box in the world square */
+function regionBox(r) {
+  const D = 180 / Math.PI, xs = [], ys = [];
+  for (let i = 0; i <= 2; i++) for (let j = 0; j <= 2; j++) {
+    const p = P2056.forward([(r[0] + (r[2] - r[0]) * i / 2) * D, (r[1] + (r[3] - r[1]) * j / 2) * D]);
+    xs.push(p[0]); ys.push(p[1]);
+  }
+  const lo = worldOfLV(Math.min(...xs), Math.max(...ys), r[4]), hi = worldOfLV(Math.max(...xs), Math.min(...ys), r[5]);
+  return { min: lo, max: hi };
+}
+const nodeFrom = (j, base) => ({
+  bv: j.boundingVolume, ge: j.geometricError, refine: j.refine,
+  uri: j.content && (j.content.uri || j.content.url) ? new URL(j.content.uri || j.content.url, base).href : null,
+  children: (j.children || []).map(c => nodeFrom(c, base)), state: 0, obj: null, used: 0
+});
+
+/* one tileset: traversal, requests, cache */
+class TileSet3D {
+  constructor(key) {
+    this.key = key; this.def = OBJ3D[key]; this.root = null; this.loaded = new Set(); this.queue = new Map();
+    this.active = 0; this.group = new THREE.Group(); this.group.matrixAutoUpdate = false;
+    fetch(this.def.url).then(r => r.json()).then(j => { this.root = nodeFrom(j.root, this.def.url); map.triggerRepaint(); })
+      .catch(e => { console.warn(key, e); setStatus(t("status.obj3dFailed", "Could not be loaded: {{name}}", { name: obj3dName(this.key) })); });
+  }
+  box(n) {
+    if (!n.box) {
+      const r = n.bv.region;
+      n.box = r ? regionBox(r) : { min: [0, 0, -1], max: [1, 1, 1] };       // only regions occur in these tilesets
+    }
+    return n.box;
+  }
+  /* visit the nodes in view: content to draw, children while the screen-space error is too large */
+  traverse(n, v, frame) {
+    const b = this.box(n), ex = v.exag;                       // heights scaled as the terrain
+    v.b3.min.set(b.min[0], b.min[1], Math.min(b.min[2], b.min[2] * ex)); v.b3.max.set(b.max[0], b.max[1], Math.max(b.max[2], b.max[2] * ex));
+    if (!v.frustum.intersectsBox(v.b3)) return;
+    const dist = Math.max(1, v.b3.distanceToPoint(v.eye) * OBJ_X0);
+    // objects that would be smaller than minPx pixels are not drawn: a building (≈ 12 m) beyond ≈ 3.4 km, a tree
+    // (≈ 6 m) beyond ≈ 1.4 km on a screen 760 px high; the node's box holds nothing nearer, so nothing below it either
+    if (this.def.size * v.sseK / dist < this.def.minPx) return;
+    if (n.uri) {
+      if (n.state === 2) {
+        n.used = frame;
+        if (n.ext) { this.traverse(n.ext, v, frame); return; }
+        if (n.obj) { n.obj.visible = true; v.draw.push(n); }
+      } else if (n.state === 0 || (n.state === 3 && n.tries < 4 && Date.now() > n.retryAt)) this.queue.set(n, dist);
+    }
+    if (n.ge * v.sseK / dist > this.def.sse) n.children.forEach(c => this.traverse(c, v, frame));
+  }
+  update(v, frame) {
+    if (!this.root) return;
+    this.group.children.forEach(o => { o.visible = false; });
+    this.queue.clear();
+    this.traverse(this.root, v, frame);
+    // the nearest requests first, 8 at a time
+    [...this.queue].sort((a, b) => a[1] - b[1]).slice(0, Math.max(0, 8 - this.active)).forEach(([n]) => this.request(n));
+  }
+  async request(n) {
+    n.state = 1; this.active++;
+    try {
+      const r = await fetch(n.uri, { signal: AbortSignal.timeout(30000) });     // a stalled request frees its slot
+      if (!r.ok) throw new Error(r.status + " " + n.uri);
+      if (/\.json(\?|$)/.test(n.uri)) n.ext = nodeFrom((await r.json()).root, n.uri);
+      else {
+        n.obj = await parseTile3D(await r.arrayBuffer(), n.uri);
+        freeArrays(n.obj);
+        n.obj.visible = false;
+        this.group.add(n.obj);
+        this.loaded.add(n);
+        n.id = ++obj3dSeq;                                   // for the key of the shadow map
+        n.used = obj3dLayer ? obj3dLayer.frame : 0;          // new: not the first to be evicted
+      }
+      n.state = 2;
+      if (this.dead && n.obj) { disposeObj(n.obj); n.obj = null; }
+    } catch (e) {
+      console.warn(this.key, e);
+      n.state = 3;                                         // asked again after 5, 10 and 20 s, then given up
+      n.tries = (n.tries || 0) + 1;
+      n.retryAt = Date.now() + 5000 * 2 ** (n.tries - 1);
+    }
+    this.active--;
+    this.evict();
+    map.triggerRepaint();
+  }
+  /* Beyond the cache size, the tiles not drawn for the longest time are dropped; those drawn in the last frame and
+     those just loaded (marked with that frame) stay, so the cache grows when one view needs more tiles. */
+  evict() {
+    if (this.loaded.size <= this.def.cache) return;
+    const old = [...this.loaded].sort((a, b) => a.used - b.used).slice(0, this.loaded.size - this.def.cache);
+    const now = obj3dLayer ? obj3dLayer.frame : -1;
+    old.forEach(n => {
+      if (n.used === now) return;
+      this.group.remove(n.obj);
+      disposeObj(n.obj);
+      n.obj = null; n.state = 0; this.loaded.delete(n);
+    });
+  }
+  dispose() { this.dead = true; this.loaded.forEach(n => disposeObj(n.obj)); this.loaded.clear(); }
+}
+function disposeObj(o) {
+  o.traverse(m => {
+    if (m.isInstancedMesh) { m.dispose(); return; }             // the tree models are shared
+    if (m.geometry) m.geometry.dispose();
+    if (m.material) [].concat(m.material).forEach(x => { if (x.map) x.map.dispose(); x.dispose(); });
+  });
+}
+
+/* Once on the GPU, the vertex and index arrays are released in JavaScript (the bounding spheres are computed before):
+   this halves the memory the page needs for the 3D objects. */
+function freeArrays(o) {
+  const free = function () { this.array = null; };
+  o.traverse(m => {
+    if (!m.isMesh || !m.geometry) return;
+    Object.values(m.geometry.attributes).forEach(a => a.onUpload(free));
+    if (m.geometry.index) m.geometry.index.onUpload(free);
+  });
+}
+/* Tile content: b3dm, i3dm and cmpt (3D Tiles 1.0). The result is an object whose matrix maps it into the world square
+   relative to the map centre (set every frame from o.userData.frame). */
+const td = new TextDecoder();
+const tileJson = (buf, o, len) => len ? JSON.parse(td.decode(new Uint8Array(buf, o, len)).replace(/[\0\s]+$/, "")) : {};
+/* Lambert shading in the sun's light: the PBR materials of the tiles have no metal and no roughness, which looks wet */
+function lambert(m, flat) {
+  const l = new THREE.MeshLambertMaterial({ color: m.color, map: m.map || null, side: THREE.DoubleSide,
+                                            alphaTest: m.map ? Math.max(m.alphaTest, 0.5) : 0, transparent: false,
+                                            vertexColors: m.vertexColors, flatShading: flat });
+  m.dispose();
+  return l;
+}
+/* the swissTLM3D objects come without normals: shaded flat (normals of the faces), with vertex normals for the shadows */
+const lambertAll = root => root.traverse(m => {
+  if (!m.isMesh) return;
+  const flat = !m.geometry.attributes.normal;
+  if (flat) m.geometry.computeVertexNormals();
+  m.material = Array.isArray(m.material) ? m.material.map(x => lambert(x, flat)) : lambert(m.material, flat);
+});
+async function parseTile3D(buf, url) {
+  const dv = new DataView(buf), magic = td.decode(new Uint8Array(buf, 0, 4));
+  if (magic === "cmpt") {
+    const g = new THREE.Group(), n = dv.getUint32(12, true);
+    g.matrixAutoUpdate = false;
+    for (let i = 0, o = 16; i < n; i++) {
+      const len = dv.getUint32(o + 8, true);
+      g.add(await parseTile3D(buf.slice(o, o + len), url));
+      o += len;
+    }
+    return g;
+  }
+  if (magic === "b3dm") {
+    const ftj = dv.getUint32(12, true), ftb = dv.getUint32(16, true), btj = dv.getUint32(20, true), btb = dv.getUint32(24, true);
+    const ft = tileJson(buf, 28, ftj), gltf = await gltfLoader.parseAsync(buf.slice(28 + ftj + ftb + btj + btb), url);
+    lambertAll(gltf.scene);
+    gltf.scene.traverse(m => { m.castShadow = m.receiveShadow = true; });
+    const c = ft.RTC_CENTER || [0, 0, 0], o = new THREE.Group();
+    o.matrixAutoUpdate = false;
+    gltf.scene.applyMatrix4(yUpToZUp());
+    o.add(gltf.scene);
+    o.userData = { frame: ecefFrame(c) };
+    return o;
+  }
+  if (magic === "i3dm") return parseI3dm(buf, dv, url);
+  throw new Error("3D Tiles content " + magic + " is not supported: " + url);
+}
+const treeModels = new Map();             // external glTF models of i3dm tiles (the three tree models), shared
+async function parseI3dm(buf, dv, url) {
+  const ftj = dv.getUint32(12, true), ftb = dv.getUint32(16, true), btj = dv.getUint32(20, true), btb = dv.getUint32(24, true);
+  const fmt = dv.getUint32(28, true), ft = tileJson(buf, 32, ftj), fb = 32 + ftj, n = ft.INSTANCES_LENGTH;
+  const gltfStart = 32 + ftj + ftb + btj + btb;
+  let model;
+  if (fmt === 0) {
+    const uri = new URL(td.decode(new Uint8Array(buf, gltfStart)).replace(/[\0\s]+$/, ""), url).href;
+    if (!treeModels.has(uri)) treeModels.set(uri, gltfLoader.loadAsync(uri).then(g => { lambertAll(g.scene); g.scene.updateMatrixWorld(true); return g.scene; }));
+    model = await treeModels.get(uri);
+  } else {
+    model = (await gltfLoader.parseAsync(buf.slice(gltfStart), url)).scene;
+    lambertAll(model); model.updateMatrixWorld(true);
+  }
+  const f32 = (k, i, len) => k in ft ? new Float32Array(buf.slice(fb + ft[k].byteOffset + 4 * len * i, fb + ft[k].byteOffset + 4 * len * (i + 1))) : null;
+  if (!ft.POSITION) throw new Error("i3dm without POSITION (quantized positions are not supported): " + url);
+  const rtc = ft.RTC_CENTER || [0, 0, 0], pos = [];
+  for (let i = 0; i < n; i++) { const p = f32("POSITION", i, 3); pos.push([p[0] + rtc[0], p[1] + rtc[1], p[2] + rtc[2]]); }
+  const c = [0, 1, 2].map(k => pos.reduce((s, p) => s + p[k], 0) / n);
+  const zup = yUpToZUp(), m = new THREE.Matrix4(), r = new THREE.Matrix4(), s = new THREE.Matrix4();
+  const up = new THREE.Vector3(), right = new THREE.Vector3(), fwd = new THREE.Vector3();
+  const inst = pos.map((p, i) => {
+    const nu = f32("NORMAL_UP", i, 3), nr = f32("NORMAL_RIGHT", i, 3);
+    if (nu && nr) { up.fromArray(nu); right.fromArray(nr); }
+    else {                                                  // east-north-up at the position (EAST_NORTH_UP or nothing)
+      const g = ecefToGeo(p[0], p[1], p[2]), lo = g[0] * Math.PI / 180, la = g[1] * Math.PI / 180;
+      right.set(-Math.sin(lo), Math.cos(lo), 0);
+      up.set(-Math.sin(la) * Math.cos(lo), -Math.sin(la) * Math.sin(lo), Math.cos(la));
+    }
+    fwd.crossVectors(right, up);
+    r.makeBasis(right, up, fwd);
+    const sc = f32("SCALE", i, 1), sn = f32("SCALE_NON_UNIFORM", i, 3);
+    s.makeScale(sn ? sn[0] : sc ? sc[0] : 1, sn ? sn[1] : sc ? sc[0] : 1, sn ? sn[2] : sc ? sc[0] : 1);
+    return new THREE.Matrix4().makeTranslation(p[0] - c[0], p[1] - c[1], p[2] - c[2]).multiply(r).multiply(s).multiply(zup);
+  });
+  const o = new THREE.Group();
+  o.matrixAutoUpdate = false;
+  model.traverse(mesh => {
+    if (!mesh.isMesh) return;
+    const im = new THREE.InstancedMesh(mesh.geometry, mesh.material, n);
+    inst.forEach((q, i) => im.setMatrixAt(i, m.multiplyMatrices(q, mesh.matrixWorld)));
+    im.frustumCulled = false;
+    im.castShadow = im.receiveShadow = true;
+    o.add(im);
+  });
+  o.userData = { frame: ecefFrame(c) };
+  return o;
+}
+
+/* The custom layer: the camera is MapLibre's matrix, shifted to the map centre; the sun lights the objects from where
+   the sun shading has it (section 2b), else from the south-west at 45°. */
+function makeObj3dLayer() {
+  const layer = {
+    id: "obj3d", type: "custom", renderingMode: "3d", frame: 0, sets: {},
+    onAdd(m, gl) {
+      this.renderer = new THREE.WebGLRenderer({ canvas: m.getCanvas(), context: gl, antialias: true });
+      this.renderer.autoClear = false;
+      this.scene = new THREE.Scene();
+      this.camera = new THREE.Camera();
+      this.sun = new THREE.DirectionalLight(0xffffff, 1.6);
+      const sky = new THREE.HemisphereLight(0xdde8ff, 0x8a7f70, 0.9);
+      sky.position.set(0, 0, 1);                                   // up is z in the world square
+      this.scene.add(this.sun, this.sun.target, sky);
+      // shadows: a shadow map of the sun around the map centre; the objects cast and receive them, and a transparent
+      // grid on the terrain (MapLibre draws the terrain, three.js cannot shade it) catches the shadows on the ground
+      this.renderer.shadowMap.type = THREE.PCFShadowMap;
+      this.renderer.shadowMap.autoUpdate = false;
+      this.sun.shadow.mapSize.set(2048, 2048);
+      this.sun.shadow.bias = -0.0004;
+      this.sun.shadow.normalBias = 0.4 / OBJ_X0;
+      this.catcher = new THREE.Mesh(new THREE.BufferGeometry(),
+        new THREE.ShadowMaterial({ opacity: 0.38, side: THREE.DoubleSide, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }));
+      Object.assign(this.catcher, { receiveShadow: true, frustumCulled: false, matrixAutoUpdate: false, renderOrder: -1, visible: false });
+      this.scene.add(this.catcher);
+      this.catcherDirty = true;
+      // the heights of the grid again once new tiles of the height model are in (not after every idle: the repaint this
+      // asks for ends in the next one)
+      this.demNew = true;
+      this.onSource = e => { if (demLayer && e.sourceId === demLayer.id && e.tile) this.demNew = true; };
+      this.onIdle = () => { if (this.demNew) { this.demNew = false; this.catcherDirty = true; map.triggerRepaint(); } };
+      m.on("sourcedata", this.onSource);
+      m.on("idle", this.onIdle);
+      this.v = { frustum: new THREE.Frustum(), eye: new THREE.Vector3(), b3: new THREE.Box3(), draw: [], sseK: 1, exag: 1 };
+      this.sunDir = new THREE.Vector3();
+      this.mvp = new THREE.Matrix4(); this.inv = new THREE.Matrix4(); this.rel = new THREE.Matrix4();
+      // the world square has y to the south, a left-handed frame: three.js would take the front faces for back faces
+      // and light them from the wrong side, so it works in a right-handed frame with y to the north (FLIP)
+      this.flip = new THREE.Matrix4().makeScale(1, -1, 1);
+      this.fit = new THREE.Matrix4();                              // FLIP with the vertical scaling of the terrain
+    },
+    sync() {
+      Object.keys(OBJ3D).forEach(k => {
+        if (obj3dWanted.has(k) && !this.sets[k]) { this.sets[k] = new TileSet3D(k); this.scene.add(this.sets[k].group); }
+        if (!obj3dWanted.has(k) && this.sets[k]) { this.scene.remove(this.sets[k].group); this.sets[k].dispose(); delete this.sets[k]; }
+      });
+      map.triggerRepaint();
+    },
+    render(gl, args) {
+      const v = this.v, P = args.defaultProjectionData.mainMatrix;
+      this.mvp.fromArray(P);
+      v.frustum.setFromProjectionMatrix(this.mvp);
+      // the camera position: the point that the matrix maps to clip (0, 0, 1, 0), i.e. column 3 of its inverse
+      const e = this.inv.copy(this.mvp).invert().elements;
+      v.eye.set(e[8] / e[11], e[9] / e[11], e[10] / e[11]);
+      v.sseK = map.getCanvas().clientHeight / (2 * Math.tan(args.fov / 2));
+      v.exag = terrainOn ? t3d.exag : 1;
+      v.draw = [];
+      this.frame++;
+      Object.values(this.sets).forEach(s => s.update(v, this.frame));
+      // Relative to an anchor near the map centre, which moves only when the centre moves by a quarter of the shadow box
+      // (or the box changes its size, or the height of the terrain under it comes in), so the shadow map stays valid while the
+      // camera turns. The box's half side grows with the camera distance (250 m … 2.5 km; a texel of the 2048² shadow map is
+      // then 0.25 … 2.5 m).
+      const ll = map.getCenter(), c = toLV(ll), cw = worldOfLV(c.x, c.y, 0), hc = map.queryTerrainElevation(ll) || 0;
+      const half = clamp(Math.hypot(v.eye.x - cw[0], v.eye.y - cw[1], v.eye.z - hc / OBJ_X0) * OBJ_X0 * 0.9, 250, 2500), A = this.anchor;
+      if (!A || Math.hypot(A.ref[0] - cw[0], A.ref[1] - cw[1]) * OBJ_X0 > A.half / 4 || Math.abs(Math.log(A.half / half)) > 0.25 ||
+          Math.abs(A.hc - hc) > A.half / 10) {
+        this.anchor = { ref: cw, half, hc, c };
+        this.catcherDirty = true;
+      }
+      const ref = this.anchor.ref;
+      this.camera.projectionMatrix.copy(this.mvp).multiply(this.rel.makeTranslation(ref[0], ref[1], ref[2])).multiply(this.flip);
+      this.camera.projectionMatrixInverse.copy(this.camera.projectionMatrix).invert();
+      // the vertical scaling takes the objects as a whole, as the terrain they stand on: they stay on it on every slope (the
+      // reference points of the building and bridge tiles lie at height 0, so a shift of the tile would not do)
+      this.fit.makeScale(1, -1, v.exag);
+      const place = o => {                                  // a composite tile: each inner tile on its own frame
+        if (!o.userData.frame) { o.children.forEach(place); return; }
+        o.matrix.makeTranslation(-ref[0], -ref[1], 0).premultiply(this.fit).multiply(o.userData.frame);
+        o.matrixWorldNeedsUpdate = true;
+      };
+      v.draw.forEach(n => place(n.obj));
+      const s = sunPos(sunDate(), ll.lat, ll.lng), R = Math.PI / 180;
+      const az = (t3d.shade ? s.az : 225) * R, alt = (t3d.shade ? clamp(s.alt, 5, 90) : 45) * R;
+      this.sunUp = !t3d.shade || s.alt > 2;
+      this.sunDir.set(Math.sin(az) * Math.cos(alt), Math.cos(az) * Math.cos(alt), Math.sin(alt));                      // east, north, up
+      this.sun.position.copy(this.sunDir);
+      this.sun.target.position.set(0, 0, 0);
+      this.shadows(v);
+      this.renderer.resetState();
+      this.renderer.setViewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+      this.renderer.render(this.scene, this.camera);
+      const busy = Object.values(this.sets).some(s => s.active || s.queue.size);
+      if (busy) map.triggerRepaint();
+    },
+    /* Shadows: the sun's shadow map over the box around the anchor, drawn again only when the anchor, the sun, the
+       vertical scaling or the tiles drawn change; the catcher grid (81 × 81 points of the terrain height, lifted 1.5 m)
+       is built again with a new anchor and after terrain tiles loaded. */
+    shadows(v) {
+      const on = t3d.objShadow && t3d.shade && this.sunUp && Object.keys(this.sets).length > 0;
+      this.renderer.shadowMap.enabled = on;
+      this.sun.castShadow = on;
+      this.catcher.visible = on;
+      if (!on) { this.shadowKey = null; return; }
+      const A = this.anchor, H = A.half / OBJ_X0, cz = A.hc / OBJ_X0, cam = this.sun.shadow.camera;
+      this.sun.target.position.set(0, 0, cz);
+      this.sun.position.copy(this.sunDir).multiplyScalar(6000 / OBJ_X0).add(this.sun.target.position);
+      if (cam.right !== H) { cam.left = cam.bottom = -H; cam.right = cam.top = H; cam.near = 0; cam.far = 12000 / OBJ_X0; cam.updateProjectionMatrix(); }
+      const g = this.catcher.userData;
+      if (this.catcherDirty || g.exag !== v.exag) {
+        this.catcherDirty = false;
+        const n = 81, pos = new Float32Array(n * n * 3), idx = [];
+        for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) {
+          const dx = (i / (n - 1) * 2 - 1) * A.half, dn = (1 - j / (n - 1) * 2) * A.half, k = 3 * (j * n + i);
+          const h = map.queryTerrainElevation(lv95(A.c.x + dx, A.c.y + dn));
+          pos[k] = dx / OBJ_X0; pos[k + 1] = dn / OBJ_X0; pos[k + 2] = ((h == null ? A.hc : h) + 1.5) / OBJ_X0;
+          if (i && j) { const a = k / 3; idx.push(a - n - 1, a - n, a, a - n - 1, a, a - 1); }
+        }
+        const geo = this.catcher.geometry;
+        geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+        geo.setIndex(idx);
+        geo.computeVertexNormals();
+        g.exag = v.exag;
+      }
+      const key = [A.ref[0], A.ref[1], A.half, this.sunDir.x, this.sunDir.y, v.exag, v.draw.length,
+                   v.draw.reduce((sum, n) => sum + n.id, 0)].join();
+      if (key !== this.shadowKey) { this.shadowKey = key; this.renderer.shadowMap.needsUpdate = true; }
+    },
+    onRemove(m) {
+      m.off("sourcedata", this.onSource);
+      m.off("idle", this.onIdle);
+      Object.values(this.sets).forEach(s => s.dispose()); this.sets = {};
+      this.catcher.geometry.dispose(); this.renderer.dispose();
+    }
+  };
+  return layer;
+}
+/* switch the 3D objects on or off (key: "buildings", "trees", "tlm"); they are drawn only in 3D */
+function setObj3d(key, on) {
+  if (on) obj3dWanted.add(key); else obj3dWanted.delete(key);
+  basemapCtl.sync();
+  writeUrlSoon();
+  syncObj3d();
+}
+async function syncObj3d() {
+  const want = terrainOn && obj3dWanted.size > 0;
+  if (!want) {
+    if (obj3dLayer && map.getLayer("obj3d")) { map.removeLayer("obj3d"); arrangeLabels(); }
+    obj3dLayer = null;
+    return;
+  }
+  try { await loadThree(); }
+  catch (e) { console.warn("three.js", e); setStatus(t("status.obj3dFailed", "Could not be loaded: {{name}}", { name: "three.js" })); return; }
+  if (!terrainOn || !obj3dWanted.size) return;
+  // above the sun shading; the street and river names below, the lifted point labels above it (arrangeLabels)
+  if (!obj3dLayer) {
+    obj3dLayer = makeObj3dLayer();
+    map.addLayer(obj3dLayer, "z-over");
+    arrangeLabels();
+  }
+  obj3dLayer.sync();
+}
 
 /* ============================================================
    2c. Labels: swisstopo vector tiles in the LV95 grid
@@ -8470,6 +8974,7 @@ function writeUrl() {
     p.set("3d", "true"); p.set("pitch", +map.getPitch().toFixed(1)); p.set("bearing", +map.getBearing().toFixed(1));
     if (t3d.dem !== T3D_DEFAULT.dem) p.set("terrain", t3d.dem);
     if (t3d.exag !== 1) p.set("exaggeration", t3d.exag);
+    if (obj3dWanted.size) p.set("objects3d", [...obj3dWanted].join(","));
   }
   p.set("center", c.x.toFixed(2) + "," + c.y.toFixed(2));               // LV95 E,N as on map.geo.admin.ch
   if (I18N.lang() !== "en") p.set("lang", I18N.lang());               // a shared link keeps its language
@@ -8582,6 +9087,7 @@ function readUrl() {
     const pt = parseFloat(q.get("pitch")), br = parseFloat(q.get("bearing")), ex = parseFloat(q.get("exaggeration"));
     if (q.get("terrain") in DEMS) t3d.dem = q.get("terrain");
     if (ex >= 0.5 && ex <= 3) t3d.exag = ex;
+    (q.get("objects3d") || "").split(",").forEach(k => { if (Object.hasOwn(OBJ3D, k)) obj3dWanted.add(k); });
     setTerrain3D(true, { pitch: isFinite(pt) ? clamp(pt, 0, 75) : 60, bearing: isFinite(br) ? br : 0 }, wantBase || null);
   }
   setLabels(wantLabels === null ? labelsDefault() : wantLabels);

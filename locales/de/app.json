@@ -277,7 +277,8 @@
       "standard": "Standard",
       "sunShadingOfThe": "Sonnenschattierung des Geländes (Glühbirnen-Schaltfläche)",
       "theShadingLightsThe": "Die Schattierung beleuchtet das Höhenmodell aus Richtung und Höhe der Sonne in der Kartenmitte (siehe <i>Sonnenzeit</i>). Himmel, von Bergen geworfene Schatten, Blendenflecke und Anaglyphen-Stereo sind in dieser Kartenbibliothek nicht verfügbar.<br>Quellen: <a href=\"https://www.swisstopo.admin.ch/de/hoehenmodell-swissalti3d\" target=\"_blank\" rel=\"noopener\">swissALTI3D</a> (0,5 m, in der Nähe; weiter weg und ausserhalb der Schweiz swissALTIRegio), <a href=\"https://www.geocat.ch/datahub/dataset/f7f058e9-288b-4c55-8f4e-6360880dbb59\" target=\"_blank\" rel=\"noopener\">swissALTIRegio</a> (Metadaten auf geocat.ch), <a href=\"https://www.swisstopo.admin.ch/de/hoehenmodell-swisssurface3d\" target=\"_blank\" rel=\"noopener\">swissSURFACE3D</a> (von swissEO auf 10 m umgerechnet).",
-      "verticalTerrainScaling": "Vertikale Überhöhung des Geländes"
+      "verticalTerrainScaling": "Vertikale Überhöhung des Geländes",
+      "objShadow": "Schatten der 3D-Gebäude, -Bäume und -Brücken (mit der Sonnenschattierung; Ebenen-Schaltfläche, <i>3D-Objekte</i>)"
     },
     "timelapse": {
       "adaptiveGainBrightScenes": "Adaptive Verstärkung (helle Szenen)",
@@ -917,6 +918,12 @@
       "tiltDown": "Zur Ansicht senkrecht von oben kippen",
       "turnKnob": "Ziehen, um die Karte zu drehen und zu kippen; Doppelklick: Norden oben, Ansicht senkrecht von oben",
       "north": "Norden oben"
+    },
+    "obj3dTitle": "3D-Objekte",
+    "obj3d": {
+      "buildings": "3D-Gebäude",
+      "trees": "3D-Bäume",
+      "tlm": "3D-Brücken, Seilbahnen"
     }
   },
   "mask": {
@@ -1119,7 +1126,8 @@
     "searchPrev": "Vorheriges Datum mit Daten wird gesucht…",
     "useArrows": "Mit ‹ › oder der Pfeil-Schaltfläche zu einem Datum mit Daten springen.",
     "vhiMaskFailed": "Die Waldmaske von swissEO VHI v100 konnte nicht geladen werden.",
-    "noAcqWindow": "Keine Aufnahme in den {{days}} Tagen bis <b>{{date}}</b>."
+    "noAcqWindow": "Keine Aufnahme in den {{days}} Tagen bis <b>{{date}}</b>.",
+    "obj3dFailed": "Konnte nicht geladen werden: {{name}}"
   },
   "sun": {
     "above": "Höhe {{alt}}° über dem Horizont.",

@@ -291,6 +291,7 @@
       "heightModel": "Height model",
       "highlightColour": "Highlight colour",
       "multidirectional": "Multidirectional",
+      "objShadow": "Shadows of the 3D buildings, trees and bridges (with the sun shading; layers button, <i>3D objects</i>)",
       "resetValues": "Reset values",
       "shadingMethod": "Shading method",
       "shadingStrength": "Shading strength",
@@ -905,6 +906,12 @@
       "up": "Move up"
     },
     "notInLink": "⚠ not in link",
+    "obj3d": {
+      "buildings": "3D buildings",
+      "tlm": "3D bridges, cableways",
+      "trees": "3D trees"
+    },
+    "obj3dTitle": "3D objects",
     "openTheMenu": "Open the menu",
     "overlaysTitle": "Map overlays",
     "pixelInspector": "Pixel inspector",
@@ -1115,6 +1122,7 @@
     "noEarlier": "No earlier date with data found.",
     "noLater": "No later date with data found.",
     "noVhi": "No VHI product within ±45 days of {{date}}.",
+    "obj3dFailed": "Could not be loaded: {{name}}",
     "searchLatest": "Searching the latest date with data…",
     "searchNext": "Searching next date with data…",
     "searchPrev": "Searching previous date with data…",

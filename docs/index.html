@@ -299,6 +299,8 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
     <li data-i18n="[html]t8.li3">Three more buttons appear above the tools: the <b>3D settings</b> (gear), the <b>sun shading</b> (light bulb)
       and the <b>sun time</b> (sun). The terrain is lit by the sun at the time of the satellite image; with the sun time
       you can light the mountains as in the morning or the evening.</li>
+    <li data-i18n="[html]t8.li4">For towns and forests, open the layers button and tick <b>3D buildings</b> or <b>3D trees</b> under
+      <i>3D objects</i>, then zoom in: they are drawn near you only.</li>
   </ol>
   <figure><img data-i18n="[alt]t8.img1" src="img/terrain-3d.jpg" alt="The Great Aletsch Glacier in 3D with the true color image and labels" width="1400" height="900">
     <figcaption data-i18n="[html]t8.cap1"><b>Fig. 8</b> The Great Aletsch Glacier in 3D: true color of 13 August 2026 on swissALTIRegio, looking
@@ -516,6 +518,8 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
       Igor, multidirectional), the <i>shading strength</i> and the <i>shadow</i>, <i>highlight</i> and <i>accent
       colours</i>. The colours are partly transparent, so the satellite image stays visible.</li>
     <li data-i18n="[html]vis-3d.li6"><b>Vertical terrain scaling</b> from 50 to 300 %: values above 100 % make the relief steeper.</li>
+    <li data-i18n="[html]vis-3d.li6a"><b>Shadows of the 3D buildings, trees and bridges</b>: with the sun shading on, the 3D objects cast shadows on each
+      other and on the ground around the centre of the map.</li>
     <li data-i18n="[html]vis-3d.li7"><b>Reset values</b> returns all settings except the height model to their defaults.</li>
   </ul>
   <figure><img data-i18n="[alt]vis-3d.img1" src="img/3d-settings.jpg" alt="The 3D settings dialog next to the 3D view of the Aletsch Glacier" width="1400" height="900">
@@ -537,6 +541,19 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
     <figcaption data-i18n="[html]vis-3d.cap2"><b>Fig. 18</b> Sun time set with the sliders to 13 August 2026, 16:45 UTC: the sun stands in the west,
     19° above the horizon, and lights the slopes facing it. <i>Scene time</i> returns to the time of the image
     (10:22 UTC that day).</figcaption></figure>
+  <h3 data-i18n="vis-3d.title4a" style="font-size:15px">3D buildings, trees, bridges and cableways</h3>
+  <ul>
+    <li data-i18n="[html]vis-3d.li9a">In 3D the layers button has a section <b>3D objects</b>: <i>3D buildings</i> (swissBUILDINGS3D), <i>3D trees</i> and
+      <i>3D bridges, cableways</i> (swissTLM3D), the 3D models of map.geo.admin.ch
+      (<a href="https://docs.geo.admin.ch/visualize-data/3d-tiles.html" target="_blank" rel="noopener">3D Tiles</a>). They are off
+      whenever you switch to 3D; tick what you need.</li>
+    <li data-i18n="vis-3d.li9b">Only what would be at least a few pixels large is drawn: on an ordinary screen buildings up to about 3.4 km and trees up to
+      about 1.4 km away. Zoom in to see them. They follow the vertical scaling and are lit by the sun of the sun shading.</li>
+    <li data-i18n="vis-3d.li9c">The 3D objects need a capable graphics card. If the map becomes slow, switch off the trees, or the shadows in the 3D settings.</li>
+    <li data-i18n="vis-3d.li9d">In 3D the names of places and peaks float 50 m above the ground, so that trees and buildings do not cover them. Street and
+      river names stay on the ground, lake names on the water.</li>
+    <li data-i18n="vis-3d.li9e">The height model swissSURFACE3D already contains buildings and trees: with it the 3D objects stand partly inside the surface.</li>
+  </ul>
   <h3 data-i18n="vis-3d.title5" style="font-size:15px">What works in 3D</h3>
   <ul>
     <li data-i18n="[html]vis-3d.li10">The <b>Basic</b> image download saves the 3D view as you see it (PNG or JPG, without scale bar, as a tilted view
@@ -544,7 +561,7 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
     <li data-i18n="[html]vis-3d.li11">The split comparison needs the flat map, so in 3D the compare list uses the <i>Opacity</i> effect; the highlights
       open in 2D.</li>
     <li data-i18n="vis-3d.li12">Statistics, the analytical download, the print and the timelapse use the area around the centre of the view.</li>
-    <li data-i18n="vis-3d.li13">Links keep the 3D view with its tilt and direction, the height model and the vertical scaling.</li>
+    <li data-i18n="vis-3d.li13">Links keep the 3D view with its tilt and direction, the height model, the vertical scaling and the 3D objects.</li>
   </ul>
   <p data-i18n="vis-3d.p3">Not available, compared with the Copernicus Browser: a sky and atmosphere, shadows cast by mountains, a lens flare,
     anaglyph stereo and a 3D timelapse.</p>
@@ -693,6 +710,8 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padd
       <td data-i18n="[html]data.td12"><a href="https://www.geocat.ch/datahub/dataset/f7f058e9-288b-4c55-8f4e-6360880dbb59" target="_blank" rel="noopener">swisstopo, metadata on geocat.ch</a></td></tr>
     <tr><td data-i18n="data.td13">swissSURFACE3D, 10 m</td><td data-i18n="data.td14">Surface model of the 3D view (option), resampled to 10 m by swissEO</td>
       <td data-i18n="[html]data.td15"><a href="https://www.swisstopo.admin.ch/en/height-model-swisssurface3d" target="_blank" rel="noopener">swisstopo</a></td></tr>
+    <tr><td data-i18n="data.td15a">swissBUILDINGS3D, 3D vegetation, swissTLM3D</td><td data-i18n="data.td15b">3D buildings, trees, bridges and cableways of the 3D view (3D Tiles)</td>
+      <td data-i18n="[html]data.td15c">swisstopo, 3d.geo.admin.ch (<a href="https://docs.geo.admin.ch/visualize-data/3d-tiles.html" target="_blank" rel="noopener">3D Tiles</a>)</td></tr>
     <tr><td data-i18n="data.td16">Habitat maps of swissEO VHI</td><td data-i18n="data.td17">Vegetation masks (forest, all vegetation)</td>
       <td data-i18n="[html]data.td18">swisstopo, swissEO VHI processor (<a href="https://github.com/swisstopo/topo-satromo-v2" target="_blank" rel="noopener">topo-satromo-v2</a>)</td></tr>
     <tr><td data-i18n="data.td19">swissTLM3D forest</td><td data-i18n="data.td20">Vegetation mask (Wald, Wald offen, Gebüschwald), pixel inspector</td>

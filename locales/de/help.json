@@ -60,7 +60,10 @@
     "title5": "Grenzen",
     "td10a": "swissALTI3D",
     "td11a": "Höhenmodell der 3D-Ansicht in Ihrer Nähe (Standard), 0,5 m",
-    "td12a": "<a href=\"https://www.swisstopo.admin.ch/de/hoehenmodell-swissalti3d\" target=\"_blank\" rel=\"noopener\">swisstopo</a>"
+    "td12a": "<a href=\"https://www.swisstopo.admin.ch/de/hoehenmodell-swissalti3d\" target=\"_blank\" rel=\"noopener\">swisstopo</a>",
+    "td15a": "swissBUILDINGS3D, 3D-Vegetation, swissTLM3D",
+    "td15b": "3D-Gebäude, Bäume, Brücken und Seilbahnen der 3D-Ansicht (3D Tiles)",
+    "td15c": "swisstopo, 3d.geo.admin.ch (<a href=\"https://docs.geo.admin.ch/visualize-data/3d-tiles.html\" target=\"_blank\" rel=\"noopener\">3D Tiles</a>)"
   },
   "envbar": "<b>Integrationsversion zum Testen.</b> Nicht für den operativen Einsatz: Die hier gezeigten Ebenen und Werte sind nicht validiert und können falsch sein. Die offizielle Version ist noch nicht veröffentlicht.",
   "footer": {
@@ -209,7 +212,8 @@
     "li2": "Ziehen Sie mit der <b>rechten Maustaste</b> (oder halten Sie <span class=\"key\">Ctrl</span> und ziehen Sie), um die Ansicht zu kippen und zu drehen; auf einem Touchscreen mit zwei Fingern. Ohne rechte Maustaste nutzen Sie die <b>3D-Navigation</b> über den Zoom-Schaltflächen: Die obere Scheibe verschiebt die Karte, die untere dreht und kippt sie; ihre rote Marke zeigt nach Norden.",
     "li3": "Über den Werkzeugen erscheinen drei weitere Schaltflächen: die <b>3D-Einstellungen</b> (Zahnrad), die <b>Sonnenschattierung</b> (Glühbirne) und die <b>Sonnenzeit</b> (Sonne). Das Gelände wird von der Sonne zur Zeit des Satellitenbilds beleuchtet; mit der Sonnenzeit können Sie die Berge wie am Morgen oder am Abend beleuchten.",
     "p1": "Die Schaltfläche <span class=\"key\">3D</span>, das letzte der Werkzeuge, legt die Karte und die Satellitenebene auf das Gelände.",
-    "title": "<span class=\"n\">8</span>In 3D ansehen"
+    "title": "<span class=\"n\">8</span>In 3D ansehen",
+    "li4": "Für Siedlungen und Wälder öffnen Sie die Ebenen-Schaltfläche und setzen unter <i>3D-Objekte</i> den Haken bei <b>3D-Gebäude</b> oder <b>3D-Bäume</b>. Zoomen Sie dann hinein: Sie werden nur in Ihrer Nähe gezeichnet."
   },
   "t9": {
     "p1": "Die Bild-Schaltfläche öffnet <b>Bild herunterladen</b>. <i>Einfach</i> speichert, was Sie sehen, als PNG oder JPG, auf Wunsch mit Datum, Massstabsbalken und Legende (auch eine 3D-Ansicht). <i>Analytisch</i> liefert GeoTIFF-Dateien mit den eigentlichen Werten für GIS-Software wie QGIS. <i>Druck in hoher Auflösung</i> rechnet die Ansicht für den Druck.",
@@ -285,7 +289,7 @@
     "li10": "Der Bild-Download <b>Einfach</b> speichert die 3D-Ansicht, wie Sie sie sehen (PNG oder JPG, ohne Massstabsbalken, da eine gekippte Ansicht keinen einheitlichen Massstab hat).",
     "li11": "Der geteilte Vergleich braucht die flache Karte, deshalb verwendet die Vergleichsliste in 3D den Effekt <i>Deckkraft</i>; die Highlights öffnen sich in 2D.",
     "li12": "Statistik, analytischer Download, Druck und Zeitraffer verwenden das Gebiet um die Mitte der Ansicht.",
-    "li13": "Links behalten die 3D-Ansicht mit Neigung und Richtung, das Höhenmodell und die vertikale Überhöhung.",
+    "li13": "Links behalten die 3D-Ansicht mit Neigung und Richtung, das Höhenmodell, die vertikale Überhöhung und die 3D-Objekte.",
     "li2": "Ziehen Sie mit der <b>rechten Maustaste</b> oder halten Sie <span class=\"key\">Ctrl</span> und ziehen Sie, um die Ansicht zu kippen und zu drehen; auf einem Touchscreen mit zwei Fingern. Verschieben und zoomen wie gewohnt. Die <b>3D-Navigation</b> über den Zoom-Schaltflächen erledigt dasselbe allein mit der Maus: Die obere Scheibe verschiebt die Karte, die untere dreht sie (links, rechts) und kippt sie (oben, unten). Klicken Sie auf einen Pfeil für einen Schritt oder halten Sie ihn gedrückt; ziehen Sie den Knopf in der Mitte, je weiter, desto schneller. Die rote Marke zeigt immer nach Norden: Ein Klick darauf dreht die Karte zurück nach Norden, ein Doppelklick auf den unteren Knopf macht sie zudem wieder flach (Ansicht senkrecht von oben). Die Zoom-Schaltflächen liegen unter den Scheiben.",
     "li3": "Eine erste 3D-Ansicht dauert einige Sekunden: Die Höhen werden aus dem Höhenmodell gelesen und in Ihrem Browser zu Gelände verarbeitet.",
     "li4": "<b>Höhenmodell</b>: <i>swissALTI3D</i>, das 0,5-m-Modell von swisstopo des Geländes ohne Bauten und Bewuchs, in Ihrer Nähe, und <i>swissALTIRegio</i>, das 10-m-Modell, weiter weg und ausserhalb der Schweiz (Standard); <i>swissALTIRegio</i> allein; oder <i>swissSURFACE3D 10 m</i>, die Oberfläche mit Gebäuden und Bäumen, von swissEO auf 10 m umgerechnet (ausserhalb der Schweiz und in ihren Lücken die Höhen von swissALTIRegio).",
@@ -301,7 +305,14 @@
     "title2": "Öffnen und navigieren",
     "title3": "3D-Einstellungen (Zahnrad)",
     "title4": "Sonnenschattierung (Glühbirne) und Sonnenzeit (Sonne)",
-    "title5": "Was in 3D funktioniert"
+    "title5": "Was in 3D funktioniert",
+    "li6a": "<b>Schatten der 3D-Gebäude, -Bäume und -Brücken</b>: Bei eingeschalteter Sonnenschattierung werfen die 3D-Objekte Schatten aufeinander und rund um die Kartenmitte auf den Boden.",
+    "title4a": "3D-Gebäude, Bäume, Brücken und Seilbahnen",
+    "li9a": "In 3D hat die Ebenen-Schaltfläche einen Abschnitt <b>3D-Objekte</b>: <i>3D-Gebäude</i> (swissBUILDINGS3D), <i>3D-Bäume</i> und <i>3D-Brücken, Seilbahnen</i> (swissTLM3D), die 3D-Modelle von map.geo.admin.ch (<a href=\"https://docs.geo.admin.ch/visualize-data/3d-tiles.html\" target=\"_blank\" rel=\"noopener\">3D Tiles</a>). Bei jedem Wechsel zu 3D sind sie ausgeschaltet; schalten Sie ein, was Sie brauchen.",
+    "li9b": "Gezeichnet wird nur, was mindestens einige Pixel gross ist: auf einem üblichen Bildschirm Gebäude bis etwa 3,4 km und Bäume bis etwa 1,4 km Entfernung. Zoomen Sie hinein, um sie zu sehen. Sie folgen der vertikalen Überhöhung und werden von der Sonne der Sonnenschattierung beleuchtet.",
+    "li9c": "Die 3D-Objekte brauchen eine leistungsfähige Grafikkarte. Wird die Karte langsam, schalten Sie die Bäume oder in den 3D-Einstellungen die Schatten aus.",
+    "li9d": "In 3D schweben die Namen von Orten und Gipfeln 50 m über dem Boden, damit Bäume und Gebäude sie nicht verdecken. Strassen- und Flussnamen bleiben am Boden, Seenamen auf dem Wasser.",
+    "li9e": "Das Höhenmodell swissSURFACE3D enthält Gebäude und Bäume bereits: Mit ihm stehen die 3D-Objekte teilweise in der Oberfläche."
   },
   "vis-base": {
     "p1": "Fahren Sie mit der Maus über die Ebenen-Schaltfläche oben rechts auf der Karte (links vom <span class=\"key\">i</span>), wie im Copernicus Browser, um die <b>Hintergrundkarte</b> zu wählen: <i>Karte</i> (Landeskarte von swisstopo), <i>SWISSIMAGE</i> (Luftbild), <i>Karte grau</i> oder <i>Keine</i>; in 3D auch die <i>swissTLM-Karte für 3D</i>, den Hintergrund der 3D-Ansicht von map.geo.admin.ch, mit der 3D beginnt. Unter <i>Kartenüberlagerungen</i> schreibt <b>Beschriftungen</b> die Namen von Orten, Strassen, Gipfeln und Seen aus der Basiskarte von swisstopo über die Satellitendaten, als scharfen Text in jedem Massstab (in 3D aufrecht und Ihnen zugewandt). Wenn Sie SWISSIMAGE wählen, werden die Beschriftungen eingeschaltet. Die Namen enden an der Grenze der Schweiz und Liechtensteins.",

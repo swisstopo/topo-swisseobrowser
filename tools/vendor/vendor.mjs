@@ -3,7 +3,7 @@
    File names carry the version (lib/maplibre-gl-6.16.0.mjs), so the deployed files can be cached as
    immutable and an upgrade is always a visible rename: after a version bump, update the LIB_CDN map in
    swisseo-browser.html and the SBOM table in README.md (this script warns when they drift).
-   The four *.esm.js bundles are built with esbuild because the jsDelivr /+esm bundles the page used
+   The *.esm.js bundles of the stubs are built with esbuild because the jsDelivr /+esm bundles the page used
    before are not self-contained (they import further jsDelivr URLs). */
 import { build } from "esbuild";
 import fs from "node:fs";
@@ -29,15 +29,23 @@ const copies = [
   ["@tmcw/togeojson", "dist/togeojson.umd.js",   v => `togeojson-${v}.umd.js`],
   ["jszip",       "dist/jszip.min.js",           v => `jszip-${v}.min.js`],
   ["shpjs",       "dist/shp.min.js",             v => `shp-${v}.min.js`],
-  ["mgrs",        "dist/mgrs.js",                v => `mgrs-${v}.js`]
+  ["mgrs",        "dist/mgrs.js",                v => `mgrs-${v}.js`],
+  // Draco decoder of three.js (Apache-2.0) for the 3D objects: the WebAssembly build with its wrapper, and the JavaScript
+  // build for a Content-Security-Policy without 'wasm-unsafe-eval' (the page picks one, loadThree)
+  ["three",       "examples/jsm/libs/draco/gltf/draco_wasm_wrapper.js", v => `draco-wasm-wrapper-three-${v}.js`],
+  ["three",       "examples/jsm/libs/draco/gltf/draco_decoder.wasm", v => `draco-decoder-three-${v}.wasm`],
+  ["three",       "examples/jsm/libs/draco/gltf/draco_decoder.js", v => `draco-decoder-three-${v}.js`]
 ];
 
-/* The ESM bundles for MapLibre's workers and their self-test: the named exports the page imports. */
+/* The ESM bundles (for MapLibre's workers; three.js for the 3D objects) and their self-test: the named exports the page
+   imports. */
 const bundles = [
   ["proj4",               "stubs/proj4.js",       v => `proj4-${v}.esm.js`,       m => typeof m.default === "function"],
   ["pbf",                 "stubs/pbf.js",         v => `pbf-${v}.esm.js`,         m => typeof m.PbfReader === "function"],
   ["@mapbox/vector-tile", "stubs/vector-tile.js", v => `vector-tile-${v}.esm.js`, m => typeof m.VectorTile === "function"],
-  ["@maplibre/vt-pbf",    "stubs/vt-pbf.js",      v => `vt-pbf-${v}.esm.js`,      m => typeof m.fromVectorTileJs === "function"]
+  ["@maplibre/vt-pbf",    "stubs/vt-pbf.js",      v => `vt-pbf-${v}.esm.js`,      m => typeof m.fromVectorTileJs === "function"],
+  ["three",               "stubs/three-tiles.js", v => `three-tiles-${v}.esm.js`, m => ["WebGLRenderer", "InstancedMesh", "ShadowMaterial",
+                           "TextureLoader", "GLTFLoader", "DRACOLoader"].every(k => typeof m[k] === "function")]
 ];
 
 /* Pinned raw files (immutable commit URLs). */
@@ -177,6 +185,18 @@ for (const [pkg, , name, check] of bundles) {
   const out = await Promise.race([answer, new Promise((_, rej) => setTimeout(() => rej(new Error("geotiff decoder worker: no answer")), 5000))]);
   if (out.id !== 7 || new Uint16Array(out.decoded).join() !== v.join()) throw new Error("geotiff decoder worker: wrong result");
   console.log("geotiff decoder worker: DEFLATE with predictor OK");
+}
+{
+  /* both Draco decoders must start: the WebAssembly one with the .wasm file as it is served */
+  const V3 = V("three"), read = f => fs.readFileSync(path.join(lib, f));
+  for (const [f, wasm] of [[`draco-wasm-wrapper-three-${V3}.js`, `draco-decoder-three-${V3}.wasm`], [`draco-decoder-three-${V3}.js`, null]]) {
+    // as a browser worker sees it: no module system, no process
+    const make = new Function("module", "exports", "process", read(f).toString("utf8") + ";return DracoDecoderModule;")();
+    const d = await Promise.race([new Promise(res => make({ ...(wasm ? { wasmBinary: new Uint8Array(read(wasm)).buffer } : {}), onModuleLoaded: res })),
+      new Promise((_, rej) => setTimeout(() => rej(new Error(f + ": the Draco decoder did not start")), 10000))]);
+    if (typeof d.Decoder !== "function") throw new Error(f + ": no Decoder");
+  }
+  console.log("Draco decoders: WebAssembly and JavaScript start");
 }
 console.log("self-test OK");
 
