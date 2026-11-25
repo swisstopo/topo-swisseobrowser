@@ -26,6 +26,7 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  actions: read           # the list of the run's artifacts (step "Wait until GitHub lists the artifact")
 
 concurrency:
   group: pages
@@ -103,9 +104,30 @@ jobs:
 
       - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
 
+      # The artifact carries the number of the attempt: a re-run uploads into the same run, and deploy-pages
+      # refuses to choose between two artifacts of one name, so without it a failed deploy could never be re-run.
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
+          name: github-pages-${{ github.run_attempt }}
           path: _site
+
+      # GitHub sometimes lists an artifact only some seconds after its upload; deploy-pages asks once, right
+      # away, and fails with 'No artifacts named "github-pages" were found' (21 and 25 November 2026).
+      - name: Wait until GitHub lists the artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NAME: github-pages-${{ github.run_attempt }}
+        run: |
+          for i in $(seq 1 24); do
+            n=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/artifacts?name=$NAME" --jq .total_count || echo 0)
+            [ "$n" = 1 ] && { echo "$NAME is listed"; exit 0; }
+            echo "$NAME is not listed yet ($i)"
+            sleep 5
+          done
+          echo "::error::$NAME was uploaded but GitHub does not list it; please re-run this workflow later"
+          exit 1
 
       - id: deployment
         uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+        with:
+          artifact_name: github-pages-${{ github.run_attempt }}
