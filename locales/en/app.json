@@ -149,6 +149,7 @@
     "noReference": "compared with no reference (none within ±20 days of {{date}})",
     "none": "none",
     "note2m": "two-month mosaics ending 31 July, 31 August and 30 September",
+    "note5d": "a map every 5 days from June to September",
     "noteMonthly": "published for the end of July, August and September",
     "seasonStart": "The season starts on 1 April: choose a later day.",
     "seasonSums": "Season sums from 1 April to {{day}}, over the daily VHI forest maps (the first view takes a while).",
@@ -679,6 +680,11 @@
       "name": "Cloud mask",
       "subtitle": "Based on the OmniCloudMask cloud mask band"
     },
+    "discoch": {
+      "description": "# DiscoCH probability of leaf discoloration\n\n**Beta version, not an official product.** Probability of early leaf discoloration for beech-dominated forests in Switzerland at 10 m, every 5 days from June to September 2026, as predicted by the **DiscoCH** model of WSL (Bloom et al. 2026) from Sentinel-2 time series: from 0 % (dark green) to 100 % (yellow).\n\nPredictions are limited to the modelled European beech distribution (Wüest et al. 2021), areas with a broadleaf proportion above 75 % (Waser et al. 2021), areas with high Sentinel-2 time series continuity and areas with a low likelihood of recent (2025/2026) forest management or disturbance. Everything else has no data.\n\nThe product is retrospective: each date uses all observations of the season within the interpolation kernel, also later ones. The map of the same year nearest to the selected date is shown; a year without maps shows none. Zoomed out, the forest looks wider than it is, because a coarse pixel is drawn when any of its 10 m pixels has a value.\n\n**Credit:** WSL, Swiss Federal Institute for Forest, Snow and Landscape Research, licensed CC BY 4.0. Publication: [doi:10.1016/j.jag.2026.105394](https://doi.org/10.1016/j.jag.2026.105394). Data: [STAC catalogue of WSL](https://browser.moregeo.it/external/zhc-c.s3.cloud.switch.ch/discoch/discoch-retro/collection.json).",
+      "name": "DiscoCH probability of leaf discoloration",
+      "subtitle": "Beech-dominated forest, every 5 days from June to September (WSL)"
+    },
     "evi": {
       "description": "# Enhanced Vegetation Index (EVI)\n\nThe enhanced vegetation index (EVI) is an 'optimized' vegetation index as it corrects for soil background signals and atmospheric influences. It is very useful in areas of dense canopy cover. The range of values for EVI is -1 to 1, with healthy vegetation generally around 0.20 to 0.80.\n\n\n\n\n\nMore infos [here](https://custom-scripts.sentinel-hub.com/sentinel-2/evi/) and [here.](https://en.wikipedia.org/wiki/Enhanced_vegetation_index)",
       "name": "EVI",
@@ -1005,7 +1011,8 @@
     "processor": "Processor",
     "product": "Product",
     "shift": "Mean shift (px)",
-    "stac": "Open in the swisstopo STAC browser"
+    "stac": "Open in the swisstopo STAC browser",
+    "stacOther": "Open in the STAC browser (catalogue of the provider)"
   },
   "search": {
     "coordinate": "Coordinate",
@@ -1121,6 +1128,7 @@
     "noDate": "No date with data found.",
     "noEarlier": "No earlier date with data found.",
     "noLater": "No later date with data found.",
+    "noProduct": "{{name}} has no map for {{year}}: its maps go from {{from}} to {{to}}.",
     "noVhi": "No VHI product within ±45 days of {{date}}.",
     "obj3dFailed": "Could not be loaded: {{name}}",
     "searchLatest": "Searching the latest date with data…",

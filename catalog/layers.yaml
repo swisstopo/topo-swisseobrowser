@@ -128,6 +128,9 @@ layers:
   - id: "ndvidiff2"
     label: "swissEO NDVIdiff v200 BETA"
     verified: false
+  - id: "discoch"
+    label: "DiscoCH probability of leaf discoloration"
+    verified: false
   - id: "vhidef"
     label: "VHI cumulative deficit"
     verified: true

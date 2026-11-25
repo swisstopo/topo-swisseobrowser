@@ -150,6 +150,7 @@
     "noReference": "confrontato senza riferimento (nessuno entro ±20 giorni dal {{date}})",
     "none": "nessuna",
     "note2m": "mosaici bimestrali che terminano il 31 luglio, il 31 agosto e il 30 settembre",
+    "note5d": "una mappa ogni 5 giorni da giugno a settembre",
     "noteMonthly": "pubblicato per fine luglio, agosto e settembre",
     "seasonStart": "La stagione inizia il 1° aprile: scegli un giorno successivo.",
     "seasonSums": "Somme della stagione dal 1° aprile al {{day}}, sulle mappe forestali VHI giornaliere (la prima visualizzazione richiede un po' di tempo).",
@@ -685,6 +686,11 @@
       "name": "Maschera delle nuvole",
       "subtitle": "Dalla banda di maschera delle nuvole OmniCloudMask"
     },
+    "discoch": {
+      "description": "# DiscoCH probabilità di decolorazione fogliare\n\n**Versione beta, non un prodotto ufficiale.** Probabilità di decolorazione precoce delle foglie per i boschi della Svizzera dominati dal faggio a 10 m, ogni 5 giorni da giugno a settembre 2026, prevista dal modello **DiscoCH** del WSL (Bloom et al. 2026) a partire da serie temporali Sentinel-2: da 0 % (verde scuro) a 100 % (giallo).\n\nLe previsioni si limitano alla distribuzione modellata del faggio (Wüest et al. 2021), alle superfici con una quota di latifoglie superiore al 75 % (Waser et al. 2021), alle superfici con serie temporali Sentinel-2 ben continue e alle superfici in cui una gestione o un disturbo recente (2025/2026) del bosco è poco probabile. Tutto il resto è senza dati.\n\nIl prodotto è retrospettivo: ogni data utilizza tutte le osservazioni della stagione entro il kernel di interpolazione, anche quelle successive. Viene mostrata la mappa dello stesso anno più vicina alla data selezionata; un anno senza mappe non ne mostra. A piccola scala il bosco appare più largo di quanto sia, perché un pixel grossolano viene disegnato appena uno dei suoi pixel di 10 m ha un valore.\n\n**Fonte:** WSL, Istituto federale per la foresta, la neve e il paesaggio, con licenza CC BY 4.0. Pubblicazione: [doi:10.1016/j.jag.2026.105394](https://doi.org/10.1016/j.jag.2026.105394). Dati: [catalogo STAC del WSL](https://browser.moregeo.it/external/zhc-c.s3.cloud.switch.ch/discoch/discoch-retro/collection.json).",
+      "name": "DiscoCH probabilità di decolorazione fogliare",
+      "subtitle": "Bosco dominato dal faggio, ogni 5 giorni da giugno a settembre (WSL)"
+    },
     "evi": {
       "description": "# Enhanced Vegetation Index (EVI)\n\nL'EVI è un indice di vegetazione «ottimizzato», perché corregge i segnali di fondo del suolo e gli influssi atmosferici. È molto utile nelle aree con chioma densa. L'intervallo di valori dell'EVI va da -1 a 1; la vegetazione sana si situa di norma tra 0,20 e 0,80.\n\n\n\nMaggiori informazioni [qui](https://custom-scripts.sentinel-hub.com/sentinel-2/evi/) e [qui.](https://en.wikipedia.org/wiki/Enhanced_vegetation_index)",
       "name": "EVI",
@@ -1014,7 +1020,8 @@
     "processor": "Processore",
     "product": "Prodotto",
     "shift": "Spostamento medio (px)",
-    "stac": "Apri nel browser STAC di swisstopo"
+    "stac": "Apri nel browser STAC di swisstopo",
+    "stacOther": "Apri nel browser STAC (catalogo del fornitore)"
   },
   "search": {
     "coordinate": "Coordinata",
@@ -1131,6 +1138,7 @@
     "noDate": "Nessuna data con dati trovata.",
     "noEarlier": "Nessuna data precedente con dati trovata.",
     "noLater": "Nessuna data successiva con dati trovata.",
+    "noProduct": "{{name}} non ha mappe per il {{year}}: le mappe vanno dal {{from}} al {{to}}.",
     "noVhi": "Nessun prodotto VHI entro ±45 giorni dal {{date}}.",
     "searchLatest": "Ricerca della data più recente con dati…",
     "searchNext": "Ricerca della data successiva con dati…",

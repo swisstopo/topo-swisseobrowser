@@ -103,7 +103,9 @@
   page as `LANGS_OFFERED` and read by `tools/assemble-local.ps1`.
 - **Layer verification**: only the user ticks a layer as verified (`verified: true` in
   `catalog/layers.yaml`). Unverified means the BETA label on integration and not offered in production.
-- Data that is not in STAC (e.g. NDVIdiff v200 BETA) gets a fixed item list in `SOURCES`.
+- Data that is not in STAC (e.g. NDVIdiff v200 BETA) gets a fixed item list in `SOURCES` (`items`). Data with a static STAC
+  catalogue of another provider (DiscoCH, WSL) gets `stac` (the address of its `collection.json`, whose item links are the
+  dates) and `credit` (attribution); `sameYear` keeps a date from showing the map of another year.
 
 ## Testing
 

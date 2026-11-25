@@ -150,6 +150,7 @@
     "noReference": "comparé sans référence (aucune à ±20 jours du {{date}})",
     "none": "aucune",
     "note2m": "mosaïques bimestrielles se terminant le 31 juillet, le 31 août et le 30 septembre",
+    "note5d": "une carte tous les 5 jours de juin à septembre",
     "noteMonthly": "publié pour fin juillet, août et septembre",
     "seasonStart": "La saison commence le 1er avril : choisissez un jour ultérieur.",
     "seasonSums": "Sommes de la saison du 1er avril au {{day}}, sur les cartes forestières VHI quotidiennes (le premier affichage prend un moment).",
@@ -685,6 +686,11 @@
       "name": "Masque de nuages",
       "subtitle": "À partir de la bande de masque de nuages OmniCloudMask"
     },
+    "discoch": {
+      "description": "# DiscoCH probabilité de décoloration des feuilles\n\n**Version bêta, pas un produit officiel.** Probabilité de décoloration précoce des feuilles pour les forêts de Suisse dominées par le hêtre à 10 m, tous les 5 jours de juin à septembre 2026, prédite par le modèle **DiscoCH** du WSL (Bloom et al. 2026) à partir de séries temporelles Sentinel-2 : de 0 % (vert foncé) à 100 % (jaune).\n\nLes prédictions se limitent à la répartition modélisée du hêtre (Wüest et al. 2021), aux surfaces avec une part de feuillus supérieure à 75 % (Waser et al. 2021), aux surfaces avec des séries temporelles Sentinel-2 bien continues et aux surfaces où une exploitation ou une perturbation récente (2025/2026) de la forêt est peu probable. Tout le reste est sans données.\n\nLe produit est rétrospectif : chaque date utilise toutes les observations de la saison dans le noyau d'interpolation, y compris les suivantes. La carte de la même année la plus proche de la date choisie est affichée ; une année sans cartes n'en montre aucune. En vue éloignée, la forêt paraît plus large qu'elle ne l'est, car un pixel grossier est dessiné dès que l'un de ses pixels de 10 m a une valeur.\n\n**Source :** WSL, Institut fédéral de recherches sur la forêt, la neige et le paysage, sous licence CC BY 4.0. Publication : [doi:10.1016/j.jag.2026.105394](https://doi.org/10.1016/j.jag.2026.105394). Données : [catalogue STAC du WSL](https://browser.moregeo.it/external/zhc-c.s3.cloud.switch.ch/discoch/discoch-retro/collection.json).",
+      "name": "DiscoCH probabilité de décoloration des feuilles",
+      "subtitle": "Forêt dominée par le hêtre, tous les 5 jours de juin à septembre (WSL)"
+    },
     "evi": {
       "description": "# Enhanced Vegetation Index (EVI)\n\nL'EVI est un indice de végétation « optimisé », car il corrige les signaux de fond du sol et les influences atmosphériques. Il est très utile dans les zones à couvert végétal dense. La plage de valeurs de l'EVI va de -1 à 1 ; la végétation saine se situe en général entre 0,20 et 0,80.\n\n\n\nPlus d'informations [ici](https://custom-scripts.sentinel-hub.com/sentinel-2/evi/) et [ici.](https://en.wikipedia.org/wiki/Enhanced_vegetation_index)",
       "name": "EVI",
@@ -1014,7 +1020,8 @@
     "processor": "Processeur",
     "product": "Produit",
     "shift": "Décalage moyen (px)",
-    "stac": "Ouvrir dans le navigateur STAC de swisstopo"
+    "stac": "Ouvrir dans le navigateur STAC de swisstopo",
+    "stacOther": "Ouvrir dans le navigateur STAC (catalogue du fournisseur)"
   },
   "search": {
     "coordinate": "Coordonnée",
@@ -1131,6 +1138,7 @@
     "noDate": "Aucune date avec des données trouvée.",
     "noEarlier": "Aucune date antérieure avec des données trouvée.",
     "noLater": "Aucune date ultérieure avec des données trouvée.",
+    "noProduct": "{{name}} n'a pas de carte pour {{year}} : les cartes vont du {{from}} au {{to}}.",
     "noVhi": "Aucun produit VHI à ±45 jours du {{date}}.",
     "searchLatest": "Recherche de la date la plus récente avec des données…",
     "searchNext": "Recherche de la date suivante avec des données…",

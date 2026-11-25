@@ -97,6 +97,10 @@ def main():
             check(t + " %s only on forest" % p, share > 0.9, "%.1f %% of %d product pixels inside the forest mask" % (100 * share, fin.sum()))
             rng = {"ndvidiff": 1, "ndvidiff2": 2, "ndviz": 20}[p]
             check(t + " %s in its range" % p, np.nanmax(np.abs(v)) <= rng, "max |v| %.3f (range ±%s)" % (np.nanmax(np.abs(v)), rng))
+        v = ld(t, "vals_discoch_off")       # WSL product: probability in %, beech-dominated forest only
+        fin = np.isfinite(v)
+        check(t + " DiscoCH 0…100 %, on forest", fin.any() and np.nanmin(v) >= 0 and np.nanmax(v) <= 100 and float((fin & forest).sum()) / fin.sum() > 0.9,
+              "min %.0f, max %.0f, %.1f %% of %d pixels inside the forest mask" % (np.nanmin(v), np.nanmax(v), 100 * float((fin & forest).sum()) / max(1, fin.sum()), fin.sum()))
         for p in ("vhidef", "vhiext"):
             v = ld(t, "vals_%s_off" % p)
             check(t + " %s ≥ 0, forest only" % p, np.nanmin(v) >= 0 and float((np.isfinite(v) & ~forest).sum()) / max(1, np.isfinite(v).sum()) < 0.1,

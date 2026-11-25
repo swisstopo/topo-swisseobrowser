@@ -25,5 +25,5 @@ python3 tools/verify/summary.py OUT                               # table per la
 ```
 
 Needs Python 3 with rasterio, numpy, scipy, Pillow and Selenium, Firefox (headless, WebGL), `qjs` (QuickJS) and the
-network (data.geo.admin.ch, cms.geo.admin.ch, the S3 vegetation masks, wms.geo.admin.ch). The test tiles and dates
+network (data.geo.admin.ch, cms.geo.admin.ch, zhc-c.s3.cloud.switch.ch, the S3 vegetation masks, wms.geo.admin.ch). The test tiles and dates
 are in `drive.py` (`TILES`). The page files are not changed: `serve.py` appends the hook (`hook.js`) when serving.

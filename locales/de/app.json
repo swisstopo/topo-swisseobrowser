@@ -147,6 +147,7 @@
     "noReference": "ohne Referenz verglichen (keine innerhalb von ±20 Tagen um den {{date}})",
     "none": "keine",
     "note2m": "Zweimonatsmosaike mit Ende 31. Juli, 31. August und 30. September",
+    "note5d": "alle 5 Tage eine Karte von Juni bis September",
     "noteMonthly": "veröffentlicht für Ende Juli, August und September",
     "seasonStart": "Die Saison beginnt am 1. April: Wählen Sie einen späteren Tag.",
     "seasonSums": "Saisonsummen vom 1. April bis {{day}}, über die täglichen VHI-Waldkarten (die erste Ansicht dauert eine Weile).",
@@ -679,6 +680,11 @@
       "name": "Wolkenmaske",
       "subtitle": "Aus dem Wolkenmasken-Band OmniCloudMask"
     },
+    "discoch": {
+      "description": "# DiscoCH Wahrscheinlichkeit der Verfärbung\n\n**Betaversion, kein offizielles Produkt.** Wahrscheinlichkeit der frühen Laubverfärbung für buchendominierte Wälder der Schweiz mit 10 m Auflösung, alle 5 Tage von Juni bis September 2026, vorhergesagt mit dem Modell **DiscoCH** der WSL (Bloom et al. 2026) aus Sentinel-2-Zeitreihen: von 0 % (dunkelgrün) bis 100 % (gelb).\n\nDie Vorhersagen beschränken sich auf die modellierte Verbreitung der Buche (Wüest et al. 2021), auf Flächen mit einem Laubholzanteil über 75 % (Waser et al. 2021), auf Flächen mit durchgehenden Sentinel-2-Zeitreihen und auf Flächen, auf denen eine kürzliche (2025/2026) Bewirtschaftung oder Störung des Waldes unwahrscheinlich ist. Alles Übrige hat keine Daten.\n\nDas Produkt ist rückblickend: Jedes Datum verwendet alle Beobachtungen der Saison innerhalb des Interpolationskerns, auch spätere. Angezeigt wird die Karte desselben Jahres, die dem gewählten Datum am nächsten liegt; ein Jahr ohne Karten zeigt keine. Herausgezoomt wirkt der Wald breiter, als er ist, weil ein grobes Pixel gezeichnet wird, sobald eines seiner 10-m-Pixel einen Wert hat.\n\n**Quelle:** WSL, Eidgenössische Forschungsanstalt für Wald, Schnee und Landschaft, lizenziert unter CC BY 4.0. Publikation: [doi:10.1016/j.jag.2026.105394](https://doi.org/10.1016/j.jag.2026.105394). Daten: [STAC-Katalog der WSL](https://browser.moregeo.it/external/zhc-c.s3.cloud.switch.ch/discoch/discoch-retro/collection.json).",
+      "name": "DiscoCH Wahrscheinlichkeit der Verfärbung",
+      "subtitle": "Buchendominierter Wald, alle 5 Tage von Juni bis September (WSL)"
+    },
     "evi": {
       "description": "# Enhanced Vegetation Index (EVI)\n\nDer EVI ist ein «optimierter» Vegetationsindex, da er Bodenhintergrundsignale und atmosphärische Einflüsse korrigiert. Er ist besonders nützlich in Gebieten mit dichtem Kronendach. Der Wertebereich des EVI reicht von -1 bis 1, gesunde Vegetation liegt meist zwischen 0,20 und 0,80.\n\n\n\nMehr Informationen [hier](https://custom-scripts.sentinel-hub.com/sentinel-2/evi/) und [hier.](https://en.wikipedia.org/wiki/Enhanced_vegetation_index)",
       "name": "EVI",
@@ -1005,7 +1011,8 @@
     "processor": "Prozessor",
     "product": "Produkt",
     "shift": "Mittlere Verschiebung (px)",
-    "stac": "Im swisstopo-STAC-Browser öffnen"
+    "stac": "Im swisstopo-STAC-Browser öffnen",
+    "stacOther": "Im STAC-Browser öffnen (Katalog des Anbieters)"
   },
   "search": {
     "coordinate": "Koordinate",
@@ -1120,6 +1127,7 @@
     "noDate": "Kein Datum mit Daten gefunden.",
     "noEarlier": "Kein früheres Datum mit Daten gefunden.",
     "noLater": "Kein späteres Datum mit Daten gefunden.",
+    "noProduct": "{{name}} hat keine Karte für {{year}}: Die Karten reichen vom {{from}} bis zum {{to}}.",
     "noVhi": "Kein VHI-Produkt innerhalb von ±45 Tagen um den {{date}}.",
     "searchLatest": "Das neueste Datum mit Daten wird gesucht…",
     "searchNext": "Nächstes Datum mit Daten wird gesucht…",

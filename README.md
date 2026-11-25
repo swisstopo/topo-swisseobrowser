@@ -41,6 +41,7 @@ the swisstopo WMS/WMTS services directly in the browser.
 | [swissEO NDVIdiff v100](https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-ndvidiff) | `forest-10m` COGs of the STAC collection `ch.swisstopo.swisseo_ndvi_diff_v100` | NDVI change of the current year compared to the previous year, forest perimeter, 10 m; one product for the end of July, August and September each year (since 2018) |
 | [swissEO NDVIz v100](https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-ndviz) | `forest-10m` COGs of the STAC collection `ch.swisstopo.swisseo_ndvi_z_v100` | NDVI anomaly as z-score, forest perimeter, 10 m; end of July, August and September (since 2017) |
 | swissEO NDVIdiff v200 **BETA** | 30 example COGs on `cms.geo.admin.ch/Topo/umweltbeobachtung/beispiele/NDVIDIFFV2/` (not in STAC; the item list is in the page) | Year-on-year NDVI change of two-month first-quartile cloud-free mosaics of S2-SR v200 (June/July, July/August, August/September, 2017–2026), forest, 10 m |
+| DiscoCH **BETA** (WSL) | COGs and static STAC catalogue of WSL on `zhc-c.s3.cloud.switch.ch/discoch/` ([collection](https://zhc-c.s3.cloud.switch.ch/discoch/discoch-retro/collection.json), CC BY 4.0) | Probability of early leaf discoloration of beech-dominated forest (Bloom et al. 2026, [doi:10.1016/j.jag.2026.105394](https://doi.org/10.1016/j.jag.2026.105394)), every 5 days from June to September 2026, 10 m |
 | Vegetation masks | Habitat map COGs v1-0 / v1-1 / v1-2 (forest, all vegetation) in `s3-topo-satromo-prod` (`data/MASKS/Vegetation/`, as used by the VHI processor), inside = value ≠ 0; the swissTLM3D forest (`wms.geo.admin.ch`, `ch.swisstopo.swisstlm3d-wald`); Forest Type NFI 2023 (WSL, probability of broadleaf trees per 10 m pixel for all vegetation above 3 m, Float32 COG in `s3-topo-satromo-prod` (`data/MASKS/Vegetation/waldmischungsgrad_2023_10m_2056_cog.tif`); Waser et al. 2025, [doi:10.16904/1000001.7](https://doi.org/10.16904/1000001.7)); the ETH tree species maps (broadleaf basal-area share and dominant species, 30 m, `ETH_forest_leaf_type_share_01_broadleaved.tif` and `ETH_forest_species_argmax.tif` in the same folder; Zhou et al. 2026, [arXiv:2611.08095](https://arxiv.org/abs/2611.08095), CC BY-NC 4.0); the agricultural land use (Nutzungsflächen, BLW from the data of the cantons, `wms.geo.admin.ch` layer `ch.blw.landwirtschaftliche-nutzungsflaechen`; [metadata on geocat.ch](https://www.geocat.ch/datahub/dataset/ae183bc4-5c91-467e-89bc-85f390340efb)) | Forest, vegetation, broadleaf / conifer or land-use mask for every S2-SR layer, statistics and exports |
 | Basemaps | `wmts.geo.admin.ch` (pixelkarte-farbe, swissimage, pixelkarte-grau, swisstlm3d-karte-farbe.3d) | Background maps *Map*, *SWISSIMAGE*, *Map Grey* and, in 3D, *swissTLM map for 3D* on the native LV95 grid |
 | 3D terrain | [swissALTI3D](https://www.swisstopo.admin.ch/en/height-model-swissalti3d): STAC collection `ch.swisstopo.swissalti3d` on `data.geo.admin.ch`, one COG per km² and release (0.5 m asset, else the 2 m one), LV95, near the camera; [swissALTIRegio](https://www.swisstopo.admin.ch/en/height-model-swissaltiregio): one COG on `data.geo.admin.ch` (STAC collection `ch.swisstopo.swissaltiregio`), 10 m, LV95, Switzerland and its border regions ([metadata on geocat.ch](https://www.geocat.ch/datahub/dataset/f7f058e9-288b-4c55-8f4e-6360880dbb59)); the surface model [swissSURFACE3D](https://www.swisstopo.admin.ch/en/height-model-swisssurface3d) resampled to 10 m, one COG in `s3-topo-satromo-prod` (`data/DSM/DSM_10m_EPSG2056_CH_clipped_10km_extended_9999_cog.tif`, Switzerland plus 10 km, no data −9999) | Heights of the optional 3D mode |
@@ -174,6 +175,7 @@ sheets ([S2-SR v200](https://www.swisstopo.admin.ch/dam/en/sd-web/-i2Y10KmboPf/s
 | NDVIdiff (int16) | 0.001 | 0 | 32700 missing data (shown grey) · 32701 no data |
 | NDVIz (int16) | 0.01 | 0 | 32700 missing data (shown grey) · 32701 no data |
 | NDVIdiff v200 BETA (int16) | 0.001 | 0 | 32701 no data (values −2000…2000) |
+| DiscoCH (uint8) | 1 | 0 | 255 no data (values 0–100, %) |
 
 **NDVIdiff / NDVIz overviews:** the internal overviews of these COGs average the missing-data code 32700
 into valid values (e.g. 31630 or −9395 in the overviews, while the full resolution stays within
@@ -182,6 +184,11 @@ data; at full resolution (zoomed in, or AOI statistics on a grid finer than 14.8
 and the statistics then match a rasterio read of the COG exactly. The overviews should be rebuilt with
 32700 excluded (e.g. as an additional no-data value or a mask). The NDVIdiff v200 BETA COGs have clean
 overviews (no-data handled when they were built) and need no such filter.
+
+**DiscoCH overviews:** averages of the 10 m pixels that have a value, without the no-data code, so no filter is needed. A
+coarse pixel has a value as soon as one of its 10 m pixels has one: zoomed out the forest looks wider than it is (2026-08-29:
+3.4 % of the raster at 10 m, 20 % at 320 m), and the mean over an area changes a little (17.2 % at 10 m, 20.5 % at
+320 m). Statistics at *Full resolution (10 m)* are not affected.
 
 Indices (NDVI, NDWI, …) are computed from ρ after this scaling. Very dark pixels can fall slightly below
 0 after the −0.1 offset; such negative reflectance is set to 0 before an index is computed, so ratio
@@ -327,7 +334,7 @@ The swissEO Browser therefore always uses the physical reflectance.
   once from the coarsest B04 overview (≈ 640 m) and the calendar updates when the map moves.
   When a layer shows another day than the selected one (the nearest swissEO VHI day, the NDVIdiff / NDVIz product
   nearest to the date), the date is grey in the menu and in the date box at the top left of the map, and the box
-  names the day of the data below it (*swissEO VHI v100 11.11.2026*; issue #56).
+  names the day of the data below it (*swissEO VHI v100 11.11.2026*; issue #56). DiscoCH takes the nearest map of the same year.
   The calendar marks days with data, has month / year pull-downs and a maximum cloud-coverage slider
   (cloud cover of the whole mosaic, from its `metadata.json`, as the tile cloud cover in Copernicus). Several orbits acquired on the same day are mosaicked
   (most recent on top; a pixel that is masked or without data in one scene is taken from the next). The AOI statistics,
@@ -344,10 +351,11 @@ The swissEO Browser therefore always uses the physical reflectance.
     B08), masked by default to the farmland of the BLW Nutzungsflächen (every category but forest,
     `lnf:a.dw.dp.r.o.dk.g.s.h.u.so.v`);
   - *Drought*: true color (TCI), NDVI, EVI, moisture index, Moisture Stress, swissEO VHI forest / vegetation, swissEO NDVIdiff,
-    **swissEO NDVIdiff v200 BETA**, **swissEO NDVIdiff v200_MVC BETA**, **swissEO NDVIdiff v200_Median BETA**, swissEO NDVIz, NDDI, NDDI change vs. the previous year and the NDVI difference to a reference date;
+    **swissEO NDVIdiff v200 BETA**, **swissEO NDVIdiff v200_MVC BETA**, **swissEO NDVIdiff v200_Median BETA**, swissEO NDVIz, **DiscoCH probability of leaf discoloration** (BETA), NDDI, NDDI change vs. the previous year and the NDVI difference to a reference date;
   - *Drought 2026*: only the **highlights** (no layer list); each story opens the true color of its two dates;
   - *Forest*: true color (TCI), NDVI, EVI, swissEO VHI forest, **VHI cumulative deficit**, **VHI days in extreme
-    stress**, swissEO NDVIdiff, swissEO NDVIdiff v200 BETA, swissEO NDVIdiff v200_MVC BETA and _Median BETA, swissEO NDVIz, NDVI difference to a reference date, Normalized Burn
+    stress**, swissEO NDVIdiff, swissEO NDVIdiff v200 BETA, swissEO NDVIdiff v200_MVC BETA and _Median BETA, swissEO NDVIz,
+    DiscoCH probability of leaf discoloration (BETA), NDVI difference to a reference date, Normalized Burn
     Ratio, moisture index and the **Forest Disturbance Classification**.
 - **Highlights** (*Drought 2026*): story cards as in the Copernicus Browser (live thumbnail, title,
   dates, chevron). Clicking a card opens it on the map (the place at a fixed resolution and the TCI of the
@@ -393,6 +401,8 @@ The swissEO Browser therefore always uses the physical reflectance.
   - Cloud mask: 20 km around Aarau (2'642'720 / 1'250'160), 2026-08-30. Terrain: Aletsch (2'645'000 / 1'143'000,
     2.56 km), 2026-08-13.
   - swissEO VHI forest, swissEO VHI vegetation and swissEO NDVIdiff v200_MVC: cut from views of the map.
+  - DiscoCH: Jura at the Weissenstein, Oberdorf SO (2'600'330 to 2'605'450 / 1'230'880 to 1'236'000, 5.12 km), 2026-08-29, computed
+    from the COG with the colours of the layer.
 
   Drawn from the colour legend (artificial rasters, each with its own pattern, as real data made them look alike):
   swissEO NDVIdiff (stable forest with spots of loss), v200 (a regional gradient of loss) and v200_Median (bands) on the
@@ -414,6 +424,20 @@ The swissEO Browser therefore always uses the physical reflectance.
     earlier ([test_reprocess_ndvidiff_csde.py](https://github.com/swisstopo/topo-satromo-v2/blob/dev-20261006/main_functions/test_reprocess_ndvidiff_csde.py)),
     clipped to forest. The window nearest to the selected date is shown; colours as swissEO NDVIdiff. Read
     with geotiff.js it matches a rasterio read exactly (test area near Aarau, 2026-08-31).
+  - *DiscoCH probability of leaf discoloration* (`discoch`): beta, data of WSL, not an official product. The probability
+    (0–100 %) of early leaf discoloration of beech-dominated forest, predicted by the DiscoCH model (Bloom et al. 2026,
+    [doi:10.1016/j.jag.2026.105394](https://doi.org/10.1016/j.jag.2026.105394)) from Sentinel-2 time series, every 5 days
+    from 5 June to 28 September 2026. Limited by WSL to the modelled distribution of European beech (Wüest et al.
+    2021), a broadleaf proportion above 75 % (Waser et al. 2021), a high continuity of the Sentinel-2 time series and no
+    likely forest management or disturbance in 2025/2026; everything else is no data. Retrospective: each date uses all
+    observations of the season within the interpolation kernel, also later ones. Colours and range of WSL: 0 % `#0A2F1F`,
+    25 % `#228B22`, 50 % `#5EAC2A`, 75 % `#9ACD32`, 100 % `#FFFF00`, linear between the stops.
+    **Dates:** the bucket has a *static* STAC catalogue, which cannot be searched; the page reads its `collection.json` once
+    and takes the dates from the item links, so maps that WSL adds appear without a change of the page. The COG is
+    addressed by its name (`cogs/discoch-retro/DiscoCH_RETRO_<YYYY-MM-DD>.tif`, the `href` of the item's asset). The map
+    nearest to the selected date **of the same year** is shown; a year without maps shows none, so that a comparison of
+    two years never shows the same map twice. ‹ ›, the arrow button and the calendar know all its dates.
+    Credit on the map and in the exports: *DiscoCH © WSL, CC BY 4.0*.
   - *swissEO NDVIdiff v200_MVC BETA* (`ndvidiff22`) and *swissEO NDVIdiff v200_Median BETA* (`ndvidiff23`): tests computed
     in the page, not official products. The user picks a **window of 7, 16, 30 or 60 days** ending on the selected
     date (layer menu, link `days`, default 30); any day can be selected. Every S2-SR acquisition of the window that passes
@@ -545,7 +569,7 @@ The swissEO Browser therefore always uses the physical reflectance.
   remove and zoom to each entry (each titled with its layer name, prefixed by the data source only for
   the S2-SR layers). With the split effect a handle on the map swipes the top layer, with the
   date of each side next to it. **Each entry shows the date of the data it actually shows**, not the date it was added
-  with: the nearest product for swissEO NDVIdiff, NDVIz and NDVIdiff v200 BETA (e.g. *2026-07-31* for a layer added on
+  with: the nearest product for swissEO NDVIdiff, NDVIz, NDVIdiff v200 BETA and DiscoCH (e.g. *2026-07-31* for a layer added on
   2026-08-13), the VHI day (the nearest one if the chosen day has none; also the end of the VHI season sums) or the
   S2-SR date (*no data* when there is none). The same date is used next to the swipe handle and in the image downloads.
 - **WMS / WMTS** (button next to Compare in the configuration card, as the Copernicus Browser *WMS / WMTS* collection):
@@ -588,7 +612,7 @@ The swissEO Browser therefore always uses the physical reflectance.
     read), and reports which dates were not reached by that day's orbit and which were fully masked. Clouds can additionally be excluded with the scene classification (SCL 3, 8, 9, 10),
     which catches clouds OmniCloudMask misses, and the area can be restricted to forest or to all
     vegetation (the share of valid pixels then refers to the masked area); a custom mask that is switched
-    on for the layer restricts the area in the same way. VHI, NDVIdiff and NDVIz statistics are read from
+    on for the layer restricts the area in the same way. VHI, NDVIdiff, NDVIz and DiscoCH statistics are read from
     their COGs; the two-date layers report the difference (and the change
     report of the NDVI Analyst method) instead of a time series, the VHI season layers the season curve.
     For a large AOI the statistics use coarser grids read from the COG overviews: up to 320 cells across for the
@@ -667,7 +691,7 @@ The swissEO Browser therefore always uses the physical reflectance.
   a clicked location; for the two-date layers the index
   on both sides and the difference; for the window composites (NDVIdiff v200_MVC / _Median BETA) both composites, the
   number of clear observations in each window and the difference; for the Forest Disturbance Classification the class; for VHI,
-  NDVIdiff, NDVIdiff v200 BETA and NDVIz the product value; for the VHI season layers the cumulative
+  NDVIdiff, NDVIdiff v200 BETA, NDVIz and DiscoCH the product value; for the VHI season layers the cumulative
   deficit, the days with VHI below 10 and the days with a VHI value.
 - **Coordinates**: positions are LV95 (EPSG:2056) everywhere: the map centre in the permalink
   (`center=2703331.08,1133878.99`, as on map.geo.admin.ch), the mouse position at the bottom right, the compare entries,
@@ -857,6 +881,7 @@ the README of `main` on GitHub.
 - [x] `ndvidiff`: swissEO NDVIdiff *(Default, Drought, Forest)*
 - [x] `ndviz`: swissEO NDVIz *(Drought, Forest)*
 - [ ] `ndvidiff2`: swissEO NDVIdiff v200 BETA *(Drought, Forest)*
+- [ ] `discoch`: DiscoCH probability of leaf discoloration *(Drought, Forest)*
 - [x] `vhidef`: VHI cumulative deficit *(Forest)*, checked by FOEN
 - [x] `vhiext`: VHI days in extreme stress *(Forest)*, checked by FOEN
 - [ ] `fdc`: Forest Disturbance Classification *(Forest)*
@@ -1217,7 +1242,7 @@ Parameter names follow the Copernicus Browser where an equivalent exists.
 | `layerMenu` | `open` | The menu of the active layer is open (default: closed) |
 | `showLayer` | `false` | The active layer is hidden, only the background map is shown |
 | `themeId` | `DROUGHT` | Configuration: `DEFAULT`, `AGRICULTURE`, `DROUGHT`, `DROUGHT2026`, `FOREST` (when missing or not containing the layer, the first configuration with the layer is used) |
-| `layerId` | `ndvi` | `true`, `nir`, `urban`, `swir`, `agri`, `geo`, `barren`, `hon`, `ndvi`, `ndwi`, `ndmi`, `ndsi`, `nbr`, `aot`, `evi`, `savi`, `ndre`, `mtvi2`, `mstress`, `nddi`, `nddichg`, `analyst`, `fdc`, `scl`, `cloud`, `terrain` (S2-SR); `vhi`, `vhiveg` (VHI); `vhidef`, `vhiext` (VHI season sums); `ndvidiff`, `ndvidiff2` (v200 BETA), `ndvidiff22`, `ndvidiff23` (v200_MVC / _Median BETA, computed in the page), `ndviz` |
+| `layerId` | `ndvi` | `true`, `nir`, `urban`, `swir`, `agri`, `geo`, `barren`, `hon`, `ndvi`, `ndwi`, `ndmi`, `ndsi`, `nbr`, `aot`, `evi`, `savi`, `ndre`, `mtvi2`, `mstress`, `nddi`, `nddichg`, `analyst`, `fdc`, `scl`, `cloud`, `terrain` (S2-SR); `vhi`, `vhiveg` (VHI); `vhidef`, `vhiext` (VHI season sums); `ndvidiff`, `ndvidiff2` (v200 BETA), `ndvidiff22`, `ndvidiff23` (v200_MVC / _Median BETA, computed in the page), `ndviz`; `discoch` (WSL, BETA) |
 | `valueRange` | `[0,0.9]` | Colour-scale min/max of index and continuous layers |
 | `threshold` | `0.5` | NDSI snow threshold (default 0.42; above it snow is shown in blue, otherwise true colour, as in the Copernicus Browser); NDVI difference to a reference date change threshold (default −0.08) |
 | `refDate` | `2025-07-01` | Reference date of the two-date layers (default: the same day one year earlier) |
@@ -1272,6 +1297,8 @@ Example:
   areas, long date ranges and large prints take a while. Imports and custom masks have size limits (see
   *Limits of the browser*); areas and masks from files are not shared through links.
 - swissEO NDVIdiff v200 BETA is beta data from example files outside STAC; its list of windows is fixed in the page.
+- DiscoCH is read from a bucket of WSL (SWITCH): when it is not reachable the layer shows *Catalogue request failed*, the other
+  layers are not affected.
 - WMS / WMTS: only services that allow cross-origin requests (CORS) can be read, and only over HTTPS; layers that the
   service offers in none of LV95, LV03, Web Mercator, UTM 32N and WGS84 cannot be shown. Layers not in LV95 are placed on
   the LV95 grid per tile (accurate to about a pixel), not reprojected per pixel. Services whose images come without
@@ -1287,7 +1314,8 @@ Example:
   contain modified Copernicus Sentinel data. 3D terrain: [swissALTI3D](https://www.swisstopo.admin.ch/en/height-model-swissalti3d), [swissALTIRegio](https://www.geocat.ch/datahub/dataset/f7f058e9-288b-4c55-8f4e-6360880dbb59) and swissSURFACE3D
   © swisstopo. Masks: [Forest Type NFI](https://doi.org/10.16904/1000001.7) © WSL (Waser et al. 2025, funded by the BAFU);
   [ETH tree species](https://arxiv.org/abs/2611.08095) © Zhou et al. 2026 (ETH Zürich), CC BY-NC 4.0 (non-commercial use only);
-  [Nutzungsflächen](https://www.geocat.ch/datahub/dataset/ae183bc4-5c91-467e-89bc-85f390340efb) © BLW and the cantons. Layers of other WMS / WMTS services
+  [Nutzungsflächen](https://www.geocat.ch/datahub/dataset/ae183bc4-5c91-467e-89bc-85f390340efb) © BLW and the cantons. [DiscoCH](https://doi.org/10.1016/j.jag.2026.105394)
+  (BETA) © WSL (Bloom et al. 2026), CC BY 4.0. Layers of other WMS / WMTS services
   © their providers.
 - User-interface workflow modelled on the [Copernicus Browser](https://browser.dataspace.copernicus.eu/)
   by the Copernicus Data Space Ecosystem ([eu-cdse/copernicus-browser](https://github.com/eu-cdse/copernicus-browser):

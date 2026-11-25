@@ -190,6 +190,7 @@ COG = {  # COG products: url pattern, scale, fill, missing, validity
     "ndvidiff": dict(scale=0.001, fill=32701, missing=32700, valid=lambda v, res: (v < 32700) & (ovr_free(res) | ((v >= -1000) & (v <= 1000)))),
     "ndviz": dict(scale=0.01, fill=32701, missing=32700, valid=lambda v, res: (v < 32700) & (ovr_free(res) | ((v >= -2000) & (v <= 2000)))),
     "ndvidiff2": dict(scale=0.001, fill=32701, missing=None, valid=lambda v, res: (v >= -2000) & (v <= 2000)),
+    "discoch": dict(scale=1, fill=255, missing=None, valid=lambda v, res: v <= 100),
 }
 
 
@@ -200,6 +201,8 @@ def ovr_free(res):
 def cog_url(lid, item):
     if lid == "ndvidiff2":
         return "https://cms.geo.admin.ch/Topo/umweltbeobachtung/beispiele/NDVIDIFFV2/swisseo_s2-sr_v200_mosaic_" + item + "_ndvidiff-forest_10m.tif"
+    if lid == "discoch":
+        return "https://zhc-c.s3.cloud.switch.ch/discoch/cogs/discoch-retro/DiscoCH_RETRO_" + item[:10] + ".tif"
     prod = {"ndvidiff": "ndvi_diff", "ndviz": "ndvi_z"}[lid]
     coll = "ch.swisstopo.swisseo_" + prod + "_v100"
     for f in stac_day(coll, item[:10]):
