@@ -26,7 +26,6 @@ permissions:
   contents: read
   pages: write
   id-token: write
-  actions: read           # the list of the run's artifacts (step "Wait until GitHub lists the artifact")
 
 concurrency:
   group: pages
@@ -37,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deploy1.outputs.page_url || steps.deploy2.outputs.page_url || steps.deploy3.outputs.page_url || steps.deploy4.outputs.page_url }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -111,23 +110,40 @@ jobs:
           name: github-pages-${{ github.run_attempt }}
           path: _site
 
-      # GitHub sometimes lists an artifact only some seconds after its upload; deploy-pages asks once, right
-      # away, and fails with 'No artifacts named "github-pages" were found' (21 and 25 November 2026).
-      - name: Wait until GitHub lists the artifact
-        env:
-          GH_TOKEN: ${{ github.token }}
-          NAME: github-pages-${{ github.run_attempt }}
-        run: |
-          for i in $(seq 1 24); do
-            n=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/artifacts?name=$NAME" --jq .total_count || echo 0)
-            [ "$n" = 1 ] && { echo "$NAME is listed"; exit 0; }
-            echo "$NAME is not listed yet ($i)"
-            sleep 5
-          done
-          echo "::error::$NAME was uploaded but GitHub does not list it; please re-run this workflow later"
-          exit 1
+      # GitHub's internal list, which deploy-pages reads once right after the upload, can lag behind it by seconds (up to
+      # 46 s reported, actions/deploy-pages#451): it then fails with 'No artifacts named "github-pages" were found' (21
+      # and 25 November 2026). So the deploy is tried up to four times, 15, 45 and 90 s apart, with the same artifact.
+      - id: deploy1
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+        continue-on-error: true
+        with:
+          artifact_name: github-pages-${{ github.run_attempt }}
 
-      - id: deployment
+      - name: Wait before deploy attempt 2
+        if: steps.deploy1.outcome == 'failure'
+        run: sleep 15
+      - id: deploy2
+        if: steps.deploy1.outcome == 'failure'
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+        continue-on-error: true
+        with:
+          artifact_name: github-pages-${{ github.run_attempt }}
+
+      - name: Wait before deploy attempt 3
+        if: steps.deploy2.outcome == 'failure'
+        run: sleep 45
+      - id: deploy3
+        if: steps.deploy2.outcome == 'failure'
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+        continue-on-error: true
+        with:
+          artifact_name: github-pages-${{ github.run_attempt }}
+
+      - name: Wait before deploy attempt 4
+        if: steps.deploy3.outcome == 'failure'
+        run: sleep 90
+      - id: deploy4
+        if: steps.deploy3.outcome == 'failure'
         uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
         with:
           artifact_name: github-pages-${{ github.run_attempt }}
