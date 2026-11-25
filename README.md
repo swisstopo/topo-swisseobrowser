@@ -438,6 +438,10 @@ The swissEO Browser therefore always uses the physical reflectance.
     nearest to the selected date **of the same year** is shown; a year without maps shows none, so that a comparison of
     two years never shows the same map twice. ‹ ›, the arrow button and the calendar know all its dates.
     Credit on the map and in the exports: *DiscoCH © WSL, CC BY 4.0*.
+    **Complete product** (`complete` in `SOURCES`): the maps are finished and masked by WSL, so the layer menu offers no
+    cloud, shadow, terrain and low-illumination masks (the custom mask stays), and the statistics have no *masked* share
+    and no *Min. valid pixels*: every map counts. The time series is drawn from 0 % to the highest value of the area
+    (mean + σ, the band kept within 0–100 %), the histogram has classes of 2 % (the values are whole percents).
   - *swissEO NDVIdiff v200_MVC BETA* (`ndvidiff22`) and *swissEO NDVIdiff v200_Median BETA* (`ndvidiff23`): tests computed
     in the page, not official products. The user picks a **window of 7, 16, 30 or 60 days** ending on the selected
     date (layer menu, link `days`, default 30); any day can be selected. Every S2-SR acquisition of the window that passes
@@ -612,7 +616,9 @@ The swissEO Browser therefore always uses the physical reflectance.
     read), and reports which dates were not reached by that day's orbit and which were fully masked. Clouds can additionally be excluded with the scene classification (SCL 3, 8, 9, 10),
     which catches clouds OmniCloudMask misses, and the area can be restricted to forest or to all
     vegetation (the share of valid pixels then refers to the masked area); a custom mask that is switched
-    on for the layer restricts the area in the same way. VHI, NDVIdiff, NDVIz and DiscoCH statistics are read from
+    on for the layer restricts the area in the same way. When a product of
+    another day is shown (VHI, NDVIdiff, NDVIz, DiscoCH), the heading, the file name and the row `data_date` of the CSV name
+    that day. VHI, NDVIdiff, NDVIz and DiscoCH statistics are read from
     their COGs; the two-date layers report the difference (and the change
     report of the NDVI Analyst method) instead of a time series, the VHI season layers the season curve.
     For a large AOI the statistics use coarser grids read from the COG overviews: up to 320 cells across for the

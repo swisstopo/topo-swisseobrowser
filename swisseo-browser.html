@@ -466,7 +466,7 @@ body.is3d .maplibregl-ctrl-bottom-right .zoom-ctl{margin-right:34px}
 .stgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:6px 0}
 .stgrid div{background:var(--bg);padding:6px 8px;font-size:11px;color:var(--muted)}
 .stgrid b{display:block;color:var(--blue);font-size:14px;font-family:ui-monospace,Consolas,monospace}
-.chart{width:100%;height:auto;display:block;margin-top:6px}
+.chart{width:100%;height:auto;display:block;margin-top:6px;overflow:visible}
 .chart text{font:10px Arial,sans-serif;fill:#555}
 .chart .ax{stroke:#999;stroke-width:1}
 .chart .gr{stroke:#e5e5e5;stroke-width:1}
@@ -2742,8 +2742,9 @@ const SOURCES = {
     note: "two-month mosaics ending 31 July, 31 August and 30 September",
     items: ["2017-07-31t235959", "2017-08-31t235959", "2017-09-30t235959", "2018-07-31t235959", "2018-08-31t235959", "2018-09-30t235959", "2019-07-31t235959", "2019-08-31t235959", "2019-09-30t235959", "2020-07-31t235959", "2020-08-31t235959", "2020-09-30t235959", "2021-07-31t235959", "2021-08-31t235959", "2021-09-30t235959", "2022-07-31t235959", "2022-08-31t235959", "2022-09-30t235959", "2023-07-31t235959", "2023-08-31t235959", "2023-09-30t235959", "2024-07-31t235959", "2024-08-31t235959", "2024-09-30t235959", "2025-07-31t235959", "2025-08-31t235959", "2025-09-30t235959", "2026-07-31t235959", "2026-08-31t235959", "2026-09-30t235959"] },
   // BETA, from the static STAC catalogue of WSL (stac: the collection.json, whose item links are the dates): a map every
-  // 5 days from June to September; sameYear: a date of a year without maps shows none (and not the nearest one)
-  discoch: { coll: null, stac: DISCOCH + "discoch-retro/collection.json", name: "WSL DiscoCH", firstYear: 2026, sparse: true, sameYear: true,
+  // 5 days from June to September; sameYear: a date of a year without maps shows none (and not the nearest one);
+  // complete: finished maps, so no cloud, shadow and terrain masks and no wording about orbits and valid shares
+  discoch: { coll: null, stac: DISCOCH + "discoch-retro/collection.json", name: "WSL DiscoCH", firstYear: 2026, sparse: true, sameYear: true, complete: true,
     credit: 'DiscoCH &copy; <a href="' + DOI_DISCOCH + '" target="_blank" rel="noopener">WSL</a>, CC BY 4.0' }
 };
 const NDVIDIFF2_BASE = "https://cms.geo.admin.ch/Topo/umweltbeobachtung/beispiele/NDVIDIFFV2/";
@@ -3801,6 +3802,8 @@ function mdLite(text) {
 }
 LAYERS.forEach(r => { if (r.ramp) r.domain = [r.min, r.max]; });
 const MASKABLE = { rgb: 1, index: 1, cont: 1, terrain: 1, fnrgb: 1, diff2: 1, fnclass: 1, wincomp: 1 };
+/* A complete product of another provider (DiscoCH): its masks are already in the maps, so none are offered. */
+const isComplete = rec => !!(SOURCES[rec.source] && SOURCES[rec.source].complete);
 /* The terrain mask (terrainmask_10m: 0–180 solar incidence angle in degrees, 200 shadow, 255 no data) as a test of one
    layer's settings: terrain shadow (200) and, with the illumination mask, an incidence angle at or above the threshold,
    i.e. a slope the sun hardly lights (issue #53). null when neither is on, so the grid is not read. */
@@ -4291,7 +4294,7 @@ function settingsToObj(rec, s) {
   if (rec.type === "wincomp" && s.days !== d.days) o.days = s.days;
   if (rec.type !== "wms" && !rec.ext && (s.cmask === "in" || s.cmask === "out")) o.customMask = s.cmask;
   if (s.opacity !== 100) o.opacity = s.opacity;
-  if (MASKABLE[rec.type]) {
+  if (MASKABLE[rec.type] && !isComplete(rec)) {
     if (s.cloud !== d.cloud) o.cloudMask = s.cloud;
     if (s.shadow !== d.shadow) o.shadowMask = s.shadow;
     if (s.terrain !== d.terrain) o.terrainMask = s.terrain;
@@ -6042,7 +6045,7 @@ function layerBody(rec) {
 
   /* ---- masks ---- */
   if (rec.source === "s2") sec(t("layer.masks", "Masks"));
-  if (MASKABLE[rec.type]) {
+  if (MASKABLE[rec.type] && !isComplete(rec)) {
     const tog = (key, label, small, relist) => {
       const l = el("label", "tog");
       l.innerHTML = "<span>" + label + "<small>" + small + "</small></span>";
@@ -7483,6 +7486,9 @@ function niceTicks(a, b, n) {
   return { ticks: t, lo: Math.min(a, t[0]), hi: Math.max(b, t[t.length - 1]) };
 }
 const fmtNum = v => fmtLoc(v, Math.abs(v) >= 100 ? 0 : Math.abs(v) >= 1 ? 2 : 3);
+/* Values in percent (DiscoCH, whole numbers from 0 to 100): at most d decimals, no trailing zeros. */
+const isPct = r => r.unit === "%";
+const fmtPct = (v, d) => I18N.fmtNumber(+(+v).toFixed(d), { maximumFractionDigits: d, useGrouping: false });
 function lineChart(series, o) {
   const W = 640, H = 250, m = { l: 48, r: 12, t: 10, b: 34 };
   const pts = series.flatMap(s => s.pts);
@@ -7496,7 +7502,7 @@ function lineChart(series, o) {
   let s = '<svg class="chart" viewBox="0 0 ' + W + " " + H + '">';
   yt.ticks.forEach(t => {
     s += '<line class="gr" x1="' + m.l + '" x2="' + (W - m.r) + '" y1="' + Y(t) + '" y2="' + Y(t) + '"/>' +
-         '<text x="' + (m.l - 5) + '" y="' + (Y(t) + 3) + '" text-anchor="end">' + fmtNum(t) + "</text>";
+         '<text x="' + (m.l - 5) + '" y="' + (Y(t) + 3) + '" text-anchor="end">' + (o.yFmt || fmtNum)(t) + "</text>";
   });
   const xt = o.xTicks || Array.from({ length: 6 }, (_, i) => x0 + (x1 - x0) * i / 5);
   xt.forEach(t => {
@@ -7543,7 +7549,10 @@ const fineBins = (hist, lo0, k1) => (lo, hi, nb) => {
 function histChart(sorted, lo, hi, colorOf, xLabel) {
   return histBars(sortedBins(sorted)(lo, hi, 40), lo, hi, colorOf, xLabel);
 }
-function histBars(bins, lo, hi, colorOf, xLabel) {
+/* Number of classes: 40, for whole percents as many as give every class the same number of values (0–100: 50 of 2 %). */
+const histN = (r, lo, hi) => isPct(r) ? Math.max(1, Math.round((hi - lo) / Math.max(1, Math.ceil((hi - lo) / 50)))) : 40;
+function histBars(bins, lo, hi, colorOf, xLabel, fmt) {
+  fmt = fmt || fmtNum;
   const NB = bins.length, W = 640, H = 170, m = { l: 48, r: 12, t: 8, b: 30 }, w = (hi - lo) / NB || 1;
   const mx = Math.max(...bins) || 1, bw = (W - m.l - m.r) / NB;
   let s = '<svg class="chart" viewBox="0 0 ' + W + " " + H + '">';
@@ -7551,12 +7560,12 @@ function histBars(bins, lo, hi, colorOf, xLabel) {
     const h = c / mx * (H - m.t - m.b), v = lo + (i + 0.5) * w, col = colorOf ? colorOf(v) : "#003F6B";
     s += '<rect x="' + (m.l + i * bw + 0.5).toFixed(1) + '" y="' + (H - m.b - h).toFixed(1) + '" width="' + (bw - 1).toFixed(1) +
          '" height="' + h.toFixed(1) + '" fill="' + col + '" stroke="rgba(0,0,0,.25)" stroke-width=".5"><title>' +
-         fmtNum(lo + i * w) + " – " + fmtNum(lo + (i + 1) * w) + ": " + c + " px</title></rect>";
+         fmt(lo + i * w) + " – " + fmt(lo + (i + 1) * w) + ": " + c + " px</title></rect>";
   });
   s += '<line class="ax" x1="' + m.l + '" x2="' + (W - m.r) + '" y1="' + (H - m.b) + '" y2="' + (H - m.b) + '"/>';
   for (let i = 0; i <= 4; i++) {
     const v = lo + (hi - lo) * i / 4, x = m.l + (W - m.l - m.r) * i / 4;
-    s += '<text x="' + x + '" y="' + (H - m.b + 14) + '" text-anchor="middle">' + fmtNum(v) + "</text>";
+    s += '<text x="' + x + '" y="' + (H - m.b + 14) + '" text-anchor="middle">' + fmt(v) + "</text>";
   }
   s += '<text x="' + (W - m.r) + '" y="' + (H - 2) + '" text-anchor="end">' + xLabel + "</text>" +
        '<text x="' + (m.l - 5) + '" y="' + (m.t + 8) + '" text-anchor="end">' + mx + "</text></svg>";
@@ -7594,6 +7603,7 @@ function openStats() {
   $("#stDate").textContent = fmtDay(state.date);
   const noTs = r.type === "class" || r.type === "fnclass" || rec.type === "diff2" || rec.type === "wincomp" || rec.type === "vhiseason";
   $("#stTsCtl").hidden = noTs;
+  $("#stMinValid").closest("label").hidden = isComplete(r);          // the share of pixels with a value is the same on every date
   $("#stProg").textContent = r.type === "class" || r.type === "fnclass" ? t("stats.noTsClass", "Time series are not available for categorical layers.") :
     rec.type === "diff2" ? t("stats.noTsDiff", "Time series are not available for the two-date layers. Use the index itself (NDVI, NDDI) for a time series.") :
     rec.type === "wincomp" ? t("stats.noTsWindow", "Time series are not available for the window composites. Use NDVI for a time series.") :
@@ -7614,6 +7624,7 @@ $("#stCloud").onchange = $("#stScl").onchange = $("#stTerr").onchange = $("#stIl
 /* Statistics of the selected date over the area of interest: on the coarse grid (fast) or at 10 m when "Full resolution"
    is chosen in the box below the info line (issue #11); the result comes with a CSV download. */
 let stRes = "coarse", stCurAbort = null;
+let stDay = null;                // the day of the data, when the layer shows another one than the selected date (otherDay)
 async function runCurrentStats() {
   const rec = stRec, r = statRec(rec), box = $("#stCur");
   if (stCurAbort) stCurAbort.abort();                 // settings changed: a running computation is outdated
@@ -7630,6 +7641,8 @@ async function runCurrentStats() {
   try {
     const scenes = await scenesFor(rec, state.date, state.cc);
     if (signal.aborted) return;
+    stDay = otherDay(rec, scenes);
+    $("#stDate").textContent = stDay ? t("stats.dataDay", "{{day}} (data nearest to {{date}})", { day: fmtDay(stDay), date: fmtDay(state.date) }) : fmtDay(state.date);
     if (!scenes.length) { box.innerHTML = '<div class="hint">' + t("stats.noAcq", "No acquisition on {{date}}.", { date: fmtDay(state.date) }) + "</div>"; return; }
     const opt = { maskClouds: $("#stCloud").checked, maskScl: $("#stScl").checked, maskTerrain: $("#stTerr").checked,
                   maskIllum: $("#stIllum").checked ? S(rec).illumThr : null, veg: stVeg,
@@ -7650,7 +7663,7 @@ async function runCurrentStats() {
     if (out.csv) {
       const dl = el("button", "btn sec sm", t("stats.downloadCsv", "Download CSV"));
       dl.style.marginTop = "6px";
-      dl.onclick = () => downloadText("swissEO_" + rec.id + "_aoi_statistics_" + (ten ? 10 : grid.res) + "m_" + state.date + ".csv",
+      dl.onclick = () => downloadText("swissEO_" + rec.id + "_aoi_statistics_" + (ten ? 10 : grid.res) + "m_" + (stDay || state.date) + ".csv",
                                       out.csv.map(csvLine).join("\n") + "\n", "text/csv");
       box.append(dl);
     }
@@ -7695,19 +7708,21 @@ function curStatsHtml(rec, r, res) {
     }).join("") || '<div class="hint">' + t("stats.noData", "No data in the area of interest.") + "</div>";
   }
   const st = res.bands;
-  if (!st[0]) return '<div class="hint">' + t("stats.noValid", "No valid pixels (all masked or outside the swath).") + "</div>";
+  if (!st[0]) return '<div class="hint">' + (isComplete(r) ? t("stats.noValue", "No pixel with a value in the area of interest.")
+    : t("stats.noValid", "No valid pixels (all masked or outside the swath).")) + "</div>";
   if (r.type === "rgb") return '<div class="stgrid">' +
     [t("layer.red", "Red"), t("layer.green", "Green"), t("layer.blue", "Blue")].map((c, i) => c + " " + r.bands[i].toUpperCase())
     .map((n, i) => "<div>" + t("stats.meanRho", "{{band}} mean ρ", { band: n }) + "<b>" + fmtLoc(st[i].mean, 4) + "</b>σ " + fmtLoc(st[i].sd, 4) + "</div>").join("") +
     "<div>" + t("stats.validPixels", "Valid pixels") + "<b>" + pct(st[0].n) + "</b>" + t("stats.maskedLower", "masked") + " " + pct(res.masked) + "</div></div>";
-  const s0 = st[0], [lo, hi, col] = histStyle(rec, r, s0);
+  const s0 = st[0], [lo, hi, col] = histStyle(rec, r, s0), p = isPct(r);
+  const num = p ? v => fmtPct(v, 2) + " %" : fmtNum, val = p ? v => fmtPct(v, 1) + " %" : fmtNum;      // means · values
   return '<div class="stgrid">' +
-    "<div>" + t("stats.mean", "Mean") + "<b>" + fmtNum(s0.mean) + "</b></div><div>" + t("stats.sd", "Std. dev.") + "<b>" + fmtNum(s0.sd) + "</b></div>" +
-    "<div>" + t("stats.median", "Median") + "<b>" + fmtNum(s0.median) + "</b></div><div>" + t("stats.validPixels", "Valid pixels") + "<b>" + pct(s0.n) + "</b></div>" +
-    "<div>" + t("stats.min", "Min") + "<b>" + fmtNum(s0.min) + "</b></div><div>" + t("stats.max", "Max") + "<b>" + fmtNum(s0.max) + "</b></div>" +
-    "<div>P10 / P90<b>" + fmtNum(s0.p10) + " / " + fmtNum(s0.p90) + "</b></div>" +
-    "<div>" + (r.type === "terrain" ? t("stats.shadow", "Shadow") : t("stats.masked", "Masked")) + "<b>" + pct(r.type === "terrain" ? res.shadow : res.masked) + "</b></div></div>" +
-    histBars(res.bins(lo, hi, 40), lo, hi, col, unitOf(r) + (r.ramp ? " " + t("stats.legendRange", "(legend range)") : ""));
+    "<div>" + t("stats.mean", "Mean") + "<b>" + num(s0.mean) + "</b></div><div>" + t("stats.sd", "Std. dev.") + "<b>" + num(s0.sd) + "</b></div>" +
+    "<div>" + t("stats.median", "Median") + "<b>" + val(s0.median) + "</b></div><div>" + t("stats.validPixels", "Valid pixels") + "<b>" + pct(s0.n) + "</b></div>" +
+    "<div>" + t("stats.min", "Min") + "<b>" + val(s0.min) + "</b></div><div>" + t("stats.max", "Max") + "<b>" + val(s0.max) + "</b></div>" +
+    "<div>P10 / P90<b>" + val(s0.p10) + " / " + val(s0.p90) + "</b></div>" +
+    (isComplete(r) ? "" : "<div>" + (r.type === "terrain" ? t("stats.shadow", "Shadow") : t("stats.masked", "Masked")) + "<b>" + pct(r.type === "terrain" ? res.shadow : res.masked) + "</b></div>") + "</div>" +
+    histBars(res.bins(lo, hi, histN(r, lo, hi)), lo, hi, col, unitOf(r) + (r.ramp ? " " + t("stats.legendRange", "(legend range)") : ""), p ? fmtTick : null);
 }
 
 /* ---- full resolution: the area of interest at 10 m, in chunks ---- */
@@ -7794,7 +7809,8 @@ function stResBox() {
           : t("stats.full", "<b>Full resolution:</b> the selected date is computed at 10 m, in pieces of 1024 × 1024 cells (about {{cells}} cells; a canton takes several minutes, a time series longer).", { cells }))
     : (ts ? t("stats.largeTs", "<b>Large area:</b> to stay quick, the statistics use a coarser grid read from the overviews of the data (<b>{{gs}} m</b> for the selected date, <b>{{gt}} m</b> for the time series).", { gs, gt })
           : t("stats.large", "<b>Large area:</b> to stay quick, the statistics use a coarser grid read from the overviews of the data (<b>{{gs}} m</b> for the selected date).", { gs })) + " " +
-      t("stats.largeMix", "A cell mixes what lies in it (for example forest and field) and the masks are applied at that size") +
+      (isComplete(stRec) ? t("stats.largeMixOnly", "A cell mixes what lies in it (for example forest and field)")
+        : t("stats.largeMix", "A cell mixes what lies in it (for example forest and field) and the masks are applied at that size")) +
       (stRec.modal ? t("stats.largeEdge", "; the 3 × 3 edge filter covers {{m}} m instead of 30 m", { m: 3 * gs }) : "") + ". " +
       t("stats.largeDiffer", "The values can differ from a 10 m analysis.");
   const seg = el("div", "seg");
@@ -7815,7 +7831,7 @@ function stResBox() {
   b.append(row);
 }
 const csvLine = a => a.map(v => /[",\n]/.test(String(v)) ? '"' + String(v).replace(/"/g, '""') + '"' : v).join(",");
-const csvHead = (rec, opt, res) => [["layer", rec.name + " (" + rec.id + ")"], ["date", state.date]].concat(rec.source === "s2" ? [
+const csvHead = (rec, opt, res) => [["layer", rec.name + " (" + rec.id + ")"], ["date", state.date]].concat(stDay ? [["data_date", stDay]] : [], rec.source === "s2" ? [
   ["vegetation_mask", vegOn(opt.veg) ? vegName(opt.veg) : "none"], ["clouds_masked", !!opt.maskClouds],
   ["scl_clouds_masked", !!opt.maskScl], ["terrain_shadow_masked", !!opt.maskTerrain],
   ["low_illumination_masked", opt.maskIllum != null ? "incidence >= " + opt.maskIllum + " deg" : false]] : [],
@@ -7835,7 +7851,7 @@ function statsCsv(rec, r, t, opt, res) {
   rows.push([], ["band", "valid_cells"].concat(keys));
   t.bands.forEach((s, b) => { if (s) rows.push([rgb ? r.bands[b].toUpperCase() : unitOf(r), s.n].concat(keys.map(k => +s[k].toPrecision(6)))); });
   if (t.bands[0] && r.type !== "rgb") {
-    const [lo, hi] = histStyle(rec, r, t.bands[0]), bins = t.bins(lo, hi, 40), w = (hi - lo) / 40;
+    const [lo, hi] = histStyle(rec, r, t.bands[0]), nb = histN(r, lo, hi), bins = t.bins(lo, hi, nb), w = (hi - lo) / nb;
     rows.push([], ["histogram_from", "histogram_to", "cells"]);
     bins.forEach((c, i) => rows.push([+(lo + i * w).toPrecision(6), +(lo + (i + 1) * w).toPrecision(6), c]));
   }
@@ -8095,7 +8111,7 @@ async function seriesDates(rec, from, to) {
 
 function drawSeries() {
   const r = statRec(stRec);
-  const minV = +$("#stMinValid").value;
+  const minV = isComplete(r) ? 0 : +$("#stMinValid").value, p100 = isPct(r);
   const pts = stSeries.filter(p => p.st && p.valid >= minV).sort((a, b) => a.date.localeCompare(b.date));
   const lab = p => fmtDay(p.date) + (p.valid != null ? " · " + t("series.valid", "valid {{pct}} %", { pct: fmtLoc(p.valid, 0) }) : "");
   let series;
@@ -8104,11 +8120,16 @@ function drawSeries() {
       pts: pts.filter(p => p.st[i]).map(p => ({ x: Date.parse(p.date), y: p.st[i].mean, label: lab(p) + " · ρ " + fmtLoc(p.st[i].mean, 4) })) }));
   } else {
     series = [{ name: "", color: "#003F6B", pts: pts.map(p => ({ x: Date.parse(p.date), y: p.st[0].mean,
-      lo: p.st[0].mean - p.st[0].sd, hi: p.st[0].mean + p.st[0].sd,
-      label: lab(p) + " · " + t("series.mean", "mean {{mean}} ± {{sd}}", { mean: fmtNum(p.st[0].mean), sd: fmtNum(p.st[0].sd) }) })) }];
+      lo: p100 ? Math.max(0, p.st[0].mean - p.st[0].sd) : p.st[0].mean - p.st[0].sd,
+      hi: p100 ? Math.min(100, p.st[0].mean + p.st[0].sd) : p.st[0].mean + p.st[0].sd,
+      label: lab(p) + " · " + t("series.mean", "mean {{mean}} ± {{sd}}", p100 ? { mean: fmtPct(p.st[0].mean, 2), sd: fmtPct(p.st[0].sd, 2) + " %" }
+        : { mean: fmtNum(p.st[0].mean), sd: fmtNum(p.st[0].sd) }) })) }];
   }
+  // percentages: from 0 to the highest value of the area; the axis of a complete product names dates that have a map
+  const xs = pts.map(p => Date.parse(p.date)), top = p100 ? Math.max(5, ...series[0].pts.map(p => p.hi)) : 100;
   $("#stChart").innerHTML = lineChart(series, { time: true, yLabel: (r.type === "index" && r.unit ? recName(r) : unitOf(r)) + (r.type === "rgb" ? "" : " " + t("series.meanSd", "(mean ± σ)")),
-    yMin: r.source === "vhi" || r.unit === "%" ? 0 : undefined, yMax: r.source === "vhi" || r.unit === "%" ? 100 : undefined });
+    yMin: r.source === "vhi" || p100 ? 0 : undefined, yMax: r.source === "vhi" || p100 ? top : undefined, yFmt: p100 ? fmtTick : null,
+    xTicks: isComplete(r) && xs.length > 1 ? (xs.length <= 6 ? xs : Array.from({ length: 6 }, (_, i) => xs[Math.round(i * (xs.length - 1) / 5)])) : null });
 }
 
 function seriesSummary(total, stopped) {
@@ -8116,6 +8137,9 @@ function seriesSummary(total, stopped) {
   const notCov = stSeries.filter(p => p.covered === 0).length;
   const allMasked = stSeries.filter(p => !p.st && p.covered > 0).length;
   const o = { n: stSeries.length, total, res: stSeriesRes, valid: withValid, masked: allMasked, notCov };
+  if (isComplete(statRec(stRec))) return (stopped ? t("series.summaryProductStopped", "Stopped after {{n}} of {{total}} dates on a {{res}} m grid; hover a point for details.", o)
+      : t("series.summaryProduct", "{{n}} dates on a {{res}} m grid; hover a point for details.", o)) +
+    (stSeriesRes > 10 ? " " + t("series.coarseMix", "A cell of {{res}} m mixes what lies in it: choose Full resolution (10 m) at the top.", o) : "");
   return (stopped ? t("series.summaryStopped", "Stopped after {{n}} of {{total}} dates on a {{res}} m grid: {{valid}} with valid pixels, {{masked}} fully masked, {{notCov}} not reached by that day's orbit.", o)
                   : t("series.summary", "{{n}} dates on a {{res}} m grid: {{valid}} with valid pixels, {{masked}} fully masked, {{notCov}} not reached by that day's orbit.", o)) + " " +
     t("series.summaryHint", "Dates below the minimum share of valid pixels are hidden; hover a point for details.") +
